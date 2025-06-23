@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -17,7 +19,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique:true)]
     private ?string $email = null;
 
     /**
@@ -48,13 +50,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $bio = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $profile_picture_url = null;
+    private ?string $profilePictureUrl = null;
+
+    /**
+     * @var Collection<int, Article>
+     */
+    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'author')]
+    private Collection $articles;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->roles = ['ROLE_USER']; // Default role
         $this->isVerified = false; // Default value for isVerified
+        $this->articles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,12 +201,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getProfilePictureUrl(): ?string
     {
-        return $this->profile_picture_url;
+        return $this->profilePictureUrl;
     }
 
-    public function setProfilePictureUrl(?string $profile_picture_url): static
+    public function setProfilePictureUrl(?string $profilePictureUrl): static
     {
-        $this->profile_picture_url = $profile_picture_url;
+        $this->profilePictureUrl = $profilePictureUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Article>
+     */
+    public function getArticles(): Collection
+    {
+        return $this->articles;
+    }
+
+    public function addArticle(Article $article): static
+    {
+        if (!$this->articles->contains($article)) {
+            $this->articles->add($article);
+            $article->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticle(Article $article): static
+    {
+        if ($this->articles->removeElement($article)) {
+            // set the owning side to null (unless already changed)
+            if ($article->getAuthor() === $this) {
+                $article->setAuthor(null);
+            }
+        }
 
         return $this;
     }
