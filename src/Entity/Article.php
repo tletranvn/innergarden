@@ -28,7 +28,7 @@ class Article
     private ?string $content = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $exerpt = null;
+    private ?string $excerpt = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -50,11 +50,11 @@ class Article
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?user $author = null;
+    private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?categorie $category = null;
+    private ?Categorie $category = null;
 
     /**
      * @var Collection<int, Commentaire>
@@ -64,6 +64,9 @@ class Article
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->viewCount = 0;
+        $this->isPublished = false;
         $this->commentaires = new ArrayCollection();
     }
 
@@ -108,14 +111,14 @@ class Article
         return $this;
     }
 
-    public function getExerpt(): ?string
+    public function getExcerpt(): ?string
     {
-        return $this->exerpt;
+        return $this->excerpt;
     }
 
-    public function setExerpt(?string $exerpt): static
+    public function setExcerpt(?string $excerpt): static
     {
-        $this->exerpt = $exerpt;
+        $this->excerpt = $excerpt;
 
         return $this;
     }
@@ -192,24 +195,24 @@ class Article
         return $this;
     }
 
-    public function getAuthor(): ?user
+    public function getAuthor(): ?User
     {
         return $this->author;
     }
 
-    public function setAuthor(?user $author): static
+    public function setAuthor(?User $author): static
     {
         $this->author = $author;
 
         return $this;
     }
 
-    public function getCategory(): ?categorie
+    public function getCategory(): ?Categorie
     {
         return $this->category;
     }
 
-    public function setCategory(?categorie $category): static
+    public function setCategory(?Categorie $category): static
     {
         $this->category = $category;
 

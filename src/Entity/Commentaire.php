@@ -32,7 +32,7 @@ class Commentaire
 
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?user $author = null;
+    private ?User $author = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'enfantComment')]
     private ?self $parentComment = null;
@@ -45,6 +45,8 @@ class Commentaire
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->isApproved = false; // Default value for new comments
         $this->enfantComment = new ArrayCollection();
     }
 
@@ -101,12 +103,12 @@ class Commentaire
         return $this;
     }
 
-    public function getAuthor(): ?user
+    public function getAuthor(): ?User
     {
         return $this->author;
     }
 
-    public function setAuthor(?user $author): static
+    public function setAuthor(?User $author): static
     {
         $this->author = $author;
 
