@@ -6,6 +6,7 @@ services:
       - "8081:80"
     volumes:
       - ./:/var/www
+      - ./docker/php/vhosts:/etc/apache2/sites-enabled
     networks:
       - innergarden_symfony
 
@@ -15,10 +16,7 @@ services:
     volumes:
       - ./var/db_data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: innergarden
-      MYSQL_USER: tenten
-      MYSQL_PASSWORD: Newstart@2025
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - "3306:3306"
     networks:
@@ -35,6 +33,7 @@ services:
       MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
       # Set the URL of your Symfony project (without trailing slash!) as value of the cors_origins directive
       MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins http://127.0.0.1:8081
         cors_origins http://127.0.0.1:8000
     # Comment the following line to disable the development mode
     command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
