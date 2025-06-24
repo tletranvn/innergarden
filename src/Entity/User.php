@@ -59,10 +59,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $articles;
 
     /**
-     * @var Collection<int, Commentaire>
+     * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'author')]
-    private Collection $commentaires;
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'author')]
+    private Collection $comments;
 
     public function __construct()
     {
@@ -70,7 +70,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = ['ROLE_USER']; // Default role
         $this->isVerified = false; // Default value for isVerified
         $this->articles = new ArrayCollection();
-        $this->commentaires = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -249,29 +249,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Commentaire>
+     * @return Collection<int, Comment>
      */
-    public function getCommentaires(): Collection
+    public function getComments(): Collection
     {
-        return $this->commentaires;
+        return $this->comments;
     }
 
-    public function addCommentaire(Commentaire $commentaire): static
+    public function addComment(Comment $comment): static
     {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
-            $commentaire->setAuthor($this);
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setAuthor($this);
         }
 
         return $this;
     }
 
-    public function removeCommentaire(Commentaire $commentaire): static
+    public function removeComment(Comment $comment): static
     {
-        if ($this->commentaires->removeElement($commentaire)) {
+        if ($this->comments->removeElement($comment)) {
             // set the owning side to null (unless already changed)
-            if ($commentaire->getAuthor() === $this) {
-                $commentaire->setAuthor(null);
+            if ($comment->getAuthor() === $this) {
+                $comment->setAuthor(null);
             }
         }
 

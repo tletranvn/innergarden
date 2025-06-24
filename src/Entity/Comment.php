@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\CommentaireRepository;
+use App\Repository\CommentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
-#[ORM\Entity(repositoryClass: CommentaireRepository::class)]
+#[ORM\Entity(repositoryClass: CommentRepository::class)]
 #[Broadcast]
-class Commentaire
+class Comment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,27 +27,27 @@ class Commentaire
     #[ORM\Column]
     private ?bool $isApproved = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commentaires')]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?Article $article = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commentaires')]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'enfantComment')]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'childComment')]
     private ?self $parentComment = null;
 
     /**
      * @var Collection<int, self>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentComment')]
-    private Collection $enfantComment;
+    private Collection $childComment;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->isApproved = false; // Default value for new comments
-        $this->enfantComment = new ArrayCollection();
+        $this->childComment = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -130,27 +130,27 @@ class Commentaire
     /**
      * @return Collection<int, self>
      */
-    public function getEnfantComment(): Collection
+    public function getChildComment(): Collection
     {
-        return $this->enfantComment;
+        return $this->childComment;
     }
 
-    public function addEnfantComment(self $enfantComment): static
+    public function addChildComment(self $childComment): static
     {
-        if (!$this->enfantComment->contains($enfantComment)) {
-            $this->enfantComment->add($enfantComment);
-            $enfantComment->setParentComment($this);
+        if (!$this->childComment->contains($childComment)) {
+            $this->childComment->add($childComment);
+            $childComment->setParentComment($this);
         }
 
         return $this;
     }
 
-    public function removeEnfantComment(self $enfantComment): static
+    public function removeChildComment(self $childComment): static
     {
-        if ($this->enfantComment->removeElement($enfantComment)) {
+        if ($this->childComment->removeElement($childComment)) {
             // set the owning side to null (unless already changed)
-            if ($enfantComment->getParentComment() === $this) {
-                $enfantComment->setParentComment(null);
+            if ($childComment->getParentComment() === $this) {
+                $childComment->setParentComment(null);
             }
         }
 

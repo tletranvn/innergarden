@@ -54,20 +54,20 @@ class Article
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Categorie $category = null;
+    private ?Category $category = null;
 
     /**
-     * @var Collection<int, Commentaire>
+     * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'article')]
-    private Collection $commentaires;
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'article')]
+    private Collection $comments;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->viewCount = 0;
         $this->isPublished = false;
-        $this->commentaires = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,12 +207,12 @@ class Article
         return $this;
     }
 
-    public function getCategory(): ?Categorie
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory(?Categorie $category): static
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
 
@@ -220,29 +220,29 @@ class Article
     }
 
     /**
-     * @return Collection<int, Commentaire>
+     * @return Collection<int, Comment>
      */
-    public function getCommentaires(): Collection
+    public function getComments(): Collection
     {
-        return $this->commentaires;
+        return $this->comments;
     }
 
-    public function addCommentaire(Commentaire $commentaire): static
+    public function addComment(Comment $comment): static
     {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
-            $commentaire->setArticle($this);
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setArticle($this);
         }
 
         return $this;
     }
 
-    public function removeCommentaire(Commentaire $commentaire): static
+    public function removeComment(Comment $comment): static
     {
-        if ($this->commentaires->removeElement($commentaire)) {
+        if ($this->comments->removeElement($comment)) {
             // set the owning side to null (unless already changed)
-            if ($commentaire->getArticle() === $this) {
-                $commentaire->setArticle(null);
+            if ($comment->getArticle() === $this) {
+                $comment->setArticle(null);
             }
         }
 
