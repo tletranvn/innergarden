@@ -11,6 +11,9 @@ services:
       - innergarden_symfony
     depends_on:
       - db
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
 
   db:
     image: arm64v8/mysql:latest
