@@ -14,6 +14,7 @@ services:
     environment:
       APP_ENV: dev
       APP_DEBUG: 1
+    user: "www-data"
 
   db:
     image: arm64v8/mysql:latest

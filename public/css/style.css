@@ -1,0 +1,341 @@
+/* public/css/style.css */
+
+/* Reset et styles de base */
+body {
+    margin: 0;
+    font-family: 'Quicksand', 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.8;
+    color: #F8F4E3; /* Crème très clair */
+    background-color: #364F6B; /* Bleu-gris profond */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    color: #8FD8D3; /* Bleu-vert pastel */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #C0E8DD; /* Vert menthe plus clair au survol */
+}
+
+/* Navbar */
+.navbar {
+    background: #405D7C; /* Bleu-gris légèrement plus clair */
+    color: #F8F4E3;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    color: #F8F4E3;
+    text-decoration: none;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.navbar-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.navbar-nav li {
+    margin-left: 30px;
+}
+
+.navbar-nav a {
+    color: #F8F4E3;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav a:hover {
+    color: #D8BFD8; /* Lavande clair au survol */
+}
+
+/* Sections principales */
+main {
+    padding: 50px 0;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(rgba(54, 79, 107, 0.7), rgba(54, 79, 107, 0.7)), url('../images/placeholder.png') no-repeat center center/cover;
+    color: #F8F4E3;
+    text-align: center;
+    padding: 150px 20px;
+    margin-bottom: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+}
+
+.hero-section h1 {
+    font-size: 4.2rem;
+    margin-bottom: 25px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+    color: #FEE7DD; /* Pêche pâle */
+}
+
+.hero-section p {
+    font-size: 1.6rem;
+    max-width: 900px;
+    margin: 0 auto;
+    opacity: 0.95;
+    line-height: 1.5;
+}
+
+/* Categories Section */
+.categories-section {
+    padding: 80px 0;
+    text-align: center;
+    background-color: #405D7C;
+    border-radius: 12px;
+    margin-bottom: 80px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.categories-section h2 {
+    font-size: 3.2rem;
+    margin-bottom: 60px;
+    color: #D8BFD8; /* Lavande pour les titres de section */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.category-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 50px;
+}
+
+.card {
+    background: #50718F;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    width: 350px;
+    text-align: left;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    border: 1px solid rgba(216, 191, 216, 0.3);
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.45);
+}
+
+.card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.card h3 {
+    font-size: 2.2rem;
+    color: #FEE7DD;
+    padding: 25px 20px 15px;
+    margin: 0;
+}
+
+.card p {
+    font-size: 1.2rem;
+    color: #DDE5EC;
+    padding: 0 20px 25px;
+    line-height: 1.6;
+}
+
+.card .btn {
+    display: inline-block;
+    background: #D8BFD8;
+    color: #364F6B;
+    padding: 14px 30px;
+    margin: 0 20px 25px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card .btn:hover {
+    background: #C0E8DD;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer */
+.footer {
+    background: #2C3E50;
+    color: #DDE5EC;
+    padding: 50px 0;
+    text-align: center; /* Centralise tout le contenu du footer */
+    margin-top: 80px;
+    box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.footer .social-links {
+    margin-bottom: 20px; /* Ajoute un peu d'espace entre les icônes et le texte */
+}
+
+.footer .social-links a {
+    color: #DDE5EC; /* Couleur des icônes */
+    font-size: 2.2rem;
+    margin: 0 20px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.footer .social-links a:hover {
+    color: #8FD8D3;
+    transform: translateY(-5px);
+}
+
+.footer p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    /* Ajustements pour les tablettes et grands mobiles */
+    .hero-section h1 {
+        font-size: 3.5rem;
+    }
+
+    .hero-section p {
+        font-size: 1.4rem;
+    }
+
+    .categories-section h2 {
+        font-size: 2.8rem;
+    }
+
+    .card {
+        width: 300px; /* Légèrement réduit pour mieux s'adapter sur 2 colonnes */
+    }
+}
+
+@media (max-width: 768px) {
+    /* Ajustements pour les mobiles et petites tablettes */
+    .navbar .container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .navbar-nav {
+        margin-top: 20px;
+        flex-wrap: wrap; /* Permet aux liens de passer à la ligne */
+        justify-content: center;
+    }
+
+    .navbar-nav li {
+        margin: 0 15px 10px; /* Ajoute un peu de marge en bas pour les liens wrapés */
+    }
+
+    .hero-section {
+        padding: 100px 20px;
+        margin-bottom: 60px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.8rem;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+    }
+
+    .categories-section {
+        padding: 60px 0;
+        margin-bottom: 60px;
+    }
+
+    .categories-section h2 {
+        font-size: 2.2rem;
+        margin-bottom: 40px;
+    }
+
+    .category-cards {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px; /* Réduit l'espacement entre les cartes empilées */
+    }
+
+    .card {
+        width: 90%; /* Prend presque toute la largeur sur mobile */
+        max-width: 350px; /* Empêche les cartes de devenir trop larges sur de très grands mobiles */
+    }
+
+    .card img {
+        height: 200px; /* Réduit la hauteur des images de carte */
+    }
+
+    .card h3 {
+        font-size: 1.8rem;
+    }
+
+    .card p {
+        font-size: 1rem;
+    }
+
+    .card .btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .footer {
+        margin-top: 60px;
+        padding: 30px 0;
+    }
+
+    .footer .social-links a {
+        font-size: 1.8rem; /* Réduit la taille des icônes */
+        margin: 0 10px;
+    }
+
+    .footer p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustements supplémentaires pour les très petits mobiles */
+    .navbar-brand {
+        font-size: 1.6rem;
+    }
+
+    .navbar-nav li {
+        margin: 0 8px 8px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero-section p {
+        font-size: 1rem;
+    }
+
+    .categories-section h2 {
+        font-size: 1.8rem;
+    }
+}

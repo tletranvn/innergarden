@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted; // pour restreindre l'a
 #[Route('/articles', name: 'articles_')] // This route prefix applies to all methods in this controller
 class ArticleController extends AbstractController
 {
-    #[Route('/', name: 'list')]
+    #[Route('/list', name: 'list')]
     public function list(ArticleRepository $articleRepository): Response // Injectez ArticleRepository
     {
         $articles = $articleRepository->findAll(); // Récupère tous les articles
@@ -48,9 +48,9 @@ class ArticleController extends AbstractController
                 $article->setCreatedAt(new \DateTimeImmutable());
             }
             $article->setUpdatedAt(new \DateTimeImmutable());
-            if ($article->isIsPublished() && null === $article->getPublishedAt()) {
+            if ($article->isPublished() && null === $article->getPublishedAt()) {
                 $article->setPublishedAt(new \DateTimeImmutable());
-            } elseif (!$article->isIsPublished() && null !== $article->getPublishedAt()) {
+            } elseif (!$article->isPublished() && null !== $article->getPublishedAt()) {
                 // Si dépublié, réinitialiser la date de publication ou la gérer selon la logique métier
                 $article->setPublishedAt(null);
             }
