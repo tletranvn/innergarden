@@ -1,15 +1,25 @@
-<nav class="navbar">
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
     <div class="container">
-        <a href="{{ path('app_home') }}" class="navbar-brand">Inner Garden</a>
-        <ul class="navbar-nav">
-            <li><a href="{{ path('app_home') }}">Accueil</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Catégories</a></li>
-            {% if app.user %}
-                <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
-            {% else %}
-                <li><a href="{{ path('app_login') }}">Connexion</a></li>
-            {% endif %}
-        </ul>
+        <a class="navbar-brand" href="#">Inner Garden</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="#">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Catégories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Connexion</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>

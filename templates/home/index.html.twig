@@ -4,43 +4,44 @@
 
 {% block body %}
     <main>
-        <section class="hero-section">
-            <h1>Découvrez un monde de transformation et de nature</h1>
-            <p>Inner Garden est votre oasis pour cultiver la vie, le jardinage et l'exploration de soi.</p>
-        </section>
-
-        <section class="categories-section">
-            <h2>Nos catégories phares</h2>
-            <div class="category-cards">
-                {# Simulation de 4 cartes de catégories #}
-                <div class="card">
-                    <img src="{{ asset('images/placeholder.png') }}" alt="Jardinage">
-                    <h3>Jardinage</h3>
-                    <p>Conseils, astuces et inspiration pour cultiver votre propre paradis vert.</p>
-                    <a href="#" class="btn">Explorer</a> {# Lien vers la page de catégorie #}
-                </div>
-                <div class="card">
-                    <img src="{{ asset('images/placeholder.png') }}" alt="Voyage Nature">
-                    <h3>Voyage Nature</h3>
-                    <p>Partez à l'aventure et reconnectez-vous avec la beauté sauvage du monde.</p>
-                    <a href="#" class="btn">Explorer</a>
-                </div>
-                <div class="card">
-                    <img src="{{ asset('images/placeholder.png') }}" alt="Bien-être">
-                    <h3>Bien-être</h3>
-                    <p>Cultivez votre paix intérieure et votre équilibre avec nos guides.</p>
-                    <a href="#" class="btn">Explorer</a>
-                </div>
-                <div class="card">
-                    <img src="{{ asset('images/placeholder.png') }}" alt="Développement Personnel">
-                    <h3>Développement Personnel</h3>
-                    <p>Des ressources pour grandir, apprendre et transformer votre vie.</p>
-                    <a href="#" class="btn">Explorer</a>
-                </div>
+        <section class="hero-section text-center py-5 mb-5 rounded-3 shadow-lg">
+            <div class="container">
+                <h1 class="hero-title display-3 fw-bold">
+                    Découvrez un monde de transformation et de nature
+                </h1>
+                <p class="hero-subtitle lead">
+                    Inner Garden est votre oasis pour cultiver la vie, le jardinage et l'exploration de soi.
+                </p>
             </div>
         </section>
 
-        {# La section contact sera ajoutée ici plus tard #}
+        <section class="categories-section py-5 mb-5 text-center rounded-3 shadow-sm">
+            <div class="container">
+                <h2 class="section-title display-4 mb-5">Nos catégories phares</h2>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center">
+                    
+                    {% set categories = [
+                        { alt: 'Jardinage', title: 'Jardinage', text: 'Conseils, astuces et inspiration pour cultiver votre propre paradis vert.' },
+                        { alt: 'Voyage Nature', title: 'Voyage Nature', text: 'Partez à l\'aventure et reconnectez-vous avec la beauté sauvage du monde.' },
+                        { alt: 'Bien-être', title: 'Bien-être', text: 'Cultivez votre paix intérieure et votre équilibre avec nos guides.' },
+                        { alt: 'Développement Personnel', title: 'Développement Personnel', text: 'Des ressources pour grandir, apprendre et transformer votre vie.' }
+                    ] %}
 
+                    {% for cat in categories %}
+                        <div class="col">
+                            <div class="card h-100 shadow-lg card-custom">
+                                <img src="{{ asset('images/placeholder.png') }}" class="card-img-top" alt="{{ cat.alt }}">
+                                <div class="card-body text-start">
+                                    <h3 class="card-title card-title-custom">{{ cat.title }}</h3>
+                                    <p class="card-text card-text-custom">{{ cat.text }}</p>
+                                    <a href="#" class="btn btn-custom">Explorer</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                </div>
+            </div>
+        </section>
     </main>
 {% endblock %}

@@ -1,13 +1,22 @@
-<footer class="footer">
-    <div class="container">
-        <p>© {{ "now"|date("Y") }} Inner Garden. Tous droits réservés.</p>
-        <p>Contact : <a href="mailto:contact@innergarden.com">contact@innergarden.com</a></p>
-        <p><a href="#">Politique de confidentialité</a></p> {# Cette route sera créée plus tard #}
+<footer class="footer mt-auto py-4 text-white-50 shadow-lg custom-footer">
+    <div class="container text-center">
+        <p class="mb-2 text-white">© {{ "now"|date("Y") }} Inner Garden. Tous droits réservés.</p>
+        <p class="mb-2">
+            <a href="mailto:contact@innergarden.com" class="text-white-50">contact@innergarden.com</a>
+        </p>
+        <p class="mb-3">
+            <a href="#" class="text-white-50">Politique de confidentialité</a>
+        </p>
         <div class="social-links">
-            {# Correction ici : Utilisez 'fa-facebook-f' au lieu de 'fa-facebook' #}
-            <a href="https://facebook.com" target="_blank" aria-label="Meta"><i class="fab fa-facebook-f"></i></a> {# Icône Facebook #}
-            <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a> {# Icône Instagram #}
-            <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a> {# Icône YouTube #}
+            <a href="https://facebook.com" target="_blank" aria-label="Meta" class="text-white-50 mx-2 fs-4">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://instagram.com" target="_blank" aria-label="Instagram" class="text-white-50 mx-2 fs-4">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" aria-label="YouTube" class="text-white-50 mx-2 fs-4">
+                <i class="fab fa-youtube"></i>
+            </a>
         </div>
     </div>
 </footer>
