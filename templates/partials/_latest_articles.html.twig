@@ -1,0 +1,32 @@
+<section class="latest-articles-section py-5 mb-5 text-center rounded-3 shadow-sm">
+    <div class="container">
+        <h2 class="section-title display-4 mb-5">Nos derniers articles</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+            {% for article in latest_articles %}
+                <div class="col">
+                    <div class="card h-100 shadow-lg card-custom">
+                        {# ajouter une image #}
+                        <img src="{{ asset('images/placeholder.png') }}" class="card-img-top" alt="Image pour {{ article.title }}">
+                        <div class="card-body text-start">
+                            <h3 class="card-title card-title-custom">{{ article.title }}</h3>
+                            {# Affichez un extrait du contenu #}
+                            <p class="card-text card-text-custom">{{ article.content|striptags|slice(0, 150) ~ '...' }}</p>
+                            <p class="card-text text-muted small">
+                                Publié le {{ article.publishedAt|date('d/m/Y') }}
+                                {% if article.author %}par {{ article.author }}{% endif %}
+                            </p>
+                            <a href="{{ path('articles_show', {'id': article.id}) }}" class="btn btn-custom">Lire la suite</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <p class="text-muted">Aucun article n'a été publié pour le moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="mt-5">
+            <a href="{{ path('articles_list') }}" class="btn btn-lg btn-secondary">Voir tous nos articles</a>
+        </div>
+    </div>
+</section>

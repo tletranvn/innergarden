@@ -27,6 +27,28 @@ class ArticleController extends AbstractController
             'articles' => $articles // Passez les articles au template
         ]);
     }
+
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(Article $article): Response
+    {
+        return $this->render('article/show.html.twig', [
+            'article' => $article,
+        ]);
+    }
+    // Une méthode pour publier les derniers articles sur la Homepage
+    public function latestArticles(ArticleRepository $articleRepository, int $limit = 5): Response
+    {
+        $latestArticles = $articleRepository->findBy(
+            ['isPublished' => true], // Filtre pour les articles publiés
+            ['publishedAt' => 'DESC'], // Tri par date de publication décroissante
+            $limit // Limite le nombre d'articles
+        );
+
+        return $this->render('partials/_latest_articles.html.twig', [
+            'latest_articles' => $latestArticles,
+        ]);
+    }
+
     #[IsGranted('ROLE_ADMIN')] // Seuls les utilisateurs avec le rôle ADMIN peuvent créer
     #[Route('/create', name: 'create')]
     public function create(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response // Injectez SluggerInterface
