@@ -16,7 +16,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">Contact</a>
                 </li>
-                {# Logique de connexion/déconnexion/pseudo et bouton "Créer un compte" #}
+                {# Logique de connexion/déconnexion/pseudo et bouton "Inscription" #}
                 {% if app.user %}
                     {# Si l'utilisateur est connecté #}
                     <li class="nav-item">
@@ -32,7 +32,7 @@
                     </li>
                     <li class="nav-item">
                         {# Nouveau bouton pour créer un compte #}
-                        <a class="btn btn-sm btn-outline-light ms-2" href="{{ path('app_register') }}">Créer un compte</a>
+                        <a class="btn btn-sm btn-outline-light ms-2" href="{{ path('app_register') }}">Inscription</a>
                     </li>
                 {% endif %}
                 {# Fin de la logique #}

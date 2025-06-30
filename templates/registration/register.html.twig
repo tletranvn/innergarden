@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}S'inscrire{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="p-4 shadow-sm rounded bg-light text-dark">
+                <h1 class="h3 mb-3 text-center">Créer un compte</h1>
+                <div id="form-messages" class="mb-3"></div>
+
+                {{ form_start(registrationForm, {'attr': {'id': 'registrationForm'}}) }}
+                    {{ form_row(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_row(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_row(registrationForm.plainPassword, {
+                        label: 'Mot de passe',
+                        'attr': {'class': 'form-control'}
+                    }) }}
+                    {{ form_row(registrationForm.agreeTerms, {
+                        label: 'J\'accepte les conditions d\'utilisation',
+                        'attr': {'class': 'form-check-input'}
+                    }) }}
+                    <br>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-custom" id="submitButton">Inscription</button>
+                    </div>
+                {{ form_end(registrationForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/registration.js') }}"></script>
+{% endblock %}
