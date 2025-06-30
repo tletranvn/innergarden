@@ -21,26 +21,44 @@ class ArticleController extends AbstractController
     #[Route('/list', name: 'list')]
     public function list(ArticleRepository $articleRepository): Response // Injectez ArticleRepository
     {
-        $articles = $articleRepository->findAll(); // Récupère tous les articles
+        // Récupère tous les articles publiés, triés par date de publication décroissante
+        $articles = $articleRepository->findBy(
+            ['isPublished' => true],
+            ['publishedAt' => 'DESC']
+        );
 
         return $this->render('article/list.html.twig', [
-            'articles' => $articles // Passez les articles au template
+            'articles' => $articles
         ]);
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
-    public function show(Article $article): Response
+    // Route pour afficher un article individuel par son slug (plus SEO-friendly)
+    #[Route('/{slug}', name: 'show', methods: ['GET'])]
+    public function show(string $slug, ArticleRepository $articleRepository, EntityManagerInterface $em): Response
     {
+        $article = $articleRepository->findOneBy(['slug' => $slug]);
+
+        if (!$article || !$article->isPublished()) {
+            throw $this->createNotFoundException('L\'article demandé n\'existe pas ou n\'est pas publié.');
+        }
+
+        // Incrémenter le compteur de vues
+        $article->setViewCount($article->getViewCount() + 1);
+        $em->flush();
+
         return $this->render('article/show.html.twig', [
             'article' => $article,
         ]);
     }
+
+
     // Une méthode pour publier les derniers articles sur la Homepage
     public function latestArticles(ArticleRepository $articleRepository, int $limit = 5): Response
     {
+        // Récupère les derniers articles publiés, triés par date de publication décroissante
         $latestArticles = $articleRepository->findBy(
-            ['isPublished' => true], // Filtre pour les articles publiés
-            ['publishedAt' => 'DESC'], // Tri par date de publication décroissante
+            ['isPublished' => true], // Filtrer uniquement les articles publiés
+            ['publishedAt' => 'DESC'], // Trier par la date de publication
             $limit // Limite le nombre d'articles
         );
 
@@ -90,7 +108,7 @@ class ArticleController extends AbstractController
         ]);
     }
     #[IsGranted('ROLE_ADMIN')] // Seuls les utilisateurs avec le rôle ADMIN peuvent créer
-    #[Route('/edit/{id}', name: 'edit')]
+    #[Route('/edit/{slug}', name: 'edit')]
     public function edit(Article $article, Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(ArticleType::class, $article);
@@ -122,7 +140,7 @@ class ArticleController extends AbstractController
 
    
     #[IsGranted('ROLE_ADMIN')] // Seuls les utilisateurs avec le rôle ADMIN peuvent créer
-    #[Route('/delete/{id}', name: 'delete')]
+    #[Route('/delete/{slug}', name: 'delete')]
     public function delete(Article $article, EntityManagerInterface $em): RedirectResponse // Injectez l'Article et EntityManagerInterface
     {
         $em->remove($article); // Supprime l'entité

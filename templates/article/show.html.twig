@@ -5,21 +5,23 @@
 {% block body %}
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <article class="card p-4 shadow-sm">
-                    <h1 class="card-title mb-3">{{ article.title }}</h1>
-                    <p class="text-muted small mb-4">
-                        Publié le {{ article.publicatedAt|date('d/m/Y H:i') }}
-                        {% if article.author %}par {{ article.author }}{% endif %}
+                    <h1 class="section-title mb-3">{{ article.title }}</h1>
+                    <p class="text-muted large mb-4">
+                        <strong>
+                        Publié le {{ article.publishedAt|date('d/m/Y H:i') }}
+                        {% if article.author %}par {{ article.author.pseudo }}{% endif %}
+                        </strong>
                     </p>
-                    {% if article.imageFilename %}
-                        <img src="{{ asset('images' ~ article.imageFilename) }}" class="img-fluid rounded mb-4" alt="{{ article.title }}">
+                    {% if article.imageUrl %}
+                        <img src="{{ asset('images' ~ article.imageUrl) }}" class="img-fluid rounded mb-4" alt="{{ article.title }}">
                     {% endif %}
                     <div class="card-text">
                         {{ article.content|raw }} {# Utilisez |raw si le contenu peut contenir du HTML #}
                     </div>
                     <div class="mt-4">
-                        <a href="{{ path('articles_list') }}" class="btn btn-outline-secondary">Retour à la liste des articles</a>
+                        <a href="{{ path('articles_list') }}" class="btn btn-custom">Retour à la liste des articles</a>
                     </div>
                 </article>
             </div>

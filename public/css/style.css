@@ -33,7 +33,7 @@ a:hover {
 
 /* NAVBAR */
 .navbar-brand {
-    color: var(--color-text) !important;
+    color: var(--color-section-title) !important;
 }
 
 .navbar-nav .nav-link {
@@ -116,7 +116,7 @@ a:hover {
 }
 
 .footer .social-links a:hover {
-    color: var(--color-accent) !important;
+    color: var(--color-btn-bg) !important;
     transform: translateY(-5px);
 }
 

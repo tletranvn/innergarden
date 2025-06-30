@@ -13,9 +13,9 @@
                             <p class="card-text card-text-custom">{{ article.content|striptags|slice(0, 150) ~ '...' }}</p>
                             <p class="card-text text-muted small">
                                 Publié le {{ article.publishedAt|date('d/m/Y') }}
-                                {% if article.author %}par {{ article.author }}{% endif %}
+                                {% if article.author %}par {{ article.author.pseudo }}{% endif %}
                             </p>
-                            <a href="{{ path('articles_show', {'id': article.id}) }}" class="btn btn-custom">Lire la suite</a>
+                            <a href="{{ path('articles_show', {'slug': article.slug}) }}" class="btn btn-custom">Lire la suite</a>
                         </div>
                     </div>
                 </div>
