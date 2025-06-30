@@ -1,24 +1,41 @@
 <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
     <div class="container">
-        <a class="navbar-brand" href="/">Inner Garden</a>
+        <a class="navbar-brand" href="{{ path('app_home') }}">Inner Garden</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto"> {# ms-auto pour aligner à droite #}
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/">Accueil</a>
+                    <a class="nav-link" aria-current="page" href="{{ path('app_home') }}">Accueil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Catégories</a>
+                    <a class="nav-link" href="{{ path('articles_list') }}">Articles</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Contact</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Connexion</a>
-                </li>
+                {# Logique de connexion/déconnexion/pseudo et bouton "Créer un compte" #}
+                {% if app.user %}
+                    {# Si l'utilisateur est connecté #}
+                    <li class="nav-item">
+                        <span class="nav-link text-white">Bonjour, <strong>{{ app.user.pseudo }}</strong> !</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-outline-light ms-2" href="{{ path('app_logout') }}">Déconnexion</a>
+                    </li>
+                {% else %}
+                    {# Si l'utilisateur n'est PAS connecté #}
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-outline-light" href="{{ path('app_login') }}">Connexion</a>
+                    </li>
+                    <li class="nav-item">
+                        {# Nouveau bouton pour créer un compte #}
+                        <a class="btn btn-sm btn-outline-light ms-2" href="{{ path('app_register') }}">Créer un compte</a>
+                    </li>
+                {% endif %}
+                {# Fin de la logique #}
             </ul>
         </div>
     </div>
