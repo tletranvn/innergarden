@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Form\ArticleType;
+use App\Entity\Comment;
+use App\Form\CommentType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,22 +34,62 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    // Route pour afficher un article individuel par son slug (plus SEO-friendly)
-    #[Route('/{slug}', name: 'show', methods: ['GET'])]
-    public function show(string $slug, ArticleRepository $articleRepository, EntityManagerInterface $em): Response
+    // Route pour afficher un article individuel et gérer les commentaires
+    #[Route('/{slug}', name: 'show', methods: ['GET', 'POST'])]
+    public function show(
+        string $slug,
+        ArticleRepository $articleRepository,
+        Request $request,
+        EntityManagerInterface $em): Response
     {
         $article = $articleRepository->findOneBy(['slug' => $slug]);
 
-        if (!$article || !$article->isPublished()) {
-            throw $this->createNotFoundException('L\'article demandé n\'existe pas ou n\'est pas publié.');
+        if (!$article) {
+            throw $this->createNotFoundException('Aucun article trouvé avec ce slug.');
         }
 
-        // Incrémenter le compteur de vues
+        if (!$article->isPublished()) {
+            throw $this->createNotFoundException('L\'article existe mais n\'est pas publié.');
+        }
+
+
+        // --- Logique du formulaire de commentaire ---
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // S'assurer que l'utilisateur est connecté pour commenter
+            if (!$this->getUser()) {
+                $this->addFlash('danger', 'Vous devez être connecté pour poster un commentaire.');
+                return $this->redirectToRoute('app_login'); // Rediriger vers la page de connexion
+            }
+
+            $comment->setArticle($article);
+            $comment->setAuthor($this->getUser()); // Associe l'utilisateur connecté comme auteur
+            $comment->setCreatedAt(new \DateTimeImmutable());
+            $comment->setIsApproved(false); // Par défaut, le commentaire n'est pas approuvé (pour la modération)
+
+            $em->persist($comment);
+            $em->flush();
+
+            $this->addFlash('success', 'Votre commentaire a été soumis avec succès et est en attente de modération.');
+
+            // Rediriger vers l'article pour éviter la soumission multiple du formulaire
+            return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+        }
+
+        // incrémenter le compteur de vues 
         $article->setViewCount($article->getViewCount() + 1);
         $em->flush();
 
         return $this->render('article/show.html.twig', [
             'article' => $article,
+            'commentForm' => $form->createView(), // Passe le formulaire à la vue
+            'comments' => $article->getComments()->filter(function(Comment $comment) { // Passe seulement les commentaires approuvés
+                return $comment->isApproved();
+            })->toArray(), // Convertir la collection en tableau
         ]);
     }
 

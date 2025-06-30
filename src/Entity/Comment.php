@@ -28,6 +28,7 @@ class Comment
     private ?bool $isApproved = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(onDelete: "CASCADE")] // Ensures that comments are deleted when the article is deleted
     private ?Article $article = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
