@@ -1,4 +1,4 @@
-FROM php:8.4-apache
+FROM php:8.3.-apache
 
 # Set ServerName to avoid warnings
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
@@ -7,7 +7,10 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 RUN apt-get update \
     && apt-get install -qq -y --no-install-recommends \
     cron \
-    locales coreutils apt-utils git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev;
+    locales coreutils apt-utils git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev \
+    && apt-get upgrade -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Generate locales
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
@@ -31,9 +34,6 @@ RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
 # Set working directory inside the container
 WORKDIR /var/www
 
-# Copy your application code into the container
-# This is crucial! Your code needs to be in /var/www before composer install runs.
-# The 'context: .' in docker-compose.yaml ensures this copies from your project root.
 COPY . /var/www
 
 # Install Composer dependencies
