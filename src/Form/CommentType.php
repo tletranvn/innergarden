@@ -24,7 +24,7 @@ class CommentType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(message: 'Veuillez saisir votre commentaire.'),
                     new Assert\Length(
-                        min: 10,
+                        min: 1,
                         max: 500,
                         minMessage: 'Votre commentaire doit contenir au moins {{ limit }} caractères.',
                         maxMessage: 'Votre commentaire ne peut pas dépasser {{ limit }} caractères.'

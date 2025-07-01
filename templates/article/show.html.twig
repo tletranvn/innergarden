@@ -1,91 +1,91 @@
-{# templates/article/show.html.twig #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ article.title }}{% endblock %}
 
 {% block body %}
-    <div class="container mt-5 mb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-9 col-lg-8">
-                <article class="card p-4 shadow-sm article-show-card-custom mb-5">
-                    <h1 class="mb-3" style="color: var(--color-section-title);">{{ article.title }}</h1>
-
-                    <p class="text-muted small mb-4">
-                        <strong>
-                            Publié le {{ article.publishedAt|date('d/m/Y H:i') }}
-                            {% if article.author %}par {{ article.author.pseudo }}{% endif %}
-                        </strong>
-                        <br>
-                        {% if article.category %}Catégorie: {{ article.category.name }}{% endif %}
-                        <br>
-                        Vues: {{ article.viewCount }}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            {# Article détaillé #}
+            <div class="card shadow-sm mb-4">
+               {# ajouter image ici plus tard si besoin #}
+                <div class="card-body">
+                    <h1 class="card-title">{{ article.title }}</h1>
+                    <p class="text-muted mb-2">
+                        Publié par {{ article.author.pseudo }} le {{ article.createdAt|date('d/m/Y') }}
+                        {% if article.category %}
+                            dans la catégorie <strong>{{ article.category.name }}</strong>
+                        {% endif %}
                     </p>
-
-                    {% if article.imageUrl %}
-                        <img src="{{ asset(article.imageUrl) }}" class="img-fluid rounded mb-4" alt="{{ article.title }}">
-                    {% endif %}
-
-                    <div class="article-content-custom mb-5">
+                    <p class="text-muted small">
+                        {{ article.viewCount }} vue{{ article.viewCount > 1 ? 's' : '' }}
+                    </p>
+                    <hr>
+                    <div class="article-content">
                         {{ article.content|raw }}
                     </div>
-
-                    <div class="mt-4 text-center">
-                        <a href="{{ path('articles_list') }}" class="btn btn-custom">Retour à la liste des articles</a>
-                    </div>
-                </article>
-
-                {# SECTION COMMENTAIRES #}
-                <section class="comments-section bg-light text-dark p-4 rounded-3 shadow-sm mb-5">
-                    <h2 class="h4 mb-4" style="color: var(--color-section-title);">Commentaires ({{ comments|length }})</h2>
-
-                    {# Liste des commentaires existants #}
-                    {% if comments is not empty %}
-                        <div class="comments-list mb-4">
-                            {% for comment in comments|sort((a, b) => a.createdAt <=> b.createdAt) %} {# Tri par date #}
-                                <div class="card p-3 mb-3 border-0 shadow-sm comment-item-custom">
-                                    <div class="d-flex align-items-center mb-2">
-                                        {# Avatar ou initiale de l'auteur #}
-                                        <div class="comment-author-avatar rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2" style="width: 40px; height: 40px; font-size: 0.9em;">
-                                            {% if comment.author.profilePictureUrl %}
-                                                <img src="{{ asset(comment.author.profilePictureUrl) }}" alt="{{ comment.author.pseudo }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
-                                            {% else %}
-                                                {{ comment.author.pseudo|first|upper }}
-                                            {% endif %}
-                                        </div>
-                                        <div>
-                                            <h5 class="mb-0">{{ comment.author.pseudo }}</h5>
-                                            <small class="text-muted">{{ comment.createdAt|date('d/m/Y à H:i') }}</small>
-                                        </div>
-                                    </div>
-                                    <p class="mb-0 comment-content-custom">{{ comment.comment }}</p>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-muted">Soyez le premier à commenter !</p>
-                    {% endif %}
-
-                    <hr class="my-4">
-
-                    {# Formulaire d'ajout de commentaire #}
-                    <h3 class="h5 mb-3" style="color: var(--color-section-title);">Laisser un commentaire</h3>
-                    {% if app.user %}
-                        {{ form_start(commentForm, {'action': path('articles_show', {'slug': article.slug}), 'method': 'POST'}) }}
-                            <div class="mb-3">
-                                <label for="comment_comment" class="form-label visually-hidden">Votre commentaire</label> {# Label caché pour l'accessibilité #}
-                                {{ form_widget(commentForm.comment) }}
-                                {{ form_errors(commentForm.comment) }} {# Affichage des erreurs de validation #}
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-custom">Envoyer le commentaire</button>
-                        {{ form_end(commentForm) }}
-                    {% else %}
-                        <div class="alert alert-info text-center" role="alert">
-                            Vous devez être <a href="{{ path('app_login') }}" class="alert-link">connecté(e)</a> pour laisser un commentaire.
-                        </div>
-                    {% endif %}
-                </section>
-
+                    <a href="{{ path('articles_list') }}" class="btn btn-secondary mt-3">Retour aux articles</a>
+                </div>
             </div>
+
+            {# Section Commentaires #}
+            <section class="comments-section bg-light p-4 rounded shadow-sm">
+                <h2 class="h4 mb-4" style="color: var(--color-section-title);">Commentaires ({{ comments|length }})</h2>
+                <div id="comment-form-messages" class="mb-3"></div>
+
+                {% if app.user %}
+                    <div class="comment-form mb-5">
+                        <h3 class="h5 mb-3" style="color: var(--color-section-title);">Laisser un commentaire</h3>
+                        {{ form_start(commentForm, {
+                            attr: {
+                                id: 'commentForm',
+                                'action': path('app_comment_new', { id: article.id })
+                            }
+                        }) }}
+                            {{ form_row(commentForm.comment) }}
+                            <button type="submit" class="btn btn-custom mt-3" id="submitCommentButton">Envoyer le commentaire</button>
+                        {{ form_end(commentForm) }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        Veuillez <a href="{{ path('app_login') }}">vous connecter</a> pour laisser un commentaire.
+                    </div>
+                {% endif %}
+
+                <div id="comments-list">
+                    {% set approvedComments = article.comments|filter(c => c.isApproved)|sort((a, b) => b.createdAt <=> a.createdAt) %}
+                    {% if approvedComments is not empty %}
+                        {% for comment in approvedComments %}
+                            <div class="card mb-3 comment-item" id="comment-{{ comment.id }}">
+                                <div class="card-body d-flex">
+                                    <div class="me-3">
+                                        {% if comment.author.avatar %}
+                                            <img src="{{ asset('uploads/avatars/' ~ comment.author.avatar) }}" alt="Avatar" class="rounded-circle" width="50" height="50">
+                                        {% else %}
+                                            <div class="avatar-placeholder rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+                                                {{ comment.author.pseudo[:1]|upper }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h5 class="card-title mb-1">{{ comment.author.pseudo }}</h5>
+                                        <small class="text-muted">{{ comment.createdAt|date('d/m/Y H:i') }}</small>
+                                        <p class="card-text mt-2">{{ comment.comment }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    
+                    {% endif %}
+                </div>
+            </section>
         </div>
     </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/comment.js') }}"></script>
 {% endblock %}

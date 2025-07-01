@@ -1,4 +1,4 @@
-FROM php:8.3.-apache
+FROM php:8.3-apache
 
 # Set ServerName to avoid warnings
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
