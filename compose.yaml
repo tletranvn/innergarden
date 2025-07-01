@@ -1,12 +1,16 @@
 services:
   www:
-    build: docker/php
+    build:
+      context: . # <-- IMPORTANT: Set the build context to the root of your project
+      dockerfile: ./docker/php/Dockerfile # <-- IMPORTANT: Specify the path to your Dockerfile
     container_name: innergarden_symfony_php
     ports:
       - "8081:80"
     volumes:
-      - ./:/var/www
-      - ./docker/php/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www # Mount your project root to /var/www inside the container
+      - ./docker/php/vhosts:/etc/apache2/sites-enabled # Mount your Apache vhosts config
+      # You might consider adding ':delegated' to volumes on macOS for better performance/stability
+      # Example: - ./:/var/www:delegated
     networks:
       - innergarden_symfony
     depends_on:
