@@ -1,1 +1,77 @@
 {% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouvel Article - Inner Garden{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8"> {# Utilise une colonne plus large pour le formulaire #}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h1 class="card-title text-center mb-4" style="color: var(--color-section-title);">Créer un nouvel Article</h1>
+
+                        {#
+                            Si les messages flash (addFlash) ne sont pas déjà affichés dans votre base.html.twig,
+                            vous pouvez ajouter le bloc suivant ici:
+                            {% for message in app.flashes('success') %}
+                                <div class="alert alert-success">{{ message }}</div>
+                            {% endfor %}
+                            {% for message in app.flashes('danger') %}
+                                <div class="alert alert-danger">{{ message }}</div>
+                            {% endfor %}
+                            etc.
+                        #}
+
+                        {{ form_start(form) }}
+                            <div class="mb-3">
+                                {{ form_row(form.title, {
+                                    'label': 'Titre de l\'article',
+                                    'attr': {'placeholder': 'Ex: Mon voyage à Bali'}
+                                }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.excerpt, {
+                                    'label': 'Extrait (court résumé pour la liste des articles)',
+                                    'attr': {'rows': 3, 'placeholder': 'Un bref aperçu du contenu de l\'article...'}
+                                }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.content, {
+                                    'label': 'Contenu de l\'article',
+                                    'attr': {'rows': 15, 'placeholder': 'Commencez à écrire votre article ici...'}
+                                }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.category, {
+                                    'label': 'Catégorie',
+                                    'placeholder': 'Choisissez une catégorie' # Ajoute un placeholder si c'est un choix vide
+                                }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.imageFile, {
+                                    'label': 'Image de l\'article (format JPG, PNG, GIF)',
+                                    'help': 'Taille maximale recommandée : 2 Mo'
+                                }) }}
+                            </div>
+                            <div class="mb-3 form-check">
+                                {{ form_row(form.isPublished, {
+                                    'label': 'Publier l\'article immédiatement'
+                                }) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.slug, {
+                                    'label': 'Slug (laisser vide pour générer automatiquement)',
+                                    'help': 'URL conviviale de l\'article (ex: mon-super-article)',
+                                    'attr': {'placeholder': 'Laissez vide pour auto-générer'}
+                                }) }}
+                            </div>
+
+                            <button type="submit" class="btn btn-custom mt-3">Créer l'article</button>
+                            <a href="{{ path('articles_list') }}" class="btn btn-secondary mt-3 ms-2">Annuler et Retour</a>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

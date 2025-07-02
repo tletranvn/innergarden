@@ -15,6 +15,7 @@ services:
       - innergarden_symfony
     depends_on:
       - db
+      - mongodb # NOUVEAU : Le service 'www' dépend maintenant aussi de 'mongodb'
     environment:
       APP_ENV: dev
       APP_DEBUG: 1
@@ -45,7 +46,7 @@ services:
       # Set the URL of your Symfony project (without trailing slash!) as value of the cors_origins directive
       MERCURE_EXTRA_DIRECTIVES: |
         cors_origins http://127.0.0.1:8081
-        cors_origins http://127.0.0.1:8000
+        cors_origins http://127.00.1:8000
     # Comment the following line to disable the development mode
     command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
     healthcheck:
@@ -58,6 +59,21 @@ services:
       - mercure_config:/config
 ###< symfony/mercure-bundle ###
 
+# NOUVEAU: Configuration du service MongoDB
+  mongodb:
+    image: mongo:latest # Image MongoDB standard
+    container_name: innergarden_mongodb
+    ports:
+      - "27017:27017" # EXPOSE LE PORT 27017 pour la connexion depuis l'hôte (Compass)
+    volumes:
+      - mongodb_data:/data/db:rw # Persiste les données de MongoDB
+    environment: # Identifiants root pour la base de données MongoDB (pour le développement)
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    networks:
+      - innergarden_symfony # sur le même réseau que 'www'
+    restart: unless-stopped # Redémarre le conteneur sauf s'il est explicitement arrêté
+
 networks:
   innergarden_symfony:
 
@@ -68,3 +84,6 @@ volumes:
   mercure_data:
   mercure_config:
 ###< symfony/mercure-bundle ###
+###> doctrine/mongodb-odm-bundle ###
+  mongodb_data:
+###< doctrine/mongodb-odm-bundle ###

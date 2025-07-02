@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+use Symfony\Component\HttpFoundation\File\File; // Importez File
+use Vich\UploaderBundle\Mapping\Annotation as Vich; // Importez VichUploaderBundle
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
-
+#[Vich\Uploadable] //ajouter cette annotation à la classe pour activer VichUploader
 class Article
 {
     #[ORM\Id]
@@ -42,8 +44,17 @@ class Article
     #[ORM\Column]
     private ?bool $isPublished = null;
 
+    // ANCIEN : #[ORM\Column(length: 255, nullable: true)]
+    // ANCIEN : private ?string $imageUrl = null;
+
+    // NOUVEAU : Cette propriété stocke le nom du fichier image
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageUrl = null;
+    private ?string $imageName = null;
+
+    // NOUVEAU : Cette propriété n'est pas persistée en BDD.
+    // Elle est utilisée par VichUploader pour le téléchargement depuis le formulaire.
+    #[Vich\UploadableField(mapping: 'article_image', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
 
     #[ORM\Column]
     private ?int $viewCount = null;
@@ -171,17 +182,62 @@ class Article
         return $this;
     }
 
-    public function getImageUrl(): ?string
+    // NOUVEAU : Getter et Setter pour imageName
+    public function getImageName(): ?string
     {
-        return $this->imageUrl;
+        return $this->imageName;
     }
 
-    public function setImageUrl(?string $imageUrl): static
+    public function setImageName(?string $imageName): static
     {
-        $this->imageUrl = $imageUrl;
+        $this->imageName = $imageName;
 
         return $this;
     }
+
+    /**
+     * NOUVEAU : Getter et Setter pour imageFile.
+     * Cette méthode est appelée par VichUploader lorsque on soumet un fichier.
+     * Si télécharger manuellement un fichier (par exemple, depuis une requête API)
+     * utilisez setImageName($filename) et setUpdatedAt($dateTime)!
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // C'est nécessaire pour déclencher les événements de Doctrine,
+            // sinon les listeners de VichUploader ne seront pas appelés.
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    // NOUVEAU : Méthode pour obtenir l'URL complète de l'image (comme on a imageUrl avant)
+    // Elle construira l'URL à partir de imageName.
+    public function getImageUrl(): ?string
+    {
+        if ($this->imageName) {
+            // Attention : '/uploads/images/articles/' doit correspondre à l'uri_prefix configuré dans vich_uploader.yaml
+            return '/uploads/images/articles/' . $this->imageName;
+        }
+        return null;
+    }
+
+    // ANCIEN : Setter pour imageUrl (laisser au cas où d'autres parties du code s'y fient,
+    // mais il ne sera plus utilisé directement pour l'upload par VichUploader)
+    // public function setImageUrl(?string $imageUrl): static
+    // {
+    //     $this->imageUrl = $imageUrl;
+    //     return $this;
+    // }
+
 
     public function getViewCount(): ?int
     {

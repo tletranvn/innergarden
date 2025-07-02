@@ -24,7 +24,13 @@ RUN curl -sSk https://getcomposer.org/installer | php -- --disable-tls && \
 # Install PHP extensions
 RUN docker-php-ext-configure intl
 RUN docker-php-ext-install pdo pdo_mysql mysqli gd opcache intl zip calendar dom mbstring zip gd xsl && a2enmod rewrite
+
+# Install apcu
 RUN pecl install apcu && docker-php-ext-enable apcu
+
+# NOUVEAU : Installer et activer l'extension MongoDB
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb
 
 # Install install-php-extensions utility
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/

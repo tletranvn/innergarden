@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType; // NOUVEAU : Importez FileType
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ArticleType extends AbstractType
@@ -45,11 +46,38 @@ class ArticleType extends AbstractType
                 'label' => 'Publier l\'article',
                 'required' => false,
             ])
-            ->add('imageUrl', TextType::class, [
-                'label' => 'URL de l\'image',
-                'required' => false,
-                'constraints' => [
-                    new Assert\Url(message: 'L\'URL de l\'image n\'est pas valide.'),
+            // NOUVEAU : Ajout du champ 'slug'
+            ->add('slug', TextType::class, [
+                'label' => 'Slug',
+                'required' => false, // Permet de laisser le champ vide pour auto-génération
+                'attr' => ['placeholder' => 'Laisser vide pour auto-générer (ex: mon-super-article)'],
+                'help' => 'L\'identifiant unique dans l\'URL de l\'article.'
+            ])
+            // ANCIEN : Le champ imageUrl est remplacé par imageFile pour l'upload via VichUploader
+            // ->add('imageUrl', TextType::class, [
+            //     'label' => 'URL de l\'image',
+            //     'required' => false,
+            //     'constraints' => [
+            //         new Assert\Url(message: 'L\'URL de l\'image n\'est pas valide.'),
+            //     ]
+            // ])
+            ->add('imageFile', FileType::class, [ // NOUVEAU : Champ pour le téléchargement de l'image
+                'label' => 'Image de l\'article (JPG, PNG, GIF)',
+                'mapped' => false, // TRÈS IMPORTANT : Ce champ n'est pas mappé directement à l'entité
+                'required' => false, // L'image n'est pas obligatoire
+                'attr' => [
+                    'accept' => 'image/*' // Pour n'accepter que les fichiers image dans la boîte de dialogue
+                ],
+                'constraints' => [ // ajouter des contraintes de validation de fichier ici
+                    new Assert\File([
+                        'maxSize' => '5M', // Taille maximale de l'image
+                        'mimeTypes' => [ // Types MIME acceptés
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, GIF).',
+                    ])
                 ]
             ])
             ->add('author', EntityType::class, [

@@ -48,8 +48,8 @@
                         {{ form_end(commentForm) }}
                     </div>
                 {% else %}
-                    <div class="alert alert-info text-center">
-                        Veuillez <a href="{{ path('app_login') }}">vous connecter</a> pour laisser un commentaire.
+                    <div class="alert alert-info text-center" role="alert">
+                            Vous devez être <a href="{{ path('app_login') }}" class="alert-link">connecté(e)</a> pour laisser un commentaire.
                     </div>
                 {% endif %}
 
