@@ -3,75 +3,93 @@
 {% block title %}Créer un nouvel Article - Inner Garden{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8"> {# Utilise une colonne plus large pour le formulaire #}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <h1 class="card-title text-center mb-4" style="color: var(--color-section-title);">Créer un nouvel Article</h1>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        {# Utilise la même taille de colonne que la page d'inscription pour une cohérence visuelle #}
+        <div class="col-md-8 col-lg-6"> {# col-md-8 col-lg-6 pour que le formulaire ait plus de place #}
+            <div class="p-4 shadow-sm rounded bg-light text-dark">
+                <h1 class="h3 mb-3 text-center">Créer un nouvel Article</h1>
+                {# ajouter ici un div pour les messages flash si base.html.twig ne les affiche pas #}
+                <div id="form-messages" class="mb-3"></div>
 
-                        {#
-                            Si les messages flash (addFlash) ne sont pas déjà affichés dans votre base.html.twig,
-                            vous pouvez ajouter le bloc suivant ici:
-                            {% for message in app.flashes('success') %}
-                                <div class="alert alert-success">{{ message }}</div>
-                            {% endfor %}
-                            {% for message in app.flashes('danger') %}
-                                <div class="alert alert-danger">{{ message }}</div>
-                            {% endfor %}
-                            etc.
-                        #}
-
-                        {{ form_start(form) }}
-                            <div class="mb-3">
-                                {{ form_row(form.title, {
-                                    'label': 'Titre de l\'article',
-                                    'attr': {'placeholder': 'Ex: Mon voyage à Bali'}
-                                }) }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form_row(form.excerpt, {
-                                    'label': 'Extrait (court résumé pour la liste des articles)',
-                                    'attr': {'rows': 3, 'placeholder': 'Un bref aperçu du contenu de l\'article...'}
-                                }) }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form_row(form.content, {
-                                    'label': 'Contenu de l\'article',
-                                    'attr': {'rows': 15, 'placeholder': 'Commencez à écrire votre article ici...'}
-                                }) }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form_row(form.category, {
-                                    'label': 'Catégorie',
-                                    'placeholder': 'Choisissez une catégorie' # Ajoute un placeholder si c'est un choix vide
-                                }) }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form_row(form.imageFile, {
-                                    'label': 'Image de l\'article (format JPG, PNG, GIF)',
-                                    'help': 'Taille maximale recommandée : 2 Mo'
-                                }) }}
-                            </div>
-                            <div class="mb-3 form-check">
-                                {{ form_row(form.isPublished, {
-                                    'label': 'Publier l\'article immédiatement'
-                                }) }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form_row(form.slug, {
-                                    'label': 'Slug (laisser vide pour générer automatiquement)',
-                                    'help': 'URL conviviale de l\'article (ex: mon-super-article)',
-                                    'attr': {'placeholder': 'Laissez vide pour auto-générer'}
-                                }) }}
-                            </div>
-
-                            <button type="submit" class="btn btn-custom mt-3">Créer l'article</button>
-                            <a href="{{ path('articles_list') }}" class="btn btn-secondary mt-3 ms-2">Annuler et Retour</a>
-                        {{ form_end(form) }}
+                {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_row(form.title, {
+                            'label': 'Titre de l\'article',
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Ex: Mon voyage à Bali'
+                            }
+                        }) }}
                     </div>
-                </div>
+                    <div class="mb-3">
+                        {{ form_row(form.excerpt, {
+                            'label': 'Extrait (court résumé pour la liste des articles)',
+                            'attr': {
+                                'class': 'form-control',
+                                'rows': 3,
+                                'placeholder': 'Un bref aperçu du contenu de l\'article...'
+                            }
+                        }) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.content, {
+                            'label': 'Contenu de l\'article',
+                            'attr': {
+                                'class': 'form-control',
+                                'rows': 15,
+                                'placeholder': 'Commencez à écrire votre article ici...'
+                            }
+                        }) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.category, {
+                            'label': 'Catégorie',
+                            'attr': {'class': 'form-select'},
+                            'placeholder': 'Choisissez une catégorie'
+                        }) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.imageFile, {
+                            'label': 'Image de l\'article (format JPG, PNG, GIF)',
+                            'attr': {'class': 'form-control'},
+                            'help': 'Taille maximale recommandée : 2 Mo'
+                        }) }}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form_row(form.isPublished, {
+                            'label': 'Publier l\'article immédiatement',
+                            'attr': {'class': 'form-check-input'}
+                        }) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.slug, {
+                            'label': 'Slug (laisser vide pour générer automatiquement)',
+                            'help': 'URL conviviale de l\'article (ex: mon-super-article)',
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Laissez vide pour auto-générer'
+                            }
+                        }) }}
+                    </div>
+
+                    <br>
+                    <div class="d-grid gap-2">
+                        {# Le bouton submit est ajouté directement dans ArticleType, donc nous n'avons pas besoin d'un add('submit') ici #}
+                        {# Si vous aviez un champ submit dans le form, vous feriez : {{ form_row(form.submit) }} #}
+                        {# Mais puisque vous l'avez retiré, nous allons juste mettre le bouton ici #}
+                        <button type="submit" class="btn btn-custom" id="submitButton">Créer l'article</button>
+                        <a href="{{ path('articles_list') }}" class="btn btn-secondary">Annuler et Retour</a>
+                    </div>
+                {{ form_end(form) }}
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
+
+{# scripts JS spécifiques pour ce formulaire#}
+{% block javascripts %}
+    {{ parent() }}
+    {# <script src="{{ asset('js/article_form.js') }}"></script> #}
 {% endblock %}

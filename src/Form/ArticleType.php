@@ -89,10 +89,6 @@ class ArticleType extends AbstractType
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'label' => 'Catégorie',
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Enregistrer l\'article',
-                'attr' => ['class' => 'btn btn-primary'],
             ]);
     }
 

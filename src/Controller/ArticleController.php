@@ -16,12 +16,12 @@ use App\Repository\ArticleRepository;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use App\Document\Photo; // <<< ASSUREZ-VOUS QUE CETTE LIGNE EST BIEN PRÉSENTE !
+use App\Document\Photo; 
 
 #[Route('/articles', name: 'articles_')]
 class ArticleController extends AbstractController
 {
-    // Solution au problème 2 : Déplacez les routes spécifiques (create, edit, delete) AVANT la route générique {slug}.
+    // les routes spécifiques (create, edit, delete) AVANT la route générique {slug}.
 
     #[IsGranted('ROLE_ADMIN')] // Seuls les utilisateurs avec le rôle ADMIN peuvent créer
     #[Route('/create', name: 'create')]
@@ -61,15 +61,25 @@ class ArticleController extends AbstractController
             $imageFile = $form->get('imageFile')->getData();
 
             if ($imageFile) {
-                $photo = new Photo(); // <<< Plus de ligne rouge si 'use App\Document\Photo;' est présent
-                $photo->setFilename($article->getImageName());
-                $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                $photo->setMimeType($imageFile->getMimeType());
-                $photo->setSize($imageFile->getSize());
-                $photo->setRelatedArticleId((string)$article->getId());
+                // NOUVEAU : Vérification si VichUploader a bien défini le nom de l'image.
+                // Si getImageName() retourne null ici, cela indique un problème de configuration
+                // ou de timing avec VichUploaderBundle, car le nom du fichier devrait être setté
+                // sur l'entité Article après le flush Doctrine.
+                if ($article->getImageName() !== null) {
+                    $photo = new Photo();
+                    $photo->setFilename($article->getImageName());
+                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
+                    $photo->setMimeType($imageFile->getMimeType());
+                    $photo->setSize($imageFile->getSize());
+                    $photo->setRelatedArticleId((string)$article->getId());
 
-                $documentManager->persist($photo);
-                $documentManager->flush();
+                    $documentManager->persist($photo);
+                    $documentManager->flush();
+                } else {
+                    // NOUVEAU : Message d'avertissement si le nom de l'image est null.
+                    // Cela évite une erreur fatale et informe l'utilisateur du problème.
+                    $this->addFlash('warning', 'L\'image a été soumise, mais ses métadonnées n\'ont pas pu être enregistrées. Veuillez vérifier la configuration de VichUploader.');
+                }
             }
 
             $this->addFlash('success', 'L\'article a été créé avec succès.');
@@ -111,21 +121,28 @@ class ArticleController extends AbstractController
             $imageFile = $form->get('imageFile')->getData();
 
             if ($imageFile) {
-                $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
+                // NOUVEAU : Vérification si VichUploader a bien défini le nom de l'image pour la modification.
+                if ($article->getImageName() !== null) {
+                    $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
 
-                if (!$photo) {
-                    $photo = new Photo();
-                    $photo->setRelatedArticleId((string)$article->getId());
+                    if (!$photo) {
+                        $photo = new Photo();
+                        $photo->setRelatedArticleId((string)$article->getId());
+                    }
+
+                    $photo->setFilename($article->getImageName());
+                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
+                    $photo->setMimeType($imageFile->getMimeType());
+                    $photo->setSize($imageFile->getSize());
+
+                    $documentManager->persist($photo);
+                    $documentManager->flush();
+                } else {
+                     // NOUVEAU : Message d'avertissement pour la mise à jour de l'image.
+                     $this->addFlash('warning', 'L\'image a été soumise, mais ses métadonnées n\'ont pas pu être mises à jour. Veuillez vérifier la configuration de VichUploader.');
                 }
-
-                $photo->setFilename($article->getImageName());
-                $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                $photo->setMimeType($imageFile->getMimeType());
-                $photo->setSize($imageFile->getSize());
-
-                $documentManager->persist($photo);
-                $documentManager->flush();
             } elseif ($form->get('imageFile')->getNormData() === null && $article->getImageName() !== null) {
+                // NOUVEAU : Logique pour supprimer la photo si elle est retirée du formulaire d'édition.
                 $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
                 if ($photo) {
                     $documentManager->remove($photo);
@@ -178,7 +195,7 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    // Solution au problème 2 : Cette route générique doit être définie APRÈS les routes spécifiques comme /create, /edit/{slug}, /delete/{slug}
+    // route générique doit être définie APRÈS les routes spécifiques comme /create, /edit/{slug}, /delete/{slug}
     #[Route('/{slug}', name: 'show', methods: ['GET', 'POST'])]
     public function show(
         string $slug,
