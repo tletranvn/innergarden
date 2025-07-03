@@ -17,6 +17,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Document\Photo;
+use Knp\Component\Pager\PaginatorInterface;
+
 
 #[Route('/articles', name: 'articles_')]
 class ArticleController extends AbstractController
@@ -183,19 +185,31 @@ class ArticleController extends AbstractController
         return $this->redirectToRoute('articles_list');
     }
 
+    // Route pour lister les articles publiés avec pagination
+    // Utilisation de KnpPaginatorBundle pour la pagination
     #[Route('/list', name: 'list')]
-    public function list(ArticleRepository $articleRepository): Response
-    {
-        $articles = $articleRepository->findBy(
-            ['isPublished' => true],
-            ['publishedAt' => 'DESC']
+    public function list(
+        Request $request, // Injection de la requête HTTP
+        ArticleRepository $articleRepository,
+        PaginatorInterface $paginator // Injection du service de pagination
+    ): Response {
+        // préparer la requête (au lieu de récupérer tous les résultats d'un coup)
+        $query = $articleRepository->createQueryBuilder('a')
+            ->where('a.isPublished = :published')
+            ->setParameter('published', true)
+            ->orderBy('a.publishedAt', 'DESC');
+
+        // utiliser le service de pagination
+        $pagination = $paginator->paginate(
+            $query, // la requête
+            $request->query->getInt('page', 1), // numéro de page depuis l'URL, par défaut 1
+            9 // nombre d'articles par page
         );
 
         return $this->render('article/list.html.twig', [
-            'articles' => $articles
+            'pagination' => $pagination // envoyer la pagination à la vue
         ]);
     }
-
     // route générique doit être définie APRÈS les routes spécifiques comme /create, /edit/{slug}, /delete/{slug}
     #[Route('/{slug}', name: 'show', methods: ['GET', 'POST'])]
     public function show(

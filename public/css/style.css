@@ -16,12 +16,14 @@
     --color-footer-bg: #3B4B5A;
 }
 
+/* Corps de page */
 body {
     font-family: 'Quicksand', 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--color-text);
     background-color: var(--color-background);
 }
 
+/* Liens globaux */
 a {
     color: var(--color-accent);
     transition: color 0.3s ease;
@@ -91,6 +93,7 @@ a:hover {
     color: var(--color-card-text);
 }
 
+/* BOUTONS */
 .btn-custom {
     background-color: var(--color-btn-bg);
     color: var(--color-btn-text);
@@ -126,6 +129,33 @@ a:hover {
 
 .custom-footer {
     background-color: var(--color-footer-bg) !important;
+}
+
+/* Pagination Bootstrap 5 custom color rose */
+.pagination .page-link {
+    color: var(--color-section-title);
+    background-color: transparent;
+    border: 1px solid var(--color-section-title);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination .page-link:hover {
+    color: var(--color-btn-text);
+    background-color: var(--color-section-title);
+    border-color: var(--color-section-title);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--color-section-title);
+    border-color: var(--color-section-title);
+    color: var(--color-btn-text);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: var(--color-card-text);
+    pointer-events: none;
+    background-color: transparent;
+    border-color: var(--color-section-title);
 }
 
 /* RESPONSIVE */

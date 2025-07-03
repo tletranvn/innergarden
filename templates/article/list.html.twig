@@ -5,9 +5,10 @@
 {% block body %}
     <div class="container mt-5">
         <h1 class="text-center mb-5 display-4">Tous nos Articles</h1>
+
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {# Boucle sur la liste des articles passée par le contrôleur #}
-            {% for article in articles %}
+            {# remplacer "articles" par "pagination" (nom de la variable retournée par le contrôleur avec KnpPaginator) #}
+            {% for article in pagination %}
                 <div class="col">
                     <div class="card h-100 shadow-sm card-custom">
                         {# Affichage de l'image de l'article ou d'un placeholder #}
@@ -18,30 +19,36 @@
                         {% endif %}
                         <div class="card-body text-start">
                             <h3 class="card-title card-title-custom">{{ article.title }}</h3>
-                            {# Affichage de l'extrait si disponible, sinon un extrait tronqué du contenu #}
+
+                            {# Affichage de l'extrait ou d'un extrait tronqué du contenu #}
                             <p class="card-text card-text-custom">
                                 {{ article.excerpt ? article.excerpt : article.content|striptags|slice(0, 150) ~ '...' }}
                             </p>
-                            {# Informations supplémentaires : date de publication, auteur (pseudo), nombre de vues #}
+
+                            {# Détails supplémentaires #}
                             <p class="card-text text-muted small">
                                 Publié le {{ article.publishedAt|date('d/m/Y') }}
-                                {% if article.author %}par {{ article.author.pseudo }}{% endif %} {# Utilisation du pseudo de l'auteur #}
+                                {% if article.author %}par {{ article.author.pseudo }}{% endif %}
                                 <br>
-                                {% if article.category %}Catégorie: {{ article.category.name }} {% endif %} {# Affichage de la catégorie #}
+                                {% if article.category %}Catégorie: {{ article.category.name }}{% endif %}
                                 <br>
                                 Vues: {{ article.viewCount }}
                             </p>
-                            {# Lien pour lire l'article complet, basé sur le slug #}
+
                             <a href="{{ path('articles_show', {'slug': article.slug}) }}" class="btn btn-custom">Lire la suite</a>
                         </div>
                     </div>
                 </div>
             {% else %}
-                {# Message si aucun article n'est trouvé #}
                 <div class="col-12">
                     <p class="text-center text-muted">Aucun article n'est disponible pour le moment.</p>
                 </div>
             {% endfor %}
         </div>
+
+        {# Ajout du bloc pagination de KnpPaginatorBundle en bas de page avec style Bootstrap 5 #}
+        <nav aria-label="Pagination" class="d-flex justify-content-center mt-4">
+            {{ knp_pagination_render(pagination, 'pagination/bootstrap_pagination.html.twig') }}
+        </nav>
     </div>
 {% endblock %}
