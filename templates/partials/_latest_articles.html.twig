@@ -5,11 +5,15 @@
             {% for article in latest_articles %}
                 <div class="col">
                     <div class="card h-100 shadow-lg card-custom">
-                        {# ajouter une image #}
-                        <img src="{{ asset('images/placeholder.png') }}" class="card-img-top" alt="Image pour {{ article.title }}">
+                        {# Affichage de l'image uploadée ou fallback #}
+                        {% if article.imageName %}
+                            <img src="{{ vich_uploader_asset(article, 'imageFile') }}" class="card-img-top" alt="Image pour {{ article.title }}">
+                        {% else %}
+                            <img src="{{ asset('images/placeholder.png') }}" class="card-img-top" alt="Image pour {{ article.title }}">
+                        {% endif %}
+                        
                         <div class="card-body text-start">
                             <h3 class="card-title card-title-custom">{{ article.title }}</h3>
-                            {# Affichez un extrait du contenu #}
                             <p class="card-text card-text-custom">{{ article.content|striptags|slice(0, 150) ~ '...' }}</p>
                             <p class="card-text text-muted small">
                                 Publié le {{ article.publishedAt|date('d/m/Y') }}

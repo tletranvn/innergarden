@@ -20,8 +20,8 @@ services:
       APP_ENV: dev
       APP_DEBUG: 1
       # NOUVEAU : Passez les variables MONGODB_URL et MONGODB_DB à l'application Symfony
-      MONGODB_URL: mongodb://root:rootpassword@mongodb:27017/innergarden_mongodb?authSource=admin
-      MONGODB_DB: innergarden_mongodb  
+      MONGODB_URL: ${MONGODB_URL}
+      MONGODB_DB: ${MONGODB_DB}
     user: "www-data"
 
   db:
@@ -46,8 +46,8 @@ services:
     volumes:
       - mongodb_data:/data/db:rw # Persiste les données de MongoDB
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root # Nom d'utilisateur root pour MongoDB
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword # Mot de passe root pour MongoDB
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME} # Nom d'utilisateur root pour MongoDB
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD} # Mot de passe root pour MongoDB
     networks:
       - innergarden_symfony # sur le même réseau que 'www'
     restart: unless-stopped # Redémarre le conteneur sauf s'il est explicitement arrêté
