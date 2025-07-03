@@ -47,13 +47,27 @@ class Article
     // ANCIEN : #[ORM\Column(length: 255, nullable: true)]
     // ANCIEN : private ?string $imageUrl = null;
 
-    // NOUVEAU : Cette propriété stocke le nom du fichier image
+    // NOUVEAU : Cette propriété stocke le nom du fichier image généré par VichUploader
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageName = null;
 
+    // NOUVEAU : Propriété pour stocker la taille du fichier (ajouté pour les métadonnées)
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $imageSize = null;
+
+    // NOUVEAU : Propriété pour stocker le type MIME du fichier (ajouté pour les métadonnées)
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageMimeType = null;
+
+    // NOUVEAU : Propriété pour stocker le nom original du fichier (ajouté pour les métadonnées)
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageOriginalName = null;
+
     // NOUVEAU : Cette propriété n'est pas persistée en BDD.
     // Elle est utilisée par VichUploader pour le téléchargement depuis le formulaire.
-    #[Vich\UploadableField(mapping: 'article_image', fileNameProperty: 'imageName')]
+    // MISE À JOUR : Ajout des attributs 'size', 'mimeType' et 'originalName' pour que VichUploader
+    // remplisse automatiquement les propriétés correspondantes après l'upload.
+    #[Vich\UploadableField(mapping: 'article_image', fileNameProperty: 'imageName', size: 'imageSize', mimeType: 'imageMimeType', originalName: 'imageOriginalName')]
     private ?File $imageFile = null;
 
     #[ORM\Column]
@@ -116,6 +130,7 @@ class Article
     }
 
     public function setContent(string $content): static
+
     {
         $this->content = $content;
 
@@ -195,11 +210,50 @@ class Article
         return $this;
     }
 
+    // NOUVEAU : Getter et Setter pour imageSize
+    public function getImageSize(): ?int
+    {
+        return $this->imageSize;
+    }
+
+    public function setImageSize(?int $imageSize): static
+    {
+        $this->imageSize = $imageSize;
+
+        return $this;
+    }
+
+    // NOUVEAU : Getter et Setter pour imageMimeType
+    public function getImageMimeType(): ?string
+    {
+        return $this->imageMimeType;
+    }
+
+    public function setImageMimeType(?string $imageMimeType): static
+    {
+        $this->imageMimeType = $imageMimeType;
+
+        return $this;
+    }
+
+    // NOUVEAU : Getter et Setter pour imageOriginalName
+    public function getImageOriginalName(): ?string
+    {
+        return $this->imageOriginalName;
+    }
+
+    public function setImageOriginalName(?string $imageOriginalName): static
+    {
+        $this->imageOriginalName = $imageOriginalName;
+
+        return $this;
+    }
+
     /**
      * NOUVEAU : Getter et Setter pour imageFile.
      * Cette méthode est appelée par VichUploader lorsque on soumet un fichier.
      * Si télécharger manuellement un fichier (par exemple, depuis une requête API)
-     * utilisez setImageName($filename) et setUpdatedAt($dateTime)!
+     * assurez-vous qu'une instance de 'UploadedFile' est injectée dans ce setter pour déclencher la mise à jour.
      *
      * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
      */
@@ -209,7 +263,7 @@ class Article
 
         if (null !== $imageFile) {
             // C'est nécessaire pour déclencher les événements de Doctrine,
-            // sinon les listeners de VichUploader ne seront pas appelés.
+            // sinon les listeners de VichUploader ne seront pas appelés et le fichier est perdu.
             $this->updatedAt = new \DateTimeImmutable();
         }
     }

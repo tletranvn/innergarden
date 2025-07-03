@@ -45,7 +45,7 @@ COPY . /var/www
 # Install Composer dependencies
 # This version keeps dev dependencies for easier development.
 # If building for production, consider 'RUN APP_ENV=prod composer install --no-dev --optimize-autoloader'
-RUN composer install --optimize-autoloader
+#RUN composer install --optimize-autoloader
 
 # Set permissions for Symfony cache and logs
 # Adjust permissions as needed, 777 might be too open for production

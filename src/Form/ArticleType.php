@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType; // NOUVEAU : Importez FileType
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Form\Type\VichImageType; // NOUVEAU : Importez VichImageType si nécessaire
 
 class ArticleType extends AbstractType
 {
@@ -61,17 +62,22 @@ class ArticleType extends AbstractType
             //         new Assert\Url(message: 'L\'URL de l\'image n\'est pas valide.'),
             //     ]
             // ])
-            ->add('imageFile', FileType::class, [ // NOUVEAU : Champ pour le téléchargement de l'image
+            // CORRECTION ICI : Utilisez VichImageType::class et RETIREZ 'mapped' => false
+            ->add('imageFile', VichImageType::class, [ // IMPORTANT : Utilisez VichImageType
                 'label' => 'Image de l\'article (JPG, PNG, GIF)',
-                'mapped' => false, // TRÈS IMPORTANT : Ce champ n'est pas mappé directement à l'entité
-                'required' => false, // L'image n'est pas obligatoire
+                // 'mapped' => false, // CETTE LIGNE DOIT ÊTRE SUPPRIMÉE OU COMMENTÉE !
+                'required' => false,
+                'allow_delete' => true, // Permet de supprimer l'image existante via un checkbox
+                'download_uri' => true, // Affiche un lien pour télécharger l'image
+                'image_uri' => true, // Affiche l'image existante si présente
+                'asset_helper' => true, // Utilise le helper asset() de Symfony pour générer l'URL de l'image
                 'attr' => [
-                    'accept' => 'image/*' // Pour n'accepter que les fichiers image dans la boîte de dialogue
+                    'accept' => 'image/*'
                 ],
-                'constraints' => [ // ajouter des contraintes de validation de fichier ici
+                'constraints' => [
                     new Assert\File([
-                        'maxSize' => '5M', // Taille maximale de l'image
-                        'mimeTypes' => [ // Types MIME acceptés
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
                             'image/jpeg',
                             'image/png',
                             'image/gif',

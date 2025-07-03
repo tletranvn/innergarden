@@ -16,7 +16,7 @@ use App\Repository\ArticleRepository;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use App\Document\Photo; 
+use App\Document\Photo;
 
 #[Route('/articles', name: 'articles_')]
 class ArticleController extends AbstractController
@@ -36,7 +36,9 @@ class ArticleController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $article = $form->getData();
+            // L'entité $article est hydratée par le formulaire.
+            // VichUploaderBundle mettra à jour l'imageFile (et via cela, imageName, imageSize, etc. si configuré)
+            // dès que l'entité est persistée et flushée.
 
             // Génération du slug
             if (!$article->getSlug()) {
@@ -56,30 +58,29 @@ class ArticleController extends AbstractController
 
             $em->persist($article);
             $em->flush(); // IMPORTANT : Flush avant d'accéder à l'ID de l'article
+                          // À ce stade, VichUploader a déplacé l'image et mis à jour imageName (et autres si configuré) sur $article.
 
-            // Enregistrement manuel des métadonnées dans MongoDB
-            $imageFile = $form->get('imageFile')->getData();
+            // NOUVEAU : Enregistrement des métadonnées de l'image dans MongoDB
+            // On vérifie si un fichier a été soumis ET si VichUploader a bien mis à jour le nom de l'image sur l'entité Article.
+            // Si $article->getImageName() n'est pas null, cela signifie que VichUploader a traité l'upload.
+            if ($article->getImageName() !== null) {
+                $photo = new Photo();
+                $photo->setFilename($article->getImageName());
 
-            if ($imageFile) {
-                // NOUVEAU : Vérification si VichUploader a bien défini le nom de l'image.
-                // Si getImageName() retourne null ici, cela indique un problème de configuration
-                // ou de timing avec VichUploaderBundle, car le nom du fichier devrait être setté
-                // sur l'entité Article après le flush Doctrine.
-                if ($article->getImageName() !== null) {
-                    $photo = new Photo();
-                    $photo->setFilename($article->getImageName());
-                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                    $photo->setMimeType($imageFile->getMimeType());
-                    $photo->setSize($imageFile->getSize());
-                    $photo->setRelatedArticleId((string)$article->getId());
+                // CORRECTION ICI : Utilisez les getters des propriétés de l'entité Article
+                // qui ont été remplies par VichUploaderBundle.
+                $photo->setOriginalFilename($article->getImageOriginalName());
+                $photo->setMimeType($article->getImageMimeType());
+                $photo->setSize($article->getImageSize());
 
-                    $documentManager->persist($photo);
-                    $documentManager->flush();
-                } else {
-                    // NOUVEAU : Message d'avertissement si le nom de l'image est null.
-                    // Cela évite une erreur fatale et informe l'utilisateur du problème.
-                    $this->addFlash('warning', 'L\'image a été soumise, mais ses métadonnées n\'ont pas pu être enregistrées. Veuillez vérifier la configuration de VichUploader.');
-                }
+                $photo->setRelatedArticleId((string)$article->getId()); // Lie la photo à l'ID de l'article MySQL
+
+                $documentManager->persist($photo);
+                $documentManager->flush(); // Persiste le document Photo dans MongoDB
+            } else {
+                // NOUVEAU : Message d'avertissement si le nom de l'image est null après soumission.
+                // Cela indique un problème avec l'upload ou la configuration de VichUploader.
+                $this->addFlash('warning', 'L\'image a été soumise, mais ses métadonnées n\'ont pas pu être enregistrées dans MongoDB. Veuillez vérifier la configuration de VichUploader et l\'entité Article.');
             }
 
             $this->addFlash('success', 'L\'article a été créé avec succès.');
@@ -116,33 +117,33 @@ class ArticleController extends AbstractController
             }
 
             $em->flush(); // Pas besoin de persist car l'entité est déjà gérée par l'EntityManager
+                          // À ce stade, VichUploader a traité l'image si une nouvelle a été soumise.
 
-            // Mise à jour/création des métadonnées dans MongoDB pour l'image de l'article
-            $imageFile = $form->get('imageFile')->getData();
+            // NOUVEAU : Mise à jour/création/suppression des métadonnées dans MongoDB pour l'image de l'article
+            // Si une nouvelle image a été soumise, $article->getImageName() ne sera pas null après le flush.
+            if ($article->getImageName() !== null) {
+                // Tente de trouver un document Photo existant lié à cet article
+                $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
 
-            if ($imageFile) {
-                // NOUVEAU : Vérification si VichUploader a bien défini le nom de l'image pour la modification.
-                if ($article->getImageName() !== null) {
-                    $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
-
-                    if (!$photo) {
-                        $photo = new Photo();
-                        $photo->setRelatedArticleId((string)$article->getId());
-                    }
-
-                    $photo->setFilename($article->getImageName());
-                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                    $photo->setMimeType($imageFile->getMimeType());
-                    $photo->setSize($imageFile->getSize());
-
-                    $documentManager->persist($photo);
-                    $documentManager->flush();
-                } else {
-                     // NOUVEAU : Message d'avertissement pour la mise à jour de l'image.
-                     $this->addFlash('warning', 'L\'image a été soumise, mais ses métadonnées n\'ont pas pu être mises à jour. Veuillez vérifier la configuration de VichUploader.');
+                if (!$photo) {
+                    // Si aucun document Photo n'existe, on en crée un nouveau
+                    $photo = new Photo();
+                    $photo->setRelatedArticleId((string)$article->getId());
                 }
-            } elseif ($form->get('imageFile')->getNormData() === null && $article->getImageName() !== null) {
+
+                // NOUVEAU : Met à jour les métadonnées de la photo
+                $photo->setFilename($article->getImageName());
+                // CORRECTION ICI : Utilisez les getters des propriétés de l'entité Article
+                // qui ont été remplies par VichUploaderBundle.
+                $photo->setOriginalFilename($article->getImageOriginalName());
+                $photo->setMimeType($article->getImageMimeType());
+                $photo->setSize($article->getImageSize());
+
+                $documentManager->persist($photo);
+                $documentManager->flush();
+            } elseif ($form->get('imageFile')->getNormData() === null && $article->getImageName() === null) {
                 // NOUVEAU : Logique pour supprimer la photo si elle est retirée du formulaire d'édition.
+                // Cela signifie que le champ imageFile était vide ET que l'article n'a plus de nom d'image.
                 $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
                 if ($photo) {
                     $documentManager->remove($photo);
@@ -171,7 +172,7 @@ class ArticleController extends AbstractController
         $em->remove($article);
         $em->flush();
 
-        // Supprimer les métadonnées de la photo de MongoDB
+        // NOUVEAU : Supprimer les métadonnées de la photo de MongoDB
         $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
         if ($photo) {
             $documentManager->remove($photo);
