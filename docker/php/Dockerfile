@@ -8,6 +8,8 @@ RUN apt-get update \
     && apt-get install -qq -y --no-install-recommends \
     cron \
     locales coreutils apt-utils git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev \
+    # NOUVEAU : Ajouter dépendances SSL nécessaires pour pecl mongodb avec support SSL
+    libssl-dev libcurl4-openssl-dev pkg-config \
     && apt-get upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -28,7 +30,8 @@ RUN docker-php-ext-install pdo pdo_mysql mysqli gd opcache intl zip calendar dom
 # Install apcu
 RUN pecl install apcu && docker-php-ext-enable apcu
 
-# NOUVEAU : Installer et activer l'extension MongoDB
+# NOUVEAU : Installer et activer l'extension MongoDB avec support SSL (libssl-dev etc. installés avant)
+# permet à pecl mongodb d’être compilé avec le support SSL nécessaire pour SCRAM-SHA-256.
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
 

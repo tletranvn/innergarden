@@ -20,3 +20,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Injection du client MongoDB en récupérant la variable d'environnement
+    MongoDB\Client:
+        arguments:
+            $uri: '%env(MONGODB_URL)%'
+    
+    App\Command\TestMongoCommand:
+        tags: ['console.command']
