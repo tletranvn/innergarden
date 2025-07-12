@@ -129,7 +129,7 @@ class ArticleController extends AbstractController
             $em->flush(); // Pas besoin de persist car l'entité est déjà gérée par l'EntityManager
                           // À ce stade, VichUploader a traité l'image si une nouvelle a été soumise.
 
-            // NOUVEAU : Mise à jour/création/suppression des métadonnées dans MongoDB pour l'image de l'article
+            // Mise à jour/création/suppression des métadonnées dans MongoDB pour l'image de l'article
             // Si une nouvelle image a été soumise, $article->getImageName() ne sera pas null après le flush.
             if ($article->getImageName() !== null) {
                 // Tente de trouver un document Photo existant lié à cet article
@@ -141,10 +141,8 @@ class ArticleController extends AbstractController
                     $photo->setRelatedArticleId((string)$article->getId());
                 }
 
-                // NOUVEAU : Met à jour les métadonnées de la photo
+                // Met à jour les métadonnées de la photo
                 $photo->setFilename($article->getImageName());
-                // CORRECTION ICI : Utilisez les getters des propriétés de l'entité Article
-                // qui ont été remplies par VichUploaderBundle.
                 $photo->setOriginalFilename($article->getImageOriginalName());
                 $photo->setMimeType($article->getImageMimeType());
                 $photo->setSize($article->getImageSize());
@@ -152,7 +150,7 @@ class ArticleController extends AbstractController
                 $documentManager->persist($photo);
                 $documentManager->flush();
             } elseif ($form->get('imageFile')->getNormData() === null && $article->getImageName() === null) {
-                // NOUVEAU : Logique pour supprimer la photo si elle est retirée du formulaire d'édition.
+                // Logique pour supprimer la photo si elle est retirée du formulaire d'édition.
                 // Cela signifie que le champ imageFile était vide ET que l'article n'a plus de nom d'image.
                 $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
                 if ($photo) {

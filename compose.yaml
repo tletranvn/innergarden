@@ -17,13 +17,15 @@ services:
       - db
       - mongodb # NOUVEAU : Le service 'www' dépend maintenant aussi de 'mongodb'
     env_file:
-      - .env.docker # Docker Compose va charger les variables de ce fichier
+      - .env.docker.local # Fichier avec les variables MongoDB
     environment:
       APP_ENV: dev
       APP_DEBUG: 1
-      # NOUVEAU : Passez les variables MONGODB_URL et MONGODB_DB à l'application Symfony
-      #MONGODB_URL: ${MONGODB_URL}
-      #MONGODB_DB: ${MONGODB_DB}
+      # Variables MongoDB passées explicitement
+      MONGODB_URL: ${MONGODB_URL}
+      MONGODB_DB: ${MONGODB_DB}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     user: "www-data"
 
   db:
@@ -41,15 +43,18 @@ services:
 
   # Configuration du service MongoDB
   mongodb:
-    image: mongo:latest # Image MongoDB standard
+    image: mongo:7.0 # Version spécifique plus stable
+    platform: linux/arm64/v8 # Force l'architecture ARM64 pour M1
     container_name: innergarden_mongodb
     ports:
       - "27017:27017" # EXPOSE LE PORT 27017 pour la connexion depuis l'hôte (Compass)
     volumes:
       - mongodb_data:/data/db:rw # Persiste les données de MongoDB
+      - ./docker/mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro # Script d'initialisation
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME} # Nom d'utilisateur root pour MongoDB
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD} # Mot de passe root pour MongoDB
+      MONGO_INITDB_DATABASE: innergarden_mongodb # Base de données à créer
     networks:
       - innergarden_symfony # sur le même réseau que 'www'
     restart: unless-stopped # Redémarre le conteneur sauf s'il est explicitement arrêté
