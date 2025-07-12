@@ -97,12 +97,20 @@ class ArticleController extends AbstractController
     #[IsGranted('ROLE_ADMIN')] // Seuls les utilisateurs avec le rôle ADMIN peuvent éditer
     #[Route('/edit/{slug}', name: 'edit')]
     public function edit(
-        Article $article,
+        string $slug,
         Request $request,
         EntityManagerInterface $em,
         SluggerInterface $slugger,
-        DocumentManager $documentManager
+        DocumentManager $documentManager,
+        ArticleRepository $articleRepository
     ): Response {
+        // Récupération explicite de l'article par slug
+        $article = $articleRepository->findOneBy(['slug' => $slug]);
+        
+        if (!$article) {
+            throw $this->createNotFoundException('Article non trouvé avec le slug: ' . $slug);
+        }
+        
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
