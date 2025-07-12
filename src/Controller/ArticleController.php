@@ -158,7 +158,7 @@ class ArticleController extends AbstractController
             return $this->redirectToRoute('articles_list');
         }
 
-        return $this->render('article/edit.html.twig', [
+        return $this->render('article/show.html.twig', [
             'form' => $form->createView(),
             'article' => $article
         ]);
@@ -168,9 +168,21 @@ class ArticleController extends AbstractController
     #[Route('/delete/{slug}', name: 'delete')]
     public function delete(
         Article $article,
+        Request $request,
         EntityManagerInterface $em,
         DocumentManager $documentManager
     ): RedirectResponse {
+        // vérification CSRF
+        // Le jeton CSRF est envoyé dans le formulaire de suppression (généralement un bouton de type "submit" avec un champ caché _token)
+        // et vérifié ici
+        $submittedToken = $request->request->get('_token');
+
+        if (!$this->isCsrfTokenValid('delete' . $article->getId(), $submittedToken)) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+        // Supprimer l'article de la base de données
+        // L'EntityManager gère la suppression de l'article
+        // et VichUploaderBundle s'occupe de la suppression de l'image associée.
         $em->remove($article);
         $em->flush();
 

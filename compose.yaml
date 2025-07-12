@@ -16,12 +16,14 @@ services:
     depends_on:
       - db
       - mongodb # NOUVEAU : Le service 'www' dépend maintenant aussi de 'mongodb'
+    env_file:
+      - .env.docker # Docker Compose va charger les variables de ce fichier
     environment:
       APP_ENV: dev
       APP_DEBUG: 1
       # NOUVEAU : Passez les variables MONGODB_URL et MONGODB_DB à l'application Symfony
-      MONGODB_URL: ${MONGODB_URL}
-      MONGODB_DB: ${MONGODB_DB}
+      #MONGODB_URL: ${MONGODB_URL}
+      #MONGODB_DB: ${MONGODB_DB}
     user: "www-data"
 
   db:
