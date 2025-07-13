@@ -71,7 +71,7 @@
                         {{ form_start(commentForm, {
                             attr: {
                                 id: 'commentForm',
-                                'action': path('articles_show', { slug: article.slug })
+                                'action': path('app_comment_new', { id: article.id })
                             }
                         }) }}
                             {{ form_row(commentForm.comment) }}

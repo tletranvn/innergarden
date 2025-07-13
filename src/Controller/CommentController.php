@@ -19,9 +19,19 @@ class CommentController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function new(Request $request, Article $article, EntityManagerInterface $em): JsonResponse
     {
+        // Vérifier que l'article est publié
+        if (!$article->isPublished()) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Impossible de commenter un article non publié.',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
         $comment = (new Comment())
             ->setArticle($article)
-            ->setAuthor($this->getUser());
+            ->setAuthor($this->getUser())
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setIsApproved(false); // Modération par défaut
 
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
@@ -32,16 +42,18 @@ class CommentController extends AbstractController
 
             return new JsonResponse([
                 'success' => true,
-                'message' => 'Commentaire ajouté avec succès !',
+                'message' => 'Commentaire ajouté avec succès et en attente de modération !',
                 'comment' => [
                     'id' => $comment->getId(),
                     'content' => $comment->getComment(),
                     'authorPseudo' => $comment->getAuthor()->getPseudo(),
                     'createdAt' => $comment->getCreatedAt()->format('d/m/Y H:i'),
+                    'isApproved' => $comment->isApproved()
                 ]
             ], Response::HTTP_CREATED);
         }
 
+        // Gestion des erreurs de validation
         $errors = [];
         foreach ($form->getErrors(true) as $error) {
             $path = $error->getCause()?->getPropertyPath() ?? 'global';
@@ -53,5 +65,23 @@ class CommentController extends AbstractController
             'message' => 'Erreurs de validation.',
             'errors' => $errors
         ], Response::HTTP_BAD_REQUEST);
+    }
+
+    #[Route('/articles/{slug}/comment', name: 'app_comment_new_by_slug', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function newBySlug(Request $request, string $slug, EntityManagerInterface $em): JsonResponse
+    {
+        // Récupérer l'article par slug
+        $article = $em->getRepository(Article::class)->findOneBy(['slug' => $slug]);
+        
+        if (!$article) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Article non trouvé.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Utiliser la même logique que la méthode principale
+        return $this->new($request, $article, $em);
     }
 }

@@ -165,13 +165,21 @@
                                             <td class="text-center">
                                                 <div class="btn-group" role="group">
                                                     {% if article.slug %}
-                                                        <!-- Voir l'article -->
-                                                        <a href="{{ path('articles_show', { slug: article.slug }) }}" 
-                                                           class="btn btn-outline-primary btn-sm" 
-                                                           title="Voir l'article"
-                                                           target="_blank">
-                                                            <i class="bi bi-eye"></i>
-                                                        </a>
+                                                        <!-- Voir l'article (ou éditer si brouillon) -->
+                                                        {% if article.isPublished %}
+                                                            <a href="{{ path('articles_show', { slug: article.slug }) }}" 
+                                                               class="btn btn-outline-primary btn-sm" 
+                                                               title="Voir l'article publié"
+                                                               target="_blank">
+                                                                <i class="bi bi-eye"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{{ path('articles_edit', { slug: article.slug }) }}" 
+                                                               class="btn btn-outline-secondary btn-sm" 
+                                                               title="Éditer le brouillon (non publié)">
+                                                                <i class="bi bi-eye-slash"></i>
+                                                            </a>
+                                                        {% endif %}
                                                         
                                                         <!-- Éditer l'article -->
                                                         <a href="{{ path('articles_edit', { slug: article.slug }) }}" 
@@ -229,9 +237,9 @@
                                 Articles {{ start }} à {{ end }} sur {{ pagination.totalItemCount }}
                             </div>
                             
-                            <!-- Pagination -->
-                            <nav aria-label="Pagination des articles">
-                                {{ knp_pagination_render(pagination) }}
+                            {# Ajout du bloc pagination de KnpPaginatorBundle en bas de page avec style Bootstrap 5 #}
+                            <nav aria-label="Pagination" class="d-flex justify-content-center mt-4">
+                                {{ knp_pagination_render(pagination, 'pagination/bootstrap_pagination.html.twig') }}
                             </nav>
                         </div>
                     </div>
