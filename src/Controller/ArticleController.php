@@ -69,7 +69,7 @@ class ArticleController extends AbstractController
                 $photo = new Photo();
                 $photo->setFilename($article->getImageName());
 
-                // CORRECTION ICI : Utilisez les getters des propriétés de l'entité Article
+                // Utilisez les getters des propriétés de l'entité Article
                 // qui ont été remplies par VichUploaderBundle.
                 $photo->setOriginalFilename($article->getImageOriginalName());
                 $photo->setMimeType($article->getImageMimeType());
@@ -112,6 +112,10 @@ class ArticleController extends AbstractController
         }
         
         $form = $this->createForm(ArticleType::class, $article);
+        
+        // Sauvegarder l'état initial de l'image pour détecter les suppressions
+        $originalImageName = $article->getImageName();
+        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -149,9 +153,8 @@ class ArticleController extends AbstractController
 
                 $documentManager->persist($photo);
                 $documentManager->flush();
-            } elseif ($form->get('imageFile')->getNormData() === null && $article->getImageName() === null) {
-                // Logique pour supprimer la photo si elle est retirée du formulaire d'édition.
-                // Cela signifie que le champ imageFile était vide ET que l'article n'a plus de nom d'image.
+            } elseif ($originalImageName !== null && $article->getImageName() === null) {
+                // L'article avait une image avant mais plus maintenant = suppression d'image
                 $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
                 if ($photo) {
                     $documentManager->remove($photo);
@@ -173,11 +176,18 @@ class ArticleController extends AbstractController
     #[IsGranted('ROLE_ADMIN')] // Seuls les utilisateurs avec le rôle ADMIN peuvent supprimer
     #[Route('/delete/{slug}', name: 'delete')]
     public function delete(
-        Article $article,
+        string $slug,
         Request $request,
         EntityManagerInterface $em,
-        DocumentManager $documentManager
+        DocumentManager $documentManager,
+        ArticleRepository $articleRepository
     ): RedirectResponse {
+        // Récupération explicite de l'article par slug
+        $article = $articleRepository->findOneBy(['slug' => $slug]);
+        
+        if (!$article) {
+            throw $this->createNotFoundException('Article non trouvé avec le slug: ' . $slug);
+        }
         // vérification CSRF
         // Le jeton CSRF est envoyé dans le formulaire de suppression (généralement un bouton de type "submit" avec un champ caché _token)
         // et vérifié ici
