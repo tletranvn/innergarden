@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau message de contact - Inner Garden</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #4A5C6F;
+            color: #F8F4E3;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #4A5C6F;
+            width: 120px;
+            flex-shrink: 0;
+        }
+        .info-value {
+            color: #333;
+            flex: 1;
+        }
+        .message-content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #F0B2B2;
+            margin-top: 20px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Nouveau message de contact</h1>
+            <p>Inner Garden - Formulaire de contact</p>
+        </div>
+        
+        <div class="content">
+            <h2 style="color: #4A5C6F; margin-bottom: 20px;">Détails du message</h2>
+            
+            <div class="info-row">
+                <div class="info-label">Prénom :</div>
+                <div class="info-value">{{ contact.firstName }}</div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Email :</div>
+                <div class="info-value">
+                    <a href="mailto:{{ contact.email }}" style="color: #F0B2B2; text-decoration: none;">
+                        {{ contact.email }}
+                    </a>
+                </div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Date :</div>
+                <div class="info-value">{{ contact.createdAt|date('d/m/Y à H:i') }}</div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Email demandé :</div>
+                <div class="info-value">
+                    {% if contact.sendEmail %}
+                        <span style="color: #28a745;">✅ Oui</span>
+                    {% else %}
+                        <span style="color: #dc3545;">❌ Non</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="message-content">
+                <h3 style="color: #4A5C6F; margin-top: 0;">Message :</h3>
+                <p style="line-height: 1.6; margin: 0;">{{ contact.message|nl2br }}</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Ce message a été envoyé via le formulaire de contact du site Inner Garden</p>
+            <p>{{ "now"|date('d/m/Y à H:i') }}</p>
+        </div>
+    </div>
+</body>
+</html>

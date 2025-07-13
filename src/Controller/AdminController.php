@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ArticleRepository;
+use App\Repository\ContactRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,12 +25,14 @@ class AdminController extends AbstractController
     public function dashboard(
         Request $request,
         ArticleRepository $articleRepository,
+        ContactRepository $contactRepository,
         PaginatorInterface $paginator
     ): Response {
         // Statistiques pour le dashboard
         $totalArticles = $articleRepository->count([]);
         $publishedArticles = $articleRepository->count(['isPublished' => true]);
         $draftArticles = $articleRepository->count(['isPublished' => false]);
+        $unprocessedMessages = $contactRepository->countUnprocessed();
         
         // Articles les plus vus
         $mostViewedArticles = $articleRepository->createQueryBuilder('a')
@@ -56,7 +59,8 @@ class AdminController extends AbstractController
                 'total' => $totalArticles,
                 'published' => $publishedArticles,
                 'drafts' => $draftArticles,
-                'mostViewed' => $mostViewedArticles
+                'mostViewed' => $mostViewedArticles,
+                'unprocessedMessages' => $unprocessedMessages
             ]
         ]);
     }

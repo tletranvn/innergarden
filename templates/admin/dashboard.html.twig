@@ -71,6 +71,23 @@
                     </div>
                 </div>
                 <div class="col-md-3">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="mb-0">{{ stats.unprocessedMessages }}</h4>
+                                    <small>Messages en attente</small>
+                                </div>
+                                <i class="bi bi-envelope-exclamation display-4 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Deuxième ligne de statistiques si nécessaire #}
+            <div class="row mb-4">
+                <div class="col-md-6">
                     <div class="card bg-info text-white">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
@@ -79,6 +96,23 @@
                                     <small>Articles populaires</small>
                                 </div>
                                 <i class="bi bi-eye display-4 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-secondary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="mb-0">📧</h4>
+                                    <small>
+                                        <a href="{{ path('app_contact') }}" class="text-white text-decoration-none">
+                                            Voir formulaire contact
+                                        </a>
+                                    </small>
+                                </div>
+                                <i class="bi bi-link-45deg display-4 opacity-50"></i>
                             </div>
                         </div>
                     </div>

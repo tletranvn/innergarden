@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nous contacter - Inner Garden{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="p-4 shadow-sm rounded bg-light text-dark">
+                <h1 class="h3 mb-3 text-center" style="color: var(--color-section-title);">Nous contacter</h1>
+                
+                <p class="text-center mb-4 text-muted">
+                    Une question, une suggestion ou envie de partager votre expérience ? 
+                    N'hésitez pas à nous écrire !
+                </p>
+
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+
+                {% for message in app.flashes('warning') %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+
+                {% for message in app.flashes('danger') %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-x-circle-fill"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+
+                {{ form_start(form, {'attr': {'id': 'contactForm', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.firstName, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.firstName) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.message, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.message, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.message) }}
+                        <div class="form-text">Minimum 10 caractères, maximum 2000 caractères.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form_widget(form.sendEmail, {'attr': {'class': 'form-check-input'}}) }}
+                            {{ form_label(form.sendEmail, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i> 
+                            Si cochée, une copie sera envoyée par email à notre équipe.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form_widget(form.submit) }}
+                    </div>
+
+                {{ form_end(form) }}
+
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <h5 class="mb-3" style="color: var(--color-section-title);">Autres moyens de nous contacter</h5>
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-envelope"></i> 
+                        Email direct : <a href="mailto:tletranvn@gmail.com" class="text-decoration-none">tletranvn@gmail.com</a>
+                    </p>
+                    <p class="text-muted">
+                        <i class="bi bi-clock"></i> 
+                        Nous répondons généralement sous 24-48h
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
