@@ -58,8 +58,12 @@
                         {# Afficher l'image actuelle si elle existe #}
                         {% if article.imageName %}
                             <div class="mt-2">
-                                <p>Image actuelle :</p>
-                                <img src="{{ asset('uploads/articles/' ~ article.imageName) }}" alt="{{ article.title }}" style="max-width: 200px; height: auto;">
+                                <p class="mb-2">Image actuelle :</p>
+                                <div class="border rounded p-2 bg-white d-inline-block">
+                                    <img src="{{ asset('uploads/images/articles/' ~ article.imageName) }}" 
+                                         alt="{{ article.title }}" 
+                                         style="width: 150px; height: 100px; object-fit: cover; border-radius: 4px;">
+                                </div>
                             </div>
                         {% endif %}
                     </div>
@@ -96,4 +100,14 @@
 {% block javascripts %}
     {{ parent() }}
     {# <script src="{{ asset('js/article_form.js') }}"></script> #}
+    <style>
+        /* Masquer l'affichage automatique de l'image par VichUploader pour éviter le doublon */
+        .vich-image img {
+            display: none !important;
+        }
+        /* Optionnel : masquer aussi le lien de téléchargement si présent 
+        .vich-image a {
+            display: none !important;
+        }*/
+    </style>
 {% endblock %}
