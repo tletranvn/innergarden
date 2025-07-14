@@ -39,16 +39,16 @@ class ContactType extends AbstractType
                     'rows' => 6
                 ]
             ])
-            ->add('sendEmail', CheckboxType::class, [
-                'label' => 'Envoyer une copie par email',
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-check-input'
-                ],
-                'label_attr' => [
-                    'class' => 'form-check-label'
-                ]
-            ])
+            //->add('sendEmail', CheckboxType::class, [
+            //    'label' => 'Envoyer une copie par email',
+            //    'required' => false,
+            //    'attr' => [
+            //        'class' => 'form-check-input'
+            //    ],
+            //    'label_attr' => [
+            //        'class' => 'form-check-label'
+            //    ]
+            //])
             ->add('submit', SubmitType::class, [
                 'label' => 'Envoyer le message',
                 'attr' => [

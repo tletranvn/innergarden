@@ -34,15 +34,15 @@ class Contact
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Le message est obligatoire')]
     #[Assert\Length(
-        min: 10,
+        min: 2,
         max: 2000,
         minMessage: 'Le message doit contenir au moins {{ limit }} caractères',
         maxMessage: 'Le message ne peut pas dépasser {{ limit }} caractères'
     )]
     private ?string $message = null;
 
-    #[ORM\Column]
-    private ?bool $sendEmail = false;
+    //#[ORM\Column]
+    //private ?bool $sendEmail = false;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -75,7 +75,7 @@ class Contact
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
+    
         return $this;
     }
 
@@ -91,17 +91,17 @@ class Contact
         return $this;
     }
 
-    public function isSendEmail(): ?bool
-    {
-        return $this->sendEmail;
-    }
+    //public function isSendEmail(): ?bool
+    //{
+    //    return $this->sendEmail;
+    //}
 
-    public function setSendEmail(bool $sendEmail): static
-    {
-        $this->sendEmail = $sendEmail;
-
-        return $this;
-    }
+    //public function setSendEmail(bool $sendEmail): static
+    //{
+    //    $this->sendEmail = $sendEmail;
+    //
+    //    return $this;
+    //}
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {

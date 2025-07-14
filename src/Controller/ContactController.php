@@ -31,26 +31,25 @@ class ContactController extends AbstractController
             $em->flush();
 
             // Envoyer l'email si l'option est cochée
-            if ($contact->isSendEmail()) {
-                try {
-                    $email = (new Email())
-                        ->from($contact->getEmail())
-                        ->to('tletranvn@gmail.com')
-                        ->subject('Nouveau message de contact - Inner Garden')
-                        ->html($this->renderView('emails/contact.html.twig', [
-                            'contact' => $contact
-                        ]));
-
-                    $mailer->send($email);
-                    
-                    $this->addFlash('success', 'Votre message a été envoyé avec succès ! Un email a également été expédié.');
-                } catch (\Exception $e) {
-                    // En cas d'erreur d'envoi d'email, on sauvegarde quand même le message
-                    $this->addFlash('warning', 'Votre message a été enregistré, mais l\'envoi par email a échoué. Nous vous recontacterons bientôt.');
-                }
-            } else {
-                $this->addFlash('success', 'Votre message a été envoyé avec succès ! Nous vous recontacterons bientôt.');
-            }
+            //if ($contact->isSendEmail()) {
+            //    try {
+            //        $email = (new Email())
+            //            ->from($contact->getEmail())
+            //            ->to('tletranvn@gmail.com')
+            //            ->subject('Nouveau message de contact - Inner Garden')
+            //            ->html($this->renderView('emails/contact.html.twig', [
+            //                'contact' => $contact
+            //            ]));
+            //        $mailer->send($email);
+            //        
+            //       $this->addFlash('success', 'Votre message a été envoyé avec succès ! Un email a également été expédié.');
+            //    } catch (\Exception $e) {
+            //        // En cas d'erreur d'envoi d'email, on sauvegarde quand même le message
+            //        $this->addFlash('warning', 'Votre message a été enregistré, mais l\'envoi par email a échoué. Nous vous recontacterons bientôt.');
+            //    }
+            //} else {
+            //    $this->addFlash('success', 'Votre message a été envoyé avec succès ! Nous vous recontacterons bientôt.');
+            //}
 
             // Redirection pour éviter la re-soumission
             return $this->redirectToRoute('app_contact');
