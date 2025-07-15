@@ -47,7 +47,7 @@ class ArticleType extends AbstractType
                 'label' => 'Publier l\'article',
                 'required' => false,
             ])
-            // NOUVEAU : Ajout du champ 'slug'
+            // Ajout du champ 'slug'
             ->add('slug', TextType::class, [
                 'label' => 'Slug',
                 'required' => false, // Permet de laisser le champ vide pour auto-génération

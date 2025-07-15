@@ -38,9 +38,6 @@ class ArticleController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // L'entité $article est hydratée par le formulaire.
-            // VichUploaderBundle mettra à jour l'imageFile (et via cela, imageName, imageSize, etc. si configuré)
-            // dès que l'entité est persistée et flushée.
 
             // Génération du slug
             if (!$article->getSlug()) {
@@ -59,8 +56,8 @@ class ArticleController extends AbstractController
             }
 
             $em->persist($article);
-            $em->flush(); // IMPORTANT : Flush avant d'accéder à l'ID de l'article
-                          // À ce stade, VichUploader a déplacé l'image et mis à jour imageName (et autres si configuré) sur $article.
+            $em->flush(); 
+                     
 
             // NOUVEAU : Enregistrement des métadonnées de l'image dans MongoDB
             // On vérifie si un fichier a été soumis ET si VichUploader a bien mis à jour le nom de l'image sur l'entité Article.
@@ -299,7 +296,7 @@ class ArticleController extends AbstractController
 
 
     // Une méthode pour publier les derniers articles sur la Homepage
-    public function latestArticles(ArticleRepository $articleRepository, int $limit = 5): Response
+    public function latestArticles(ArticleRepository $articleRepository, int $limit = 6): Response
     {
         // Récupère les derniers articles publiés, triés par date de publication décroissante
         $latestArticles = $articleRepository->findBy(

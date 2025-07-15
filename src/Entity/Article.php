@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 use Symfony\Component\HttpFoundation\File\File; // Importez File
 use Vich\UploaderBundle\Mapping\Annotation as Vich; // Importez VichUploaderBundle
+use Symfony\Component\Validator\Constraints as Assert; // Import pour les validations
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[Vich\Uploadable] //ajouter cette annotation à la classe pour activer VichUploader
@@ -68,6 +69,12 @@ class Article
     // MISE À JOUR : Ajout des attributs 'size', 'mimeType' et 'originalName' pour que VichUploader
     // remplisse automatiquement les propriétés correspondantes après l'upload.
     #[Vich\UploadableField(mapping: 'article_image', fileNameProperty: 'imageName', size: 'imageSize', mimeType: 'imageMimeType', originalName: 'imageOriginalName')]
+    #[Assert\File(
+        maxSize: '5M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+        mimeTypesMessage: 'Veuillez télécharger une image valide (JPEG, PNG, GIF, WebP)',
+        maxSizeMessage: 'La taille du fichier ne doit pas dépasser 5 MB'
+    )]
     private ?File $imageFile = null;
 
     #[ORM\Column]

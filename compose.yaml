@@ -15,7 +15,7 @@ services:
       - innergarden_symfony
     depends_on:
       - db
-      - mongodb # NOUVEAU : Le service 'www' dépend maintenant aussi de 'mongodb'
+      - mongodb
     env_file:
       - .env.docker.local # Fichier avec les variables MongoDB
     environment:
@@ -40,8 +40,6 @@ services:
       - "3307:3306"
     networks:
       - innergarden_symfony
-
-  # Configuration du service MongoDB
   mongodb:
     image: mongo:7.0 # Version spécifique plus stable
     platform: linux/arm64/v8 # Force l'architecture ARM64 pour M1
@@ -65,3 +63,4 @@ networks:
 volumes:
   db_data:
   mongodb_data:
+  

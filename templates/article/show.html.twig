@@ -28,7 +28,8 @@
                     </p>
                     <hr>
                     <div class="article-content">
-                        {{ article.content|raw }}
+                        {{ article.content|nl2br }} {# Utilisation de nl2br pour conserver les sauts de ligne
+                                                    Convertit les retours à la ligne (\n) en balises <br> HTML #}
                     </div>
                     <a href="{{ path('articles_list') }}" class="btn btn-secondary mt-3">Retour aux articles</a>
                     {# Admin peut editer et supprimer l'article #}

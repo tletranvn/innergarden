@@ -8,7 +8,7 @@ RUN apt-get update \
     && apt-get install -qq -y --no-install-recommends \
     cron \
     locales coreutils apt-utils git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev \
-    # NOUVEAU : Ajouter dépendances SSL nécessaires pour pecl mongodb avec support SSL
+    # Ajouter dépendances SSL nécessaires pour pecl mongodb avec support SSL
     libssl-dev libcurl4-openssl-dev pkg-config \
     && apt-get upgrade -y \
     && apt-get clean \
@@ -30,7 +30,7 @@ RUN docker-php-ext-install pdo pdo_mysql mysqli gd opcache intl zip calendar dom
 # Install apcu
 RUN pecl install apcu && docker-php-ext-enable apcu
 
-# NOUVEAU : Installer et activer l'extension MongoDB avec support SSL (libssl-dev etc. installés avant)
+# Installer et activer l'extension MongoDB avec support SSL (libssl-dev etc. installés avant)
 # permet à pecl mongodb d’être compilé avec le support SSL nécessaire pour SCRAM-SHA-256.
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
@@ -45,12 +45,10 @@ WORKDIR /var/www
 
 COPY . /var/www
 
-# Install Composer dependencies
-# This version keeps dev dependencies for easier development.
-# If building for production, consider 'RUN APP_ENV=prod composer install --no-dev --optimize-autoloader'
-#RUN composer install --optimize-autoloader
-
 # Set permissions for Symfony cache and logs
 # Adjust permissions as needed, 777 might be too open for production
 RUN chown -R www-data:www-data var public \
     && chmod -R 777 var public
+    
+# If building for production, consider 'RUN APP_ENV=prod composer install --no-dev --optimize-autoloader'
+#RUN composer install --optimize-autoloader
