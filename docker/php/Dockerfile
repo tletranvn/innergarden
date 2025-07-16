@@ -45,10 +45,29 @@ WORKDIR /var/www
 
 COPY . /var/www
 
+# --- DÉBUT DES MODIFICATIONS POUR LA COMPATIBILITÉ HEROKU ET LE FONCTIONNEMENT SYMFONY ---
+
+# Active la prise en charge des fichiers .htaccess par Apache. C'est crucial pour la réécriture d'URL de Symfony.
+# Sans cela, Apache ignorerait les règles de réécriture dans public/.htaccess, pouvant mener à des erreurs 403/404.
+RUN sed -i -e 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+
+# L'image php:apache utilise /var/www/html comme DocumentRoot par défaut.
+# Le code Symfony est copié dans /var/www, et le point d'entrée web est public/.
+# Cette ligne supprime le dossier par défaut de l'image et crée un lien symbolique
+# de /var/www/html vers le dossier `public` de Symfony.
+# Ainsi, Apache servira correctement l'application depuis son vrai point d'entrée.
+RUN rm -rf /var/www/html \
+    && ln -s /var/www/public /var/www/html
+
+# --- FIN DES MODIFICATIONS ---
+
 # Set permissions for Symfony cache and logs
 # Adjust permissions as needed, 777 might be too open for production
-RUN chown -R www-data:www-data var public \
-    && chmod -R 777 var public
+# Ajout de /var/www/html dans les permissions pour s'assurer que le nouveau DocumentRoot est accessible.
+RUN chown -R www-data:www-data var public /var/www/html \
+    && chmod -R 777 var public /var/www/html
     
 # If building for production, consider 'RUN APP_ENV=prod composer install --no-dev --optimize-autoloader'
-#RUN composer install --optimize-autoloader
+# Il est recommandé de décommenter et d'exécuter cette commande pour le déploiement en production.
+# Cela installera les dépendances Symfony de manière optimisée pour la performance et sans les outils de développement.
+# RUN composer install --optimize-autoloader

@@ -1,4 +1,4 @@
-# 🍃 Configuration MongoDB Atlas pour Heroku
+# Configuration MongoDB Atlas pour Heroku
 
 ## Vue d'ensemble
 
@@ -20,7 +20,7 @@ MongoDB Atlas est le service cloud gratuit de MongoDB. Il offre 512MB de stockag
 3. **Nommez** votre cluster : `innergarden-cluster`
 4. **Cliquez** sur "Create Cluster"
 
-⏱️ **Attendre** 3-5 minutes pour la création du cluster
+**Attendre** 3-5 minutes pour la création du cluster
 
 ## Étape 3 : Créer un utilisateur de base de données
 
@@ -39,7 +39,7 @@ MongoDB Atlas est le service cloud gratuit de MongoDB. Il offre 512MB de stockag
 1. **Cliquez** sur "Network Access" dans le menu de gauche
 2. **Cliquez** sur "Add IP Address"
 3. **Choisissez** "Allow Access from Anywhere" (0.0.0.0/0)
-   - ⚠️ Pour la production, restreindre aux IPs Heroku
+   - Pour la production, restreindre aux IPs Heroku
 4. **Cliquez** sur "Confirm"
 
 ## Étape 5 : Obtenir l'URI de connexion
@@ -57,7 +57,7 @@ MongoDB Atlas est le service cloud gratuit de MongoDB. Il offre 512MB de stockag
 mongodb+srv://innergarden_user:PASSWORD@innergarden-cluster.xxxxx.mongodb.net/innergarden?retryWrites=true&w=majority
 ```
 
-⚠️ **Remplacez** `PASSWORD` par votre mot de passe réel
+**Remplacez** `PASSWORD` par votre mot de passe réel
 
 ## Étape 6 : Configuration sur Heroku
 

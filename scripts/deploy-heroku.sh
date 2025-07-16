@@ -38,8 +38,8 @@ heroku config:set APP_SECRET=$(openssl rand -hex 32)
 
 # Ajout des addons pour MySQL et MongoDB
 echo "Ajout des addons..."
-heroku addons:create jawsdb:kitefin || echo "⚠️  JawsDB déjà installé"
-heroku addons:create mongolab:sandbox || echo "⚠️  MongoDB Atlas déjà installé"
+heroku addons:create jawsdb:kitefin || echo "JawsDB déjà installé"
+heroku addons:create mongolab:sandbox || echo "MongoDB Atlas déjà installé"
 
 # Déploiement
 echo "Déploiement de l'application..."
