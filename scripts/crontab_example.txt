@@ -1,0 +1,15 @@
+# Configuration crontab pour les sauvegardes automatiques
+# Pour l'installer : crontab -e
+# Puis ajouter ces lignes :
+
+# Sauvegarde quotidienne à 2h du matin
+0 2 * * * cd /Users/tranletran/Projects/innergarden && ./scripts/backup_complete.sh
+
+# Sauvegarde MySQL toutes les 6h
+0 */6 * * * cd /Users/tranletran/Projects/innergarden && ./scripts/backup_mysql.sh
+
+# Sauvegarde MongoDB toutes les 4h
+0 */4 * * * cd /Users/tranletran/Projects/innergarden && ./scripts/backup_mongodb.sh
+
+# Nettoyage des anciens backups chaque dimanche à minuit
+0 0 * * 0 find /Users/tranletran/Projects/innergarden/backups -name "*.gz" -type f -mtime +14 -delete

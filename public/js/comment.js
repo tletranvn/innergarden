@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitCommentButton.disabled = true; // Désactive le bouton
             submitCommentButton.textContent = 'Envoi en cours...'; // Texte d'attente
 
-            const formData = new FormData(commentForm);
+            const formData = new FormData(commentForm); // ← Récupère toutes les données du formulaire
 
             try {
                 const response = await fetch(commentForm.action, {
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const data = await response.json(); // Attend et parse la réponse JSON
 
-                if (response.ok) { // Si la réponse HTTP est un succès (2xx)
+                if (response.ok) { // Si la réponse HTTP est un succès (code 2xx)
                     if (data.success) {
                         displayMessage(commentFormMessages, data.message, 'success');
                         commentForm.reset(); // Vide le formulaire après succès

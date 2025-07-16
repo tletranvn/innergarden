@@ -1,0 +1,9 @@
+[2025-07-16 10:30:49] Début de la sauvegarde complète
+[2025-07-16 10:30:49] Sauvegarde MySQL...
+[2025-07-16 10:31:05] Sauvegarde MySQL terminée
+[2025-07-16 10:31:05] Sauvegarde MongoDB...
+[2025-07-16 10:31:06] Erreur lors de la sauvegarde MongoDB
+[2025-07-16 10:31:06] Sauvegarde des fichiers uploadés...
+[2025-07-16 10:31:06] Sauvegarde des uploads terminée : ./backups/uploads/uploads_backup_20250716_103049.tar.gz
+[2025-07-16 10:31:06] Sauvegarde complète terminée
+[2025-07-16 10:31:06] Taille des sauvegardes :

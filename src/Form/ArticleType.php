@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType; // NOUVEAU : Importez FileType
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Form\Type\VichImageType; // NOUVEAU : Importez VichImageType si nécessaire
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType; // NOUVEAU : Import pour le champ publishedAt
 
 class ArticleType extends AbstractType
 {
@@ -46,6 +47,12 @@ class ArticleType extends AbstractType
             ->add('isPublished', CheckboxType::class, [
                 'label' => 'Publier l\'article',
                 'required' => false,
+            ])
+            // Ajout publishedAt pour la date de publication automatiquement gérée
+            ->add('publishedAt', DateTimeType::class, [
+                'required' => false,
+                'widget' => 'single_text',
+                'label' => 'Date de publication (optionnelle)',
             ])
             // Ajout du champ 'slug'
             ->add('slug', TextType::class, [
@@ -96,6 +103,7 @@ class ArticleType extends AbstractType
                 'choice_label' => 'name',
                 'label' => 'Catégorie',
             ]);
+            
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -43,7 +43,7 @@ class Article
     private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\Column]
-    private ?bool $isPublished = null;
+    private ?bool $isPublished = false;
 
     // ANCIEN : #[ORM\Column(length: 255, nullable: true)]
     // ANCIEN : private ?string $imageUrl = null;
