@@ -94,6 +94,13 @@ RUN mkdir -p /app/var /app/public && \
     chown -R www-data:www-data /app/var /app/public /var/www/html \
     && chmod -R 777 /app/var /app/public /var/www/html
 
+# DEBUGGING: Check Apache modules after configuration
+RUN apachectl -M
+
+# NEW: Define the command that Heroku should execute when starting the web dyno.
+# This overrides any default command Heroku might infer for PHP Docker images.
+CMD ["apache2-foreground"]
+
 # --- FIN DES MODIFICATIONS ---
 
 # If building for production, consider 'RUN APP_ENV=prod composer install --no-dev --optimize-autoloader'
