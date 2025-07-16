@@ -57,7 +57,7 @@ COPY . /app
 # et qu'elles sont incluses dans l'image finale pour Heroku.
 # Pour le développement local, ce n'est pas strictement nécessaire si tu as déjà tes vendors localement,
 # mais c'est une bonne pratique pour les builds de l'image.
-RUN composer install --no-dev --prefer-dist --optimize-autoloader
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-scripts
 
 # Active la prise en charge des fichiers .htaccess par Apache. C'est crucial pour la réécriture d'URL de Symfony.
 # Sans cela, Apache ignorerait les règles de réécriture dans public/.htaccess, pouvant mener à des erreurs 403/404.
