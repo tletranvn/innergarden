@@ -10,12 +10,7 @@ if [ $# -eq 0 ]; then
 fi
 
 BACKUP_FILE=$1
-DB_NAME="innergarden_mongodb"
-
-# Credentials MongoDB (depuis .env.docker.local)
-MONGO_USER="root"
-MONGO_PASSWORD="root"
-MONGO_AUTH_DB="admin"
+DB_NAME="innergarden"
 
 # Vérifier que le fichier existe
 if [ ! -f "$BACKUP_FILE" ]; then
@@ -54,7 +49,7 @@ docker compose cp $DATA_DIR mongodb:/tmp/restore/
 
 # Restaurer
 echo "Restauration..."
-docker compose exec -T mongodb mongorestore --db $DB_NAME --username $MONGO_USER --password $MONGO_PASSWORD --authenticationDatabase $MONGO_AUTH_DB --drop /tmp/restore/
+docker compose exec -T mongodb mongorestore --db $DB_NAME --drop /tmp/restore/
 
 if [ $? -eq 0 ]; then
     echo "Restauration MongoDB terminée avec succès"

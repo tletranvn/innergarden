@@ -23,3 +23,20 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> Docker ###
+/docker/
+/compose.yaml
+/compose.override.yaml
+###< Docker ###
+
+###> Backup files ###
+/backups/
+/scripts/backup_*.sh
+/scripts/restore_*.sh
+###< Backup files ###
+
+###> IDE ###
+/.idea/
+/.vscode/
+###< IDE ###

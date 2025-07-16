@@ -90,6 +90,11 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "compile": [
+            "php bin/console cache:clear",
+            "php bin/console cache:warmup",
+            "php bin/console assets:install public --symlink --relative"
         ]
     },
     "conflict": {

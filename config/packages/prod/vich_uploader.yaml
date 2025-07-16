@@ -1,0 +1,11 @@
+# Configuration Vich Uploader pour Heroku
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        article_image: 
+            uri_prefix: /uploads/images/articles
+            upload_destination: '/tmp/uploads/images/articles'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true

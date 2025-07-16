@@ -1,0 +1,43 @@
+{
+  "name": "InnerGarden",
+  "description": "Application Symfony pour la gestion d'articles et commentaires",
+  "keywords": ["symfony", "php", "cms", "blog"],
+  "website": "https://github.com/tletranvn/innergarden",
+  "repository": "https://github.com/tletranvn/innergarden",
+  "logo": "https://symfony.com/logos/symfony_black_02.png",
+  "success_url": "/",
+  "env": {
+    "APP_ENV": {
+      "description": "Environnement Symfony",
+      "value": "prod"
+    },
+    "APP_DEBUG": {
+      "description": "Mode debug Symfony",
+      "value": "false"
+    },
+    "APP_SECRET": {
+      "description": "Clé secrète Symfony",
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "addons": [
+    {
+      "plan": "jawsdb:kitefin"
+    },
+    {
+      "plan": "mongolab:sandbox"
+    }
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/php"
+    }
+  ],
+  "stack": "heroku-22"
+}
