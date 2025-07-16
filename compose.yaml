@@ -2,7 +2,8 @@ services:
   www:
     build:
       context: . # <-- IMPORTANT: Set the build context to the root of the project
-      dockerfile: ./docker/php/Dockerfile # <-- IMPORTANT: Specify the path to the Dockerfile
+      dockerfile: Dockerfile # <-- IMPORTANT: Specify the path to the Dockerfile à la racine pour heroku aussi
+    # dockerfile: ./docker/php/Dockerfile # <-- AVANT heroku
     container_name: innergarden_symfony_php
     ports:
       - "8081:80"
