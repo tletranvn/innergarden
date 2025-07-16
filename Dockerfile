@@ -3,6 +3,13 @@ FROM php:8.3-apache
 # Set ServerName to avoid warnings
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
+# NOUVELLE MODIFICATION : Désactiver les MPMs worker et event pour éviter les conflits
+# L'image php:apache utilise prefork par défaut pour PHP.
+# S'assurer qu'un seul MPM est chargé est crucial.
+RUN a2dismod mpm_event || true && \
+    a2dismod mpm_worker || true && \
+    a2enmod mpm_prefork
+
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -qq -y --no-install-recommends \
@@ -57,6 +64,7 @@ COPY . /app
 # et qu'elles sont incluses dans l'image finale pour Heroku.
 # Pour le développement local, ce n'est pas strictement nécessaire si tu as déjà tes vendors localement,
 # mais c'est une bonne pratique pour les builds de l'image.
+# MODIFICATION : Ajout de --no-scripts pour éviter l'exécution des scripts post-install de Symfony qui peuvent échouer lors du build Docker.
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-scripts
 
 # Active la prise en charge des fichiers .htaccess par Apache. C'est crucial pour la réécriture d'URL de Symfony.
@@ -79,7 +87,9 @@ RUN rm -rf /var/www/html \
 # Ajout de /var/www/html dans les permissions pour s'assurer que le nouveau DocumentRoot est accessible.
 # Bien que 777 soit très permissif, c'est souvent utilisé pour déboguer sur Heroku.
 # Pour une production sérieuse, tu pourrais viser 775 ou des permissions plus strictes si possible.
-# NOUVELLE : Crée les répertoires 'var' et 'public' s'ils n'existent pas
+# NOUVELLE MODIFICATION : Crée explicitement les répertoires 'var' et 'public' AVANT de changer les permissions,
+# pour éviter les erreurs "No such file or directory" si Symfony ne les a pas encore créés.
+# MODIFICATION : Chemins absolus pour 'var' et 'public' dans chown/chmod pour qu'ils soient trouvés dans /app.
 RUN mkdir -p /app/var /app/public && \
     chown -R www-data:www-data /app/var /app/public /var/www/html \
     && chmod -R 777 /app/var /app/public /var/www/html
