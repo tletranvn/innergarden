@@ -79,7 +79,9 @@ RUN rm -rf /var/www/html \
 # Ajout de /var/www/html dans les permissions pour s'assurer que le nouveau DocumentRoot est accessible.
 # Bien que 777 soit très permissif, c'est souvent utilisé pour déboguer sur Heroku.
 # Pour une production sérieuse, tu pourrais viser 775 ou des permissions plus strictes si possible.
-RUN chown -R www-data:www-data /app/var /app/public /var/www/html \
+# NOUVELLE : Crée les répertoires 'var' et 'public' s'ils n'existent pas
+RUN mkdir -p /app/var /app/public && \
+    chown -R www-data:www-data /app/var /app/public /var/www/html \
     && chmod -R 777 /app/var /app/public /var/www/html
 
 # --- FIN DES MODIFICATIONS ---
