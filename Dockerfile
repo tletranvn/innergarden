@@ -3,12 +3,27 @@ FROM php:8.3-apache
 # Set ServerName to avoid warnings
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# NOUVELLE MODIFICATION : Désactiver les MPMs worker et event pour éviter les conflits
-# L'image php:apache utilise prefork par défaut pour PHP.
-# S'assurer qu'un seul MPM est chargé est crucial.
-RUN a2dismod mpm_event || true && \
-    a2dismod mpm_worker || true && \
-    a2enmod mpm_prefork
+# NOUVELLE MODIFICATION AGRESSIVE ET DÉTAILLÉE POUR LES MPMs :
+# Nous avons constaté que même avec a2dismod, le problème "More than one MPM loaded" persiste au démarrage du dyno.
+# Cela suggère une configuration Apache plus profonde qui charge plusieurs MPMs.
+# Cette étape vise à supprimer agressivement toutes les configurations de modules MPM sauf 'prefork'.
+# 1. Supprime les liens symboliques existants des modules MPM dans 'mods-enabled'.
+#    Cela s'assure qu'aucun MPM (sauf celui que nous allons explicitement activer) n'est activé par défaut.
+#    Le "|| true" est important pour éviter que la build ne faille si les fichiers n'existent pas (ex: ils ont déjà été supprimés par une étape précédente).
+RUN find /etc/apache2/mods-enabled -maxdepth 1 -type l -name "mpm_*.load" -delete || true && \
+    find /etc/apache2/mods-enabled -maxdepth 1 -type l -name "mpm_*.conf" -delete || true
+
+# 2. Supprime les fichiers de configuration réels des modules MPM (autres que prefork) dans 'mods-available'.
+#    Ceci est une mesure extrême pour empêcher Apache de trouver et de charger d'autres MPMs.
+#    Il est crucial que seule l'implémentation 'prefork' soit présente.
+RUN find /etc/apache2/mods-available -maxdepth 1 -type f -name "mpm_*.conf" -exec rm -f {} \; || true
+
+# 3. Active explicitement le module 'mpm_prefork'.
+#    Après avoir tout nettoyé, on s'assure que le bon MPM est bien activé.
+RUN a2enmod mpm_prefork
+
+# S'assurer que le module PHP est également activé, ce qui est généralement le cas avec php:apache
+RUN a2enmod php8.3
 
 # Install system dependencies
 RUN apt-get update \
@@ -95,10 +110,12 @@ RUN mkdir -p /app/var /app/public && \
     && chmod -R 777 /app/var /app/public /var/www/html
 
 # DEBUGGING: Check Apache modules after configuration
+# C'est la commande la plus importante pour nous. Elle doit montrer UN SEUL MPM chargé (prefork).
 RUN apachectl -M
 
 # NEW: Define the command that Heroku should execute when starting the web dyno.
 # This overrides any default command Heroku might infer for PHP Docker images.
+# Cette commande est le point d'entrée de votre application web Heroku.
 CMD ["apache2-foreground"]
 
 # --- FIN DES MODIFICATIONS ---
@@ -107,4 +124,4 @@ CMD ["apache2-foreground"]
 # Ce RUN composer install --no-dev --prefer-dist --optimize-autoloader a été déplacé
 # après le COPY . /app pour assurer que les vendors sont installés dans l'image pour Heroku.
 # Tu peux garder cette ligne commentée si tu la veux comme rappel pour une build prod dédiée.
-# RUN composer install --no-dev --optimize-autoloader
+# RUN composer install --no-dev --optimize-autoloader renvoyer moi la version finale en gardant mes commentaire et ajouter les nouvelles commantaires où tu as modifié
