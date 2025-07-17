@@ -22,8 +22,9 @@ RUN find /etc/apache2/mods-available -maxdepth 1 -type f -name "mpm_*.conf" -exe
 #    Après avoir tout nettoyé, on s'assure que le bon MPM est bien activé.
 RUN a2enmod mpm_prefork
 
-# S'assurer que le module PHP est également activé, ce qui est généralement le cas avec php:apache
-RUN a2enmod php8.3
+# Rétabli: Suppression de 'a2enmod php8.3' car il n'existe pas ou est géré automatiquement par l'image de base.
+# L'image `php:8.3-apache` gère l'activation du module PHP pour Apache automatiquement.
+# RUN a2enmod php8.3 # <-- Cette ligne a été supprimée.
 
 # Install system dependencies
 RUN apt-get update \
@@ -124,4 +125,4 @@ CMD ["apache2-foreground"]
 # Ce RUN composer install --no-dev --prefer-dist --optimize-autoloader a été déplacé
 # après le COPY . /app pour assurer que les vendors sont installés dans l'image pour Heroku.
 # Tu peux garder cette ligne commentée si tu la veux comme rappel pour une build prod dédiée.
-# RUN composer install --no-dev --optimize-autoloader renvoyer moi la version finale en gardant mes commentaire et ajouter les nouvelles commantaires où tu as modifié
+# RUN composer install --no-dev --optimize-autoloader 
