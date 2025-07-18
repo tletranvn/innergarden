@@ -1,0 +1,13 @@
+.git
+.idea
+vendor
+node_modules
+public/build
+var
+compose.yaml
+compose.override.yaml
+Dockerfile
+.env
+.env.local
+.env.*.local
+README.md
