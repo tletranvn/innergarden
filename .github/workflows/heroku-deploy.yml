@@ -1,9 +1,7 @@
-name: Deploy to Heroku
-
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
@@ -12,6 +10,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Debug Heroku API Key Presence
+        run: |
+          if [ -z "${{ secrets.HEROKU_API_KEY }}" ]; then
+            echo "::error::HEROKU_API_KEY secret is empty or not accessible!"
+            exit 1
+          else
+            echo "HEROKU_API_KEY seems to be present (masked): ${{ secrets.HEROKU_API_KEY }}"
+          fi
 
       - name: Log in to Heroku Container Registry
         run: echo "${{ secrets.HEROKU_API_KEY }}" | docker login --username=_ --password-stdin registry.heroku.com
