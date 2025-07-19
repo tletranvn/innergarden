@@ -24,7 +24,23 @@ COPY . /var/www/html/
 
 # Installer les dépendances Composer
 WORKDIR /var/www/html
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Nettoyer le cache de Symfony
+RUN rm -rf var/cache/*
+
+# Définir un DATABASE_URL pour le BUILD qui ne nécessite pas de connexion réelle
+# Utilisation de SQLite en mémoire pour éviter l'erreur de connexion MySQL
+ENV DATABASE_URL="sqlite:///:memory:"
+
+# NOUVEAU : Définir un MONGODB_URL pour le BUILD
+# Cela doit être syntaxiquement valide mais ne pointer vers rien de réel
+ENV MONGODB_URL="mongodb://localhost:27017/fake_db"
+
+# Installer les dépendances Composer sans dev dependencies
+# Définir APP_ENV=prod spécifiquement pour cette commande RUN
+# Cela garantit que les scripts Symfony liés au build se comportent comme en prod
+
+RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 

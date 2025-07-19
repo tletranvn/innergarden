@@ -1,5 +1,4 @@
 # Configuration MongoDB pour Heroku
-# Désactiver temporairement MongoDB pendant le build
 
 doctrine_mongodb:
     auto_generate_proxy_classes: false
@@ -7,8 +6,7 @@ doctrine_mongodb:
     connections:
         default:
             server: '%env(MONGODB_URL)%'
-            options:
-                connect: false  # Ne pas se connecter automatiquement
+            options: {}
     default_database: innergarden
     document_managers:
         default:
@@ -16,7 +14,7 @@ doctrine_mongodb:
             mappings:
                 App:
                     is_bundle: false
-                    type: annotation
+                    type: attribute   
                     dir: '%kernel.project_dir%/src/Document'
                     prefix: 'App\Document'
                     alias: App
