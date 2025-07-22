@@ -29,3 +29,7 @@ php bin/console doctrine:schema:validate --env=test
 php bin/console doctrine:mongodb:generate:proxies --env=test
 php bin/console doctrine:mongodb:query App\\Document\\Article find --env=test
 exit
+cd var/www
+cd /var/www
+php bin/console doctrine:migrations:migrate --env=test
+exit
