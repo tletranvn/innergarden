@@ -14,6 +14,10 @@ doctrine_mongodb:
                     dir: '%kernel.project_dir%/src/Document'
                     prefix: 'App\Document'
 
+when@test:
+    doctrine_mongodb:
+        default_database: 'innergarden_mongodb_test'
+
 when@prod:
     doctrine_mongodb:
         auto_generate_proxy_classes: false
