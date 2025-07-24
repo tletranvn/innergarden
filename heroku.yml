@@ -1,6 +1,4 @@
-build:
-  docker:
-    web: Dockerfile
+# Removed 'build' section as image is pushed via heroku container:push
 release:
   # This command will be executed before the web dyno starts
   # It's crucial for database migrations in a production environment
