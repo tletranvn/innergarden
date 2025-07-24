@@ -1,4 +1,12 @@
 build:
   docker:
     web: Dockerfile
-
+release:
+  # This command will be executed before the web dyno starts
+  # It's crucial for database migrations in a production environment
+  command:
+    - php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+run:
+  # This defines the command for your web dyno (similar to a Procfile's 'web' entry)
+  # Ensure this matches how your application should be started in production
+  web: symfony serve --env=prod --port=$PORT
