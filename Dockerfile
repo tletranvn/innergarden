@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y \
     pkg-config libssl-dev \
  && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install pdo pdo_mysql intl opcache zip gd \
- # MONGODB AVEC PECL 
+ # MONGODB AVEC PECL
  && pecl install mongodb \
  && docker-php-ext-enable mongodb \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -20,10 +20,10 @@ COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
 # Ensuite, copier le reste de l'application
-COPY . /var/www/html/
+COPY . /var/www
 
 # Installer les dépendances Composer
-WORKDIR /var/www/html
+WORKDIR /var/www
 
 # Nettoyer le cache de Symfony
 RUN rm -rf var/cache/*
@@ -40,12 +40,17 @@ ENV MONGODB_URL="mongodb://localhost:27017/fake_db"
 # Définir APP_ENV=prod spécifiquement pour cette commande RUN
 # Cela garantit que les scripts Symfony liés au build se comportent comme en prod
 
-RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
+# Install all Composer dependencies (including dev dependencies for local development)
+RUN composer install --optimize-autoloader --no-interaction
+# RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+# CORRECTION ICI : Définir le document root d'Apache à /var/www/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/public
 
+# CORRECTION ICI : Ajuster la configuration Apache pour utiliser le nouveau document root
 RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/000-default.conf
 
-RUN chown -R www-data:www-data /var/www/html
+# CORRECTION ICI : Changer les permissions pour le répertoire de code correct
+RUN chown -R www-data:www-data /var/www
 
 CMD ["start.sh"]

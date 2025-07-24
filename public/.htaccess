@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+
+    RewriteEngine On
+
+    # Si la requête cible un fichier ou dossier existant, ne pas rediriger
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Sinon, réécrire toutes les autres requêtes vers index.php
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
