@@ -5,8 +5,10 @@ build:
 release:
   image: web
   command:
-    - echo "Release phase ran successfully!"
+    - php bin/console doctrine:migrations:migrate --no-interaction --env=prod
 
 run:
-  image: web
-  web: start.sh
+  web:
+    # The 'image' key must be nested under the process type (e.g., 'web')
+    image: web
+    command: start.sh
