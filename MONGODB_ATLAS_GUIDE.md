@@ -17,7 +17,7 @@ MongoDB Atlas est le service cloud gratuit de MongoDB. Il offre 512MB de stockag
 2. **Sélectionnez** un fournisseur cloud :
    - AWS recommandé pour Heroku
    - Région : `us-east-1` (Virginia) pour une latence optimale
-3. **Nommez** votre cluster : `innergarden-cluster`
+3. **Nommez** votre cluster : `cluster`
 4. **Cliquez** sur "Create Cluster"
 
 **Attendre** 3-5 minutes pour la création du cluster
@@ -28,7 +28,7 @@ MongoDB Atlas est le service cloud gratuit de MongoDB. Il offre 512MB de stockag
 2. **Cliquez** sur "Add New Database User"
 3. **Configurez** :
    - Authentication Method : `Password`
-   - Username : `innergarden_user`
+   - Username : `user`
    - Password : Générer un mot de passe fort (bouton "Autogenerate")
    - Database User Privileges : `Read and write to any database`
 4. **Sauvegardez** le mot de passe quelque part de sûr
@@ -54,7 +54,7 @@ MongoDB Atlas est le service cloud gratuit de MongoDB. Il offre 512MB de stockag
 
 ### Format de l'URI :
 ```
-mongodb+srv://innergarden_user:PASSWORD@innergarden-cluster.xxxxx.mongodb.net/innergarden?retryWrites=true&w=majority
+mongodb+srv://USER:PASSWORD@cluster.xxxxx.mongodb.net/innergarden?retryWrites=true&w=majority
 ```
 
 **Remplacez** `PASSWORD` par votre mot de passe réel
@@ -69,7 +69,7 @@ mongodb+srv://innergarden_user:PASSWORD@innergarden-cluster.xxxxx.mongodb.net/in
 ### Méthode 2 : Manuelle
 ```bash
 # Configurer l'URI MongoDB
-heroku config:set MONGODB_URL="mongodb+srv://innergarden_user:VOTRE_PASSWORD@innergarden-cluster.xxxxx.mongodb.net/innergarden?retryWrites=true&w=majority"
+heroku config:set MONGODB_URL="mongodb+srv://USER:VOTRE_PASSWORD@cluster.xxxxx.mongodb.net/innergarden?retryWrites=true&w=majority"
 
 # Vérifier la configuration
 heroku config:get MONGODB_URL
