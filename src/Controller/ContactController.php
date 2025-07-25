@@ -51,6 +51,8 @@ class ContactController extends AbstractController
             //    $this->addFlash('success', 'Votre message a été envoyé avec succès ! Nous vous recontacterons bientôt.');
             //}
 
+            $this->addFlash('success', 'Votre message a été envoyé avec succès ! Nous vous recontacterons bientôt.');
+            
             // Redirection pour éviter la re-soumission
             return $this->redirectToRoute('app_contact');
         }

@@ -8,9 +8,29 @@
         <div class="col-md-6 col-lg-4">
             <div class="p-4 shadow-sm rounded bg-light text-dark">
                 <h1 class="h3 mb-3 text-center">Créer un compte</h1>
-                <div id="form-messages" class="mb-3"></div>
 
+                {# --- START: Flash Message Display --- #}
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {% for message in app.flashes('warning') %}
+                    <div class="alert alert-warning" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {# --- END: Flash Message Display --- #}
+
+                {# The 'id' attributes on form and button are not strictly necessary for non-AJAX,
+                   but keeping them is harmless. #}
                 {{ form_start(registrationForm, {'attr': {'id': 'registrationForm'}}) }}
+                    {# form_row will automatically add Bootstrap's 'is-invalid' class and display errors #}
                     {{ form_row(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
                     {{ form_row(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
                     {{ form_row(registrationForm.plainPassword, {
@@ -30,9 +50,5 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('js/registration.js') }}"></script>
 {% endblock %}
