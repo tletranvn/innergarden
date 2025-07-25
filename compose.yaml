@@ -33,11 +33,12 @@ services:
     user: "www-data"
 
   db:
-    image: mysql:latest
+    image: mysql:latest # Version spécifique correspondant à la version de MySQL utilisée dans DATABASE_URL
     # platform: linux/arm64
     container_name: innergarden_symfony_mysql
     volumes:
       - ./var/db_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro # Script d'initialisation to create database for new setup
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
@@ -47,7 +48,8 @@ services:
       
   mongodb:
     image: mongo:7.0 # Version spécifique plus stable
-    # platform: linux/arm64/v8 # Force l'architecture ARM64 pour M1
+    platform: linux/amd64/v3 # Force l'architecture AMD64 sur linux
+    # platform: linux/arm64/v8 # Uncomment if switch to use ARM64
     container_name: innergarden_mongodb
     ports:
       - "27017:27017" # EXPOSE LE PORT 27017 pour la connexion depuis l'hôte (Compass)
