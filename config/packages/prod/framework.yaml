@@ -1,0 +1,13 @@
+framework:
+    session:
+        # Use database sessions for Heroku production environment
+        # This helps with CSRF token reliability across multiple dynos
+        handler_id: 'Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler'
+        cookie_secure: true
+        cookie_samesite: 'lax'  # Changed from strict to lax for better compatibility
+        cookie_lifetime: 7200
+        gc_maxlifetime: 7200
+        
+    # Ensure CSRF protection is enabled
+    csrf_protection:
+        enabled: true

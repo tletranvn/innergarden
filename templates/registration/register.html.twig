@@ -27,7 +27,7 @@
                 {% endfor %}
                 {# --- END: Flash Message Display --- #}
 
-                {{ form_start(registrationForm, {'attr': {'id': 'registrationForm', 'novalidate': 'novalidate'}}) }}
+                {{ form_start(registrationForm, {'attr': {'id': 'registrationForm', 'method': 'POST', 'novalidate': 'novalidate'}}) }}
                     {# Display general form errors #}
                     {% if registrationForm.vars.errors|length > 0 %}
                         <div class="alert alert-danger">
@@ -88,6 +88,21 @@
                         <button type="submit" class="btn btn-custom" id="submitButton">Inscription</button>
                     </div>
                 {{ form_end(registrationForm) }}
+                
+                <script>
+                // Simple form submission protection (not AJAX)
+                document.getElementById('registrationForm').addEventListener('submit', function(e) {
+                    const submitButton = document.getElementById('submitButton');
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Inscription en cours...';
+                    
+                    // Re-enable after 10 seconds in case of network issues
+                    setTimeout(function() {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Inscription';
+                    }, 10000);
+                });
+                </script>
             </div>
         </div>
     </div>

@@ -3,7 +3,18 @@ framework:
     secret: '%env(APP_SECRET)%'
 
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    session:
+        # Use Redis or database for session storage in production
+        # For Heroku, we'll configure this to be more reliable
+        cookie_secure: auto
+        cookie_samesite: lax
+        cookie_lifetime: 3600
+        gc_maxlifetime: 3600
+        # Store sessions in database for Heroku reliability
+        handler_id: null
+        
+    csrf_protection:
+        enabled: true
 
     #esi: true
     #fragments: true

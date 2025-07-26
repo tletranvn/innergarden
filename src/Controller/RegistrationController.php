@@ -23,6 +23,12 @@ class RegistrationController extends AbstractController
         Security $security, // Inject Security service for auto-login
         LoggerInterface $logger // Keep this injected for error logging
     ): Response {
+        // Ensure session is started for CSRF protection
+        $session = $request->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+        
         $user = new User();
         $form = $this->createForm(RegistrationForm::class, $user);
         $form->handleRequest($request);
@@ -62,15 +68,26 @@ class RegistrationController extends AbstractController
             }
         } elseif ($form->isSubmitted()) {
             // Form was submitted but has validation errors
-            $logger->info('Registration form validation failed');
+            $logger->info('Registration form validation failed', [
+                'session_id' => $request->getSession()->getId(),
+                'csrf_token_submitted' => $request->request->get('registration_form')['_token'] ?? 'none',
+                'csrf_valid' => $form->get('_token') ? $form->get('_token')->isValid() : 'no_csrf_field'
+            ]);
             
             // Log all form errors for debugging in Heroku logs
             foreach ($form->getErrors(true) as $error) {
-                $logger->error('Registration form error: ' . $error->getMessage(), [
+                $errorMessage = $error->getMessage();
+                $logger->error('Registration form error: ' . $errorMessage, [
                     'field' => $error->getOrigin() ? $error->getOrigin()->getName() : 'form',
-                    'submitted_data' => $request->request->all()
+                    'submitted_data' => array_intersect_key($request->request->all(), array_flip(['registration_form']))
                 ]);
-                $this->addFlash('warning', $error->getMessage());
+                
+                // Handle CSRF token errors specifically
+                if (strpos($errorMessage, 'CSRF token') !== false || strpos($errorMessage, 'token is invalid') !== false) {
+                    $this->addFlash('error', 'Token de sécurité invalide. Veuillez réessayer.');
+                } else {
+                    $this->addFlash('warning', $errorMessage);
+                }
             }
             
             // Check for specific field errors and add user-friendly messages
