@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\LoginForm;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,9 @@ class SecurityController extends AbstractController
             $session->start();
         }
         
+        // Create the login form (same pattern as registration)
+        $loginForm = $this->createForm(LoginForm::class);
+        
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
@@ -26,6 +30,7 @@ class SecurityController extends AbstractController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('security/login.html.twig', [
+            'loginForm' => $loginForm,
             'last_username' => $lastUsername,
             'error' => $error,
         ]);

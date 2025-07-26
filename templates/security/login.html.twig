@@ -26,7 +26,8 @@
                 {% endfor %}
                 {# --- END: Flash Message Display --- #}
                 
-                <form method="post" class="p-4 shadow-sm rounded bg-light text-dark"> {# Ajout de styles pour la carte du formulaire #}
+                <div class="p-4 shadow-sm rounded bg-light text-dark">
+                {{ form_start(loginForm, {'attr': {'method': 'POST', 'novalidate': 'novalidate'}}) }}
                     {# Message d'erreur #}
                     {% if error %}
                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -39,34 +40,43 @@
                         </div>
                     {% endif %}
 
-                    <h1 class="h3 mb-3 font-weight-normal text-center">Veuillez vous connecter</h1> {# Centrer le titre #}
+                    <h1 class="h3 mb-3 font-weight-normal text-center">Veuillez vous connecter</h1>
+
+                    {# Same pattern as registration form #}
+                    <div class="mb-3">
+                        {{ form_label(loginForm._username) }}
+                        {{ form_widget(loginForm._username, {'attr': {'class': 'form-control'}, 'value': last_username}) }}
+                        {% if loginForm._username.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(loginForm._username) }}
+                            </div>
+                        {% endif %}
+                    </div>
 
                     <div class="mb-3">
-                        <label for="username">Email</label>
-                        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
+                        {{ form_label(loginForm._password) }}
+                        {{ form_widget(loginForm._password, {'attr': {'class': 'form-control'}}) }}
+                        {% if loginForm._password.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(loginForm._password) }}
+                            </div>
+                        {% endif %}
                     </div>
 
-                    <div class="mb-3">
-                        <label for="password">Mot de passe</label> 
-                        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                    <div class="mb-3 form-check">
+                        {{ form_widget(loginForm._remember_me, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(loginForm._remember_me, 'Se souvenir de moi', {'label_attr': {'class': 'form-check-label'}}) }}
+                        {% if loginForm._remember_me.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(loginForm._remember_me) }}
+                            </div>
+                        {% endif %}
                     </div>
 
-                    {# Standard CSRF token for login (same pattern as registration) #}
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                    {# Option "Se souvenir de moi" #}
-                    <div class="form-check mb-3">
-                        <input type="checkbox" name="_remember_me" id="_remember_me" class="form-check-input">
-                        <label class="form-check-label" for="_remember_me">Se souvenir de moi</label> 
+                    <div class="d-grid gap-2">
+                        {{ form_widget(loginForm.submit) }}
                     </div>
-
-                    {# Bouton de connexion #}
-                    <div class="d-grid gap-2"> {# Pour que le bouton prenne toute la largeur #}
-                        <button class="btn btn-custom" type="submit" id="loginButton">
-                            Se connecter
-                        </button>
-                    </div>
-                </form>
+                {{ form_end(loginForm) }}
                 
                 <script>
                 // Simple form submission protection (same as registration form)
@@ -82,6 +92,7 @@
                     }, 10000);
                 });
                 </script>
+                </div>
             </div>
         </div>
     </div>
