@@ -44,31 +44,31 @@
 
                     {# Same pattern as registration form #}
                     <div class="mb-3">
-                        {{ form_label(loginForm._username) }}
-                        {{ form_widget(loginForm._username, {'attr': {'class': 'form-control'}, 'value': last_username}) }}
-                        {% if loginForm._username.vars.errors|length > 0 %}
+                        {{ form_label(loginForm.email) }}
+                        {{ form_widget(loginForm.email, {'attr': {'class': 'form-control'}, 'value': last_username}) }}
+                        {% if loginForm.email.vars.errors|length > 0 %}
                             <div class="text-danger small mt-1">
-                                {{ form_errors(loginForm._username) }}
+                                {{ form_errors(loginForm.email) }}
                             </div>
                         {% endif %}
                     </div>
 
                     <div class="mb-3">
-                        {{ form_label(loginForm._password) }}
-                        {{ form_widget(loginForm._password, {'attr': {'class': 'form-control'}}) }}
-                        {% if loginForm._password.vars.errors|length > 0 %}
+                        {{ form_label(loginForm.password) }}
+                        {{ form_widget(loginForm.password, {'attr': {'class': 'form-control'}}) }}
+                        {% if loginForm.password.vars.errors|length > 0 %}
                             <div class="text-danger small mt-1">
-                                {{ form_errors(loginForm._password) }}
+                                {{ form_errors(loginForm.password) }}
                             </div>
                         {% endif %}
                     </div>
 
                     <div class="mb-3 form-check">
-                        {{ form_widget(loginForm._remember_me, {'attr': {'class': 'form-check-input'}}) }}
-                        {{ form_label(loginForm._remember_me, 'Se souvenir de moi', {'label_attr': {'class': 'form-check-label'}}) }}
-                        {% if loginForm._remember_me.vars.errors|length > 0 %}
+                        {{ form_widget(loginForm.rememberMe, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(loginForm.rememberMe, 'Se souvenir de moi', {'label_attr': {'class': 'form-check-label'}}) }}
+                        {% if loginForm.rememberMe.vars.errors|length > 0 %}
                             <div class="text-danger small mt-1">
-                                {{ form_errors(loginForm._remember_me) }}
+                                {{ form_errors(loginForm.rememberMe) }}
                             </div>
                         {% endif %}
                     </div>

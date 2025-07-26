@@ -24,37 +24,22 @@ class SecurityController extends AbstractController
         // Create the login form (same pattern as registration)
         $loginForm = $this->createForm(LoginForm::class);
         
-        // Handle form submission and add debug logging
+        // Handle form submission for debugging
         $loginForm->handleRequest($request);
         
         if ($loginForm->isSubmitted()) {
             $logger->info('Login form submitted', [
                 'method' => $request->getMethod(),
                 'isValid' => $loginForm->isValid(),
-                'errors' => $loginForm->getErrors(true),
                 'session_id' => $session->getId(),
-                'csrf_token' => $request->request->get('login_form')['_csrf_token'] ?? 'not_found'
             ]);
-            
-            if (!$loginForm->isValid()) {
-                foreach ($loginForm->getErrors(true) as $error) {
-                    $errorMessage = $error->getMessage();
-                    $logger->error('Login form validation error: ' . $errorMessage);
-                    
-                    // Check specifically for CSRF errors
-                    if (strpos($errorMessage, 'CSRF') !== false || strpos($errorMessage, 'token') !== false) {
-                        $this->addFlash('error', 'Security token expired. Please try again.');
-                        $logger->error('CSRF token validation failed in login', [
-                            'session_id' => $session->getId(),
-                            'error_message' => $errorMessage
-                        ]);
-                    }
-                }
-            }
         }
         
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
+        if ($error) {
+            $logger->error('Authentication error: ' . $error->getMessage());
+        }
 
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
@@ -65,13 +50,6 @@ class SecurityController extends AbstractController
             'error' => $error,
         ]);
     }
-
-    #[Route(path: '/logout', name: 'app_logout')]
-    public function logout(): void
-    {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
-    }
-}
 
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void

@@ -3,11 +3,12 @@ framework:
         # Use database sessions for Heroku production environment
         # This helps with CSRF token reliability across multiple dynos
         handler_id: 'Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler'
-        cookie_secure: auto  # Changed to auto - lets Symfony detect HTTPS automatically
-        cookie_samesite: 'lax'  # Changed from strict to lax for better compatibility
+        cookie_secure: auto  # Auto-detect HTTPS
+        cookie_samesite: 'lax'  # More permissive than strict
         cookie_lifetime: 7200
         gc_maxlifetime: 7200
-        cookie_httponly: true  # Added for security
+        cookie_httponly: true
+        save_path: null  # Explicitly disable file-based session storage
         
     # Ensure CSRF protection is enabled
     csrf_protection:
