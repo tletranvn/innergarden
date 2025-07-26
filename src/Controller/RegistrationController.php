@@ -60,6 +60,37 @@ class RegistrationController extends AbstractController
                     'registrationForm' => $form,
                 ], new Response(null, Response::HTTP_INTERNAL_SERVER_ERROR)); // Return 500 status for server error
             }
+        } elseif ($form->isSubmitted()) {
+            // Form was submitted but has validation errors
+            $logger->info('Registration form validation failed');
+            
+            // Log all form errors for debugging in Heroku logs
+            foreach ($form->getErrors(true) as $error) {
+                $logger->error('Registration form error: ' . $error->getMessage(), [
+                    'field' => $error->getOrigin() ? $error->getOrigin()->getName() : 'form',
+                    'submitted_data' => $request->request->all()
+                ]);
+                $this->addFlash('warning', $error->getMessage());
+            }
+            
+            // Check for specific field errors and add user-friendly messages
+            if ($form->get('email')->getErrors()->count() > 0) {
+                $this->addFlash('error', 'Il y a un problème avec l\'adresse email.');
+            }
+            if ($form->get('pseudo')->getErrors()->count() > 0) {
+                $this->addFlash('error', 'Il y a un problème avec le pseudo.');
+            }
+            if ($form->get('plainPassword')->getErrors()->count() > 0) {
+                $this->addFlash('error', 'Il y a un problème avec le mot de passe.');
+            }
+            if ($form->get('agreeTerms')->getErrors()->count() > 0) {
+                $this->addFlash('error', 'Vous devez accepter les conditions d\'utilisation.');
+            }
+            
+            // Return with 422 status to indicate validation error
+            return $this->render('registration/register.html.twig', [
+                'registrationForm' => $form,
+            ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
         // If it's a GET request (initial page load) or a POST request with invalid data,

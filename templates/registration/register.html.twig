@@ -27,25 +27,46 @@
                 {% endfor %}
                 {# --- END: Flash Message Display --- #}
 
-                {{ form_start(registrationForm, {'attr': {'id': 'registrationForm'}}) }}
+                {{ form_start(registrationForm, {'attr': {'id': 'registrationForm', 'novalidate': 'novalidate'}}) }}
+                    {# Display general form errors #}
+                    {% if registrationForm.vars.errors|length > 0 %}
+                        <div class="alert alert-danger">
+                            {% for error in registrationForm.vars.errors %}
+                                <p class="mb-0">{{ error.message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
                     {# --- MODIFIED: Explicitly rendering form_errors for each field to ensure visibility --- #}
                     {# form_row usually includes errors, but this ensures it if a custom theme/CSS hides them #}
                     <div class="mb-3"> {# Add margin-bottom for spacing #}
                         {{ form_label(registrationForm.pseudo) }}
                         {{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.pseudo) }} {# Explicitly render errors #}
+                        {% if registrationForm.pseudo.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(registrationForm.pseudo) }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         {{ form_label(registrationForm.email) }}
                         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.email) }} {# Explicitly render errors #}
+                        {% if registrationForm.email.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
                         {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(registrationForm.plainPassword) }} {# Explicitly render errors #}
+                        {% if registrationForm.plainPassword.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(registrationForm.plainPassword) }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     {# For checkboxes, errors are usually handled differently by themes #}
@@ -54,7 +75,11 @@
                             'attr': {'class': 'form-check-input'}
                         }) }}
                         {{ form_label(registrationForm.agreeTerms, 'J\'accepte les conditions d\'utilisation', {'label_attr': {'class': 'form-check-label'}}) }}
-                        {{ form_errors(registrationForm.agreeTerms) }} {# Explicitly render errors #}
+                        {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(registrationForm.agreeTerms) }}
+                            </div>
+                        {% endif %}
                     </div>
                     {# --- END MODIFIED SECTION --- #}
                     
