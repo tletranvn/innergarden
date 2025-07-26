@@ -27,20 +27,37 @@
                 {% endfor %}
                 {# --- END: Flash Message Display --- #}
 
-                {# The 'id' attributes on form and button are not strictly necessary for non-AJAX,
-                   but keeping them is harmless. #}
                 {{ form_start(registrationForm, {'attr': {'id': 'registrationForm'}}) }}
-                    {# form_row will automatically add Bootstrap's 'is-invalid' class and display errors #}
-                    {{ form_row(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_row(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_row(registrationForm.plainPassword, {
-                        label: 'Mot de passe',
-                        'attr': {'class': 'form-control'}
-                    }) }}
-                    {{ form_row(registrationForm.agreeTerms, {
-                        label: 'J\'accepte les conditions d\'utilisation',
-                        'attr': {'class': 'form-check-input'}
-                    }) }}
+                    {# --- MODIFIED: Explicitly rendering form_errors for each field to ensure visibility --- #}
+                    {# form_row usually includes errors, but this ensures it if a custom theme/CSS hides them #}
+                    <div class="mb-3"> {# Add margin-bottom for spacing #}
+                        {{ form_label(registrationForm.pseudo) }}
+                        {{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.pseudo) }} {# Explicitly render errors #}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.email) }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.email) }} {# Explicitly render errors #}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
+                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.plainPassword) }} {# Explicitly render errors #}
+                    </div>
+
+                    {# For checkboxes, errors are usually handled differently by themes #}
+                    <div class="mb-3 form-check"> {# Use form-check for Bootstrap checkbox styling #}
+                        {{ form_widget(registrationForm.agreeTerms, {
+                            'attr': {'class': 'form-check-input'}
+                        }) }}
+                        {{ form_label(registrationForm.agreeTerms, 'J\'accepte les conditions d\'utilisation', {'label_attr': {'class': 'form-check-label'}}) }}
+                        {{ form_errors(registrationForm.agreeTerms) }} {# Explicitly render errors #}
+                    </div>
+                    {# --- END MODIFIED SECTION --- #}
+                    
                     <br>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-custom" id="submitButton">Inscription</button>
