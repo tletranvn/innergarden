@@ -21,6 +21,9 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                username_parameter: login_form[_username]
+                password_parameter: login_form[_password]
+                csrf_parameter: login_form[_csrf_token]
             logout:
                 path: app_logout
 
