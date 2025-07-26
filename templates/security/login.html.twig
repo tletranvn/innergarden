@@ -7,6 +7,25 @@
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4"> {# Colonne de taille moyenne, centrée #}
+                
+                {# --- START: Flash Message Display (same as registration) --- #}
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {% for message in app.flashes('warning') %}
+                    <div class="alert alert-warning" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {# --- END: Flash Message Display --- #}
+                
                 <form method="post" class="p-4 shadow-sm rounded bg-light text-dark"> {# Ajout de styles pour la carte du formulaire #}
                     {# Message d'erreur #}
                     {% if error %}
@@ -32,8 +51,8 @@
                         <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
                     </div>
 
-                    {# Champ CSRF pour la sécurité #}
-                    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                    {# Standard CSRF token for login (same pattern as registration) #}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                     {# Option "Se souvenir de moi" #}
                     <div class="form-check mb-3">
@@ -43,11 +62,26 @@
 
                     {# Bouton de connexion #}
                     <div class="d-grid gap-2"> {# Pour que le bouton prenne toute la largeur #}
-                        <button class="btn btn-custom" type="submit">
+                        <button class="btn btn-custom" type="submit" id="loginButton">
                             Se connecter
                         </button>
                     </div>
                 </form>
+                
+                <script>
+                // Simple form submission protection (same as registration form)
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    const submitButton = document.getElementById('loginButton');
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Connexion en cours...';
+                    
+                    // Re-enable after 10 seconds in case of network issues
+                    setTimeout(function() {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Se connecter';
+                    }, 10000);
+                });
+                </script>
             </div>
         </div>
     </div>
