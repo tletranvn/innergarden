@@ -12,6 +12,15 @@
                 {# ajouter ici un div pour les messages flash si base.html.twig ne les affiche pas #}
                 <div id="form-messages" class="mb-3"></div>
 
+                {# Display form errors #}
+                {% if form.vars.errors|length > 0 %}
+                    <div class="alert alert-danger">
+                        {% for error in form.vars.errors %}
+                            <p>{{ error.message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 {{ form_start(form) }}
                     <div class="mb-3">
                         {{ form_row(form.title, {
@@ -50,6 +59,13 @@
                         }) }}
                     </div>
                     <div class="mb-3">
+                        {{ form_row(form.author, {
+                            'label': 'Auteur',
+                            'attr': {'class': 'form-select'},
+                            'placeholder': 'Choisissez un auteur'
+                        }) }}
+                    </div>
+                    <div class="mb-3">
                         {{ form_row(form.imageFile, {
                             'label': 'Image de l\'article (format JPG, PNG, GIF)',
                             'attr': {'class': 'form-control'},
@@ -75,12 +91,13 @@
 
                     <br>
                     <div class="d-grid gap-2">
-                        {# Le bouton submit est ajouté directement dans ArticleType, donc nous n'avons pas besoin d'un add('submit') ici #}
-                        {# Si vous aviez un champ submit dans le form, vous feriez : {{ form_row(form.submit) }} #}
-                        {# Mais puisque vous l'avez retiré, nous allons juste mettre le bouton ici #}
+                        {# The submit button is added directly here #}
                         <button type="submit" class="btn btn-custom" id="submitButton">Créer l'article</button>
                         <a href="{{ path('articles_list') }}" class="btn btn-secondary">Annuler et Retour</a>
                     </div>
+                    
+                    {# Render any remaining form fields that weren't explicitly rendered #}
+                    {{ form_rest(form) }}
                 {{ form_end(form) }}
             </div>
         </div>
