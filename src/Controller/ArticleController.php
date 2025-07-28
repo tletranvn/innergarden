@@ -62,7 +62,7 @@ class ArticleController extends AbstractController
             // NOUVEAU : Enregistrement des métadonnées de l'image dans MongoDB
             // On vérifie si un fichier a été soumis ET si VichUploader a bien mis à jour le nom de l'image sur l'entité Article.
             // Si $article->getImageName() n'est pas null, cela signifie que VichUploader a traité l'upload.
-            if ($article->getImageName() !== null) {
+            if ($article->getImageName() !== null && $article->getImageFile() !== null) {
                 $photo = new Photo();
                 $photo->setFilename($article->getImageName());
 
@@ -71,6 +71,14 @@ class ArticleController extends AbstractController
                 $photo->setOriginalFilename($article->getImageOriginalName());
                 $photo->setMimeType($article->getImageMimeType());
                 $photo->setSize($article->getImageSize());
+
+                // Store the image as base64 for Heroku persistence
+                $imageFile = $article->getImageFile();
+                if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\File) {
+                    $imageContent = file_get_contents($imageFile->getPathname());
+                    $base64Image = base64_encode($imageContent);
+                    $photo->setImageData($base64Image);
+                }
 
                 $photo->setRelatedArticleId((string)$article->getId()); // Lie la photo à l'ID de l'article MySQL
 

@@ -13,8 +13,8 @@
                     <div class="card h-100 shadow-sm card-custom">
                         {# Affichage de l'image de l'article ou d'un placeholder #}
                         {% if article.imageName %}
-                            {# Try to display the uploaded image, but fallback to placeholder if file doesn't exist #}
-                            <img src="{{ vich_uploader_asset(article, 'imageFile') }}" 
+                            {# Use our custom image controller to serve images from MongoDB #}
+                            <img src="{{ path('app_image_article', {'articleId': article.id}) }}" 
                                  class="card-img-top" 
                                  alt="{{ article.title }}"
                                  onerror="this.src='{{ asset('images/placeholder.png') }}'; this.onerror=null;">

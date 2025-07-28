@@ -12,7 +12,7 @@
                 {# Display article image if available #}
                 {% if article.imageName %}
                     <div class="text-center mb-4">
-                        <img src="{{ vich_uploader_asset(article, 'imageFile') }}" 
+                        <img src="{{ path('app_image_article', {'articleId': article.id}) }}" 
                              class="img-fluid rounded shadow-sm" 
                              alt="{{ article.title }}"
                              style="max-height: 400px; width: auto;"

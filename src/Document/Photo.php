@@ -27,6 +27,9 @@ class Photo
     #[Field(type: "string", name: "related_article_id")] // ID de l'article MySQL lié, stocké comme string
     protected ?string $relatedArticleId = null;
 
+    #[Field(type: "string")] // Store base64 encoded image data
+    protected ?string $imageData = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -84,6 +87,17 @@ class Photo
     public function setRelatedArticleId(string $relatedArticleId): self
     {
         $this->relatedArticleId = $relatedArticleId;
+        return $this;
+    }
+
+    public function getImageData(): ?string
+    {
+        return $this->imageData;
+    }
+
+    public function setImageData(?string $imageData): self
+    {
+        $this->imageData = $imageData;
         return $this;
     }
 }
