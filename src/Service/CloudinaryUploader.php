@@ -31,15 +31,13 @@ class CloudinaryUploader
     public function upload(UploadedFile $file, array $options = []): array
     {
         $defaultOptions = [
-            'folder' => 'innergarden/articles', // Keep this, it's correct for setting the folder
+            // Remove folder option since you want images stored directly in Cloudinary root
             'resource_type' => 'auto',
             'overwrite' => true,
         ];
 
         // Merge user-provided options with defaults.
-        // If a 'public_id' is provided in $options, it will be used.
-        // If it includes a path, that path will be used.
-        // If it doesn't include a path, the 'folder' option will determine the folder.
+        // Since we removed the 'folder' option, images will be stored at the root level
         $options = array_merge($defaultOptions, $options);
 
         // Debugging: Uncomment to see options before upload

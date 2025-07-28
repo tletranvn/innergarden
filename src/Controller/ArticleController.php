@@ -18,6 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Document\Photo;
 use Knp\Component\Pager\PaginatorInterface;
+use App\Service\CloudinaryUploader;
 
 
 #[Route('/articles', name: 'articles_')]
@@ -32,7 +33,7 @@ class ArticleController extends AbstractController
         EntityManagerInterface $em,
         SluggerInterface $slugger,
         DocumentManager $documentManager,
-        \App\Service\CloudinaryUploader $cloudinaryUploader
+        CloudinaryUploader $cloudinaryUploader
     ): Response {
         $article = new Article();
         $form = $this->createForm(ArticleType::class, $article);
