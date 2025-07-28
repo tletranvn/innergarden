@@ -31,7 +31,8 @@ class ArticleController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         SluggerInterface $slugger,
-        DocumentManager $documentManager
+        DocumentManager $documentManager,
+        \App\Service\CloudinaryUploader $cloudinaryUploader
     ): Response {
         $article = new Article();
         $form = $this->createForm(ArticleType::class, $article);
@@ -58,36 +59,39 @@ class ArticleController extends AbstractController
             $em->persist($article);
             $em->flush(); 
                      
+            // Handle Cloudinary image upload
+            $imageFile = $article->getImageFile();
+            if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+                try {
+                    // Upload to Cloudinary
+                    $result = $cloudinaryUploader->upload($imageFile, [
+                        'public_id' => $article->getSlug() . '_' . time(),
+                    ]);
 
-            // NOUVEAU : Enregistrement des métadonnées de l'image dans MongoDB
-            // On vérifie si un fichier a été soumis ET si VichUploader a bien mis à jour le nom de l'image sur l'entité Article.
-            // Si $article->getImageName() n'est pas null, cela signifie que VichUploader a traité l'upload.
-            if ($article->getImageName() !== null && $article->getImageFile() !== null) {
-                $photo = new Photo();
-                $photo->setFilename($article->getImageName());
+                    // Store Cloudinary public_id as image name
+                    $article->setImageName($result['public_id']);
+                    $article->setImageSize($result['bytes']);
+                    $article->setImageMimeType($imageFile->getMimeType());
+                    $article->setImageOriginalName($imageFile->getClientOriginalName());
 
-                // Utilisez les getters des propriétés de l'entité Article
-                // qui ont été remplies par VichUploaderBundle.
-                $photo->setOriginalFilename($article->getImageOriginalName());
-                $photo->setMimeType($article->getImageMimeType());
-                $photo->setSize($article->getImageSize());
+                    // Update article with Cloudinary info
+                    $em->persist($article);
+                    $em->flush();
 
-                // Store the image as base64 for Heroku persistence
-                $imageFile = $article->getImageFile();
-                if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\File) {
-                    $imageContent = file_get_contents($imageFile->getPathname());
-                    $base64Image = base64_encode($imageContent);
-                    $photo->setImageData($base64Image);
+                    // Store metadata in MongoDB
+                    $photo = new Photo();
+                    $photo->setFilename($result['public_id']);
+                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
+                    $photo->setMimeType($imageFile->getMimeType());
+                    $photo->setSize($result['bytes']);
+                    $photo->setRelatedArticleId((string)$article->getId());
+
+                    $documentManager->persist($photo);
+                    $documentManager->flush();
+
+                } catch (\Exception $e) {
+                    $this->addFlash('warning', 'L\'image n\'a pas pu être téléchargée: ' . $e->getMessage());
                 }
-
-                $photo->setRelatedArticleId((string)$article->getId()); // Lie la photo à l'ID de l'article MySQL
-
-                $documentManager->persist($photo);
-                $documentManager->flush(); // Persiste le document Photo dans MongoDB
-            } else {
-                // NOUVEAU : Message d'avertissement si le nom de l'image est null après soumission.
-                // Cela indique un problème avec l'upload ou la configuration de VichUploader.
-                $this->addFlash('warning', 'L\'image a été soumise, mais ses métadonnées n\'ont pas pu être enregistrées dans MongoDB. Veuillez vérifier la configuration de VichUploader et l\'entité Article.');
             }
 
             $this->addFlash('success', 'L\'article a été créé avec succès.');
