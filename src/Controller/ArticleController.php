@@ -64,11 +64,12 @@ class ArticleController extends AbstractController
             if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
                 try {
                     // Upload to Cloudinary
+                    // The CloudinaryUploader service will handle the 'folder' option.
                     $result = $cloudinaryUploader->upload($imageFile, [
-                        'public_id' => 'innergarden/articles/' . $article->getSlug() . '_' . time(),
+                        'public_id' => $article->getSlug() . '_' . time(),
                     ]);
 
-                    // Store the full public_id from Cloudinary (includes folder path)
+                    // Store the full public_id from Cloudinary (includes folder path if specified by 'folder' option)
                     $article->setImageName($result['public_id']);
                     $article->setImageSize($result['bytes']);
                     $article->setImageMimeType($imageFile->getMimeType());
@@ -80,7 +81,7 @@ class ArticleController extends AbstractController
 
                     // Store metadata in MongoDB
                     $photo = new Photo();
-                    $photo->setFilename($result['public_id']);
+                    $photo->setFilename($result['public_id']); // This will now include the folder from CloudinaryUploader
                     $photo->setOriginalFilename($imageFile->getClientOriginalName());
                     $photo->setMimeType($imageFile->getMimeType());
                     $photo->setSize($result['bytes']);
@@ -247,13 +248,15 @@ class ArticleController extends AbstractController
             'pagination' => $pagination // envoyer la pagination à la vue
         ]);
     }
+
     // route générique doit être définie APRÈS les routes spécifiques comme /create, /edit/{slug}, /delete/{slug}
     #[Route('/{slug}', name: 'show', methods: ['GET', 'POST'])]
     public function show(
         string $slug,
         ArticleRepository $articleRepository,
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        CloudinaryUploader $cloudinaryUploader // *** IMPORTANT: Inject the service here ***
     ): Response {
         $article = $articleRepository->findOneBy(['slug' => $slug]);
 
@@ -264,7 +267,6 @@ class ArticleController extends AbstractController
         if (!$article->isPublished()) {
             throw $this->createNotFoundException('L\'article existe mais n\'est pas publié.');
         }
-
 
         // --- Logique du formulaire de commentaire ---
         $comment = new Comment();
@@ -303,9 +305,9 @@ class ArticleController extends AbstractController
             'comments' => $article->getComments()->filter(function(Comment $comment) {
                 return $comment->isApproved();
             })->toArray(),
+            'cloudinaryUploader' => $cloudinaryUploader, // *** IMPORTANT: Pass the service to the Twig template ***
         ]);
     }
-
 
     // Une méthode pour publier les derniers articles sur la Homepage
     public function latestArticles(ArticleRepository $articleRepository, int $limit = 6): Response
