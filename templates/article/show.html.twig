@@ -9,7 +9,16 @@
         <div class="col-md-10">
             {# Article détaillé #}
             <div class="card shadow-sm mb-4">
-               {# ajouter image ici plus tard si besoin #}
+                {# Display article image if available #}
+                {% if article.imageName %}
+                    <div class="text-center mb-4">
+                        <img src="{{ vich_uploader_asset(article, 'imageFile') }}" 
+                             class="img-fluid rounded shadow-sm" 
+                             alt="{{ article.title }}"
+                             style="max-height: 400px; width: auto;"
+                             onerror="this.style.display='none'; this.onerror=null;">
+                    </div>
+                {% endif %}
                 <div class="card-body">
                     <h1 class="card-title">{{ article.title }}</h1>
                     <p class="text-muted mb-2">
