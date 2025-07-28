@@ -65,10 +65,10 @@ class ArticleController extends AbstractController
                 try {
                     // Upload to Cloudinary
                     $result = $cloudinaryUploader->upload($imageFile, [
-                        'public_id' => $article->getSlug() . '_' . time(),
+                        'public_id' => 'innergarden/articles/' . $article->getSlug() . '_' . time(),
                     ]);
 
-                    // Store Cloudinary public_id as image name
+                    // Store the full public_id from Cloudinary (includes folder path)
                     $article->setImageName($result['public_id']);
                     $article->setImageSize($result['bytes']);
                     $article->setImageMimeType($imageFile->getMimeType());

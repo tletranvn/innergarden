@@ -36,7 +36,10 @@ class CloudinaryUploader
 
         $options = array_merge($defaultOptions, $options);
 
-        return $this->uploadApi->upload($file->getPathname(), $options);
+        $result = $this->uploadApi->upload($file->getPathname(), $options);
+        
+        // Return the result with the full public_id that includes the folder
+        return $result;
     }
 
     public function delete(string $publicId): array

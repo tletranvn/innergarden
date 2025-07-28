@@ -13,7 +13,7 @@
                     <div class="card h-100 shadow-sm card-custom">
                         {# Affichage de l'image de l'article ou d'un placeholder #}
                         {% if article.imageName %}
-                            {# Use Cloudinary URL directly - we'll create a Twig function for this #}
+                            {# Use Cloudinary URL - public_id already includes folder path #}
                             <img src="https://res.cloudinary.com/dunb0wzvm/image/upload/{{ article.imageName }}" 
                                  class="card-img-top" 
                                  alt="{{ article.title }}"
