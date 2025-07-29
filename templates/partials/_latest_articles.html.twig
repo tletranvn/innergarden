@@ -7,9 +7,16 @@
                     <div class="card h-100 shadow-lg card-custom">
                         {# Affichage de l'image uploadée ou fallback #}
                         {% if article.imageName %}
-                            <img src="{{ article.imageUrl ?: asset('images/placeholder.png') }}" class="card-img-top" alt="Image pour {{ article.title }}">
+                            <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                                 class="card-img-top"
+                                 alt="{{ article.title }}"
+                                 style="object-fit: cover; height: 220px;"
+                                 onerror="this.src='{{ asset('images/placeholder.png') }}'; this.onerror=null;">
                         {% else %}
-                            <img src="{{ asset('images/placeholder.png') }}" class="card-img-top" alt="Image pour {{ article.title }}">
+                            <img src="{{ asset('images/placeholder.png') }}"
+                                 class="card-img-top"
+                                 alt="Image par défaut pour {{ article.title }}"
+                                 style="object-fit: cover; height: 220px;">
                         {% endif %}
                         
                         <div class="card-body text-start">

@@ -353,12 +353,12 @@ class ArticleController extends AbstractController
             'comments' => $article->getComments()->filter(function(Comment $comment) {
                 return $comment->isApproved();
             })->toArray(),
-            'cloudinaryUploader' => $cloudinaryUploader, // *** IMPORTANT: Pass the service to the Twig template ***
+            'cloudinaryUploader' => $cloudinaryUploader // *** IMPORTANT: Pass the service to the Twig template ***
         ]);
     }
 
     // Une méthode pour publier les derniers articles sur la Homepage
-    public function latestArticles(ArticleRepository $articleRepository, int $limit = 6): Response
+    public function latestArticles(ArticleRepository $articleRepository, CloudinaryUploader $cloudinaryUploader, int $limit = 6): Response
     {
         // Récupère les derniers articles publiés, triés par date de publication décroissante
         $latestArticles = $articleRepository->findBy(
@@ -369,6 +369,7 @@ class ArticleController extends AbstractController
 
         return $this->render('partials/_latest_articles.html.twig', [
             'latest_articles' => $latestArticles,
+            'cloudinaryUploader' => $cloudinaryUploader
         ]);
     }
 }

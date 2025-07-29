@@ -160,17 +160,18 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                <div class="d-flex align-items-center">                                    {% if article.imageName %}
-                                        <img src="{{ article.imageUrl ?: asset('images/placeholder.png') }}" 
-                                             alt="Image" 
-                                             class="rounded me-2" 
-                                             style="width: 40px; height: 40px; object-fit: cover;">
-                                    {% else %}
-                                        <img src="{{ asset('images/placeholder.png') }}" 
-                                             alt="Pas d'image" 
-                                             class="rounded me-2" 
-                                             style="width: 40px; height: 40px; object-fit: cover;">
-                                    {% endif %}
+                                                <div class="d-flex align-items-center">                                    
+                                                    {% if article.imageName %}
+                                                        <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}" 
+                                                            alt="Image" 
+                                                            class="rounded me-2" 
+                                                            style="width: 40px; height: 40px; object-fit: cover;">
+                                                    {% else %}
+                                                        <img src="{{ asset('images/placeholder.png') }}" 
+                                                            alt="Pas d'image" 
+                                                            class="rounded me-2" 
+                                                            style="width: 40px; height: 40px; object-fit: cover;">
+                                                    {% endif %}
                                                     <div>
                                                         <strong>{{ article.title }}</strong>
                                                         {% if article.slug %}

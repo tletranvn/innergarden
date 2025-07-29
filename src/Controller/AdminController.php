@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\CloudinaryUploader;
 
 #[Route('/admin', name: 'admin_')]
 #[IsGranted('ROLE_ADMIN')]
@@ -26,7 +27,8 @@ class AdminController extends AbstractController
         Request $request,
         ArticleRepository $articleRepository,
         ContactRepository $contactRepository,
-        PaginatorInterface $paginator
+        PaginatorInterface $paginator,
+        CloudinaryUploader $cloudinaryUploader
     ): Response {
         // Statistiques pour le dashboard
         $totalArticles = $articleRepository->count([]);
@@ -60,8 +62,9 @@ class AdminController extends AbstractController
                 'published' => $publishedArticles,
                 'drafts' => $draftArticles,
                 'mostViewed' => $mostViewedArticles,
-                'unprocessedMessages' => $unprocessedMessages
-            ]
+                'unprocessedMessages' => $unprocessedMessages,
+            ],
+            'cloudinaryUploader' => $cloudinaryUploader // Pass the Cloudinary service to the Twig template
         ]);
     }
 }
