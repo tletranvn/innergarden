@@ -161,7 +161,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center">                                    {% if article.imageName %}
-                                        <img src="{{ asset('uploads/images/articles/' ~ article.imageName) }}" 
+                                        <img src="{{ article.imageUrl ?: asset('images/placeholder.png') }}" 
                                              alt="Image" 
                                              class="rounded me-2" 
                                              style="width: 40px; height: 40px; object-fit: cover;">

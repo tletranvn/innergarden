@@ -13,8 +13,8 @@
                     <div class="card h-100 shadow-sm card-custom">
                         {# Affichage de l'image de l'article ou d'un placeholder #}
                         {% if article.imageName %}
-                            {# Use Cloudinary URL - public_id already includes folder path #}
-                            <img src="https://res.cloudinary.com/dunb0wzvm/image/upload/{{ article.imageName }}" 
+                            {# Use CloudinaryUploader service to generate the correct URL #}
+                            <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}" 
                                  class="card-img-top" 
                                  alt="{{ article.title }}"
                                  onerror="this.src='{{ asset('images/placeholder.png') }}'; this.onerror=null;">

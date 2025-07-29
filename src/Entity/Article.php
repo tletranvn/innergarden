@@ -9,11 +9,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 use Symfony\Component\HttpFoundation\File\File; // Importez File
-use Vich\UploaderBundle\Mapping\Annotation as Vich; // Importez VichUploaderBundle
 use Symfony\Component\Validator\Constraints as Assert; // Import pour les validations
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
-#[Vich\Uploadable] //ajouter cette annotation à la classe pour activer VichUploader
 class Article
 {
     #[ORM\Id]
@@ -64,11 +62,8 @@ class Article
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageOriginalName = null;
 
-    // NOUVEAU : Cette propriété n'est pas persistée en BDD.
-    // Elle est utilisée par VichUploader pour le téléchargement depuis le formulaire.
-    // MISE À JOUR : Ajout des attributs 'size', 'mimeType' et 'originalName' pour que VichUploader
-    // remplisse automatiquement les propriétés correspondantes après l'upload.
-    #[Vich\UploadableField(mapping: 'article_image', fileNameProperty: 'imageName', size: 'imageSize', mimeType: 'imageMimeType', originalName: 'imageOriginalName')]
+    // Simple file property for form handling (not persisted to database)
+    // This is used to capture the uploaded file from the form
     #[Assert\File(
         maxSize: '5M',
         mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
@@ -280,13 +275,12 @@ class Article
         return $this->imageFile;
     }
 
-    // NOUVEAU : Méthode pour obtenir l'URL complète de l'image (comme on a imageUrl avant)
-    // Elle construira l'URL à partir de imageName.
+    // Method to get the complete image URL - now returns the stored Cloudinary URL directly
     public function getImageUrl(): ?string
     {
         if ($this->imageName) {
-            // Attention : '/uploads/images/articles/' doit correspondre à l'uri_prefix configuré dans vich_uploader.yaml
-            return '/uploads/images/articles/' . $this->imageName;
+            // Since we now store the full Cloudinary URL in imageName, return it directly
+            return $this->imageName;
         }
         return null;
     }

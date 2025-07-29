@@ -24,6 +24,14 @@ use App\Service\CloudinaryUploader;
 #[Route('/articles', name: 'articles_')]
 class ArticleController extends AbstractController
 {
+    public function __construct()
+    {
+        // Enable PHP logging for debugging
+        ini_set('log_errors', 1);
+        ini_set('error_log', '/tmp/article_debug.log');
+        error_log("DEBUG: ArticleController constructor called");
+    }
+    
     // les routes spécifiques (create, edit, delete) AVANT la route générique {slug}.
 
     #[IsGranted('ROLE_ADMIN')] // Seuls les utilisateurs avec le rôle ADMIN peuvent créer
@@ -35,10 +43,29 @@ class ArticleController extends AbstractController
         DocumentManager $documentManager,
         CloudinaryUploader $cloudinaryUploader
     ): Response {
+        // Enable PHP logging for debugging
+        ini_set('log_errors', 1);
+        ini_set('error_log', '/tmp/article_debug.log');
+        
+        error_log("DEBUG: ArticleController::create method called");
+        error_log("DEBUG: Request method: " . $request->getMethod());
+        error_log("DEBUG: Request has files: " . ($request->files->count() > 0 ? 'true' : 'false'));
+        
         $article = new Article();
         $form = $this->createForm(ArticleType::class, $article);
 
         $form->handleRequest($request);
+        error_log("DEBUG: Form submitted: " . ($form->isSubmitted() ? 'true' : 'false'));
+        
+        if ($form->isSubmitted()) {
+            error_log("DEBUG: Form valid: " . ($form->isValid() ? 'true' : 'false'));
+            error_log("DEBUG: Request files: " . json_encode($request->files->all()));
+            
+            if (!$form->isValid()) {
+                error_log("DEBUG: Form errors: " . (string) $form->getErrors(true));
+            }
+        }
+        
         if ($form->isSubmitted() && $form->isValid()) {
 
             // Génération du slug
@@ -57,32 +84,35 @@ class ArticleController extends AbstractController
                 $article->setPublishedAt(null);
             }
 
-            $em->persist($article);
-            $em->flush(); 
-                     
-            // Handle Cloudinary image upload
-            $imageFile = $article->getImageFile();
+            // Handle Cloudinary image upload BEFORE persisting the article
+            $imageFile = $form->get('imageFile')->getData();
+            error_log("DEBUG: Form imageFile data type: " . gettype($imageFile));
+            if ($imageFile !== null) {
+                error_log("DEBUG: Form imageFile class: " . get_class($imageFile));
+            }
+            error_log("DEBUG: Form imageFile instanceof UploadedFile: " . ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile ? 'true' : 'false'));
+            
             if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+                error_log("DEBUG: Starting Cloudinary upload for file: " . $imageFile->getClientOriginalName());
                 try {
-                    // Upload to Cloudinary
-                    // The CloudinaryUploader service will handle the 'folder' option.
-                    $result = $cloudinaryUploader->upload($imageFile, [
-                        'public_id' => $article->getSlug() . '_' . time(),
-                    ]);
+                    // Upload to Cloudinary - let Cloudinary manage the public_id
+                    $result = $cloudinaryUploader->upload($imageFile);
+                    error_log("DEBUG: Cloudinary upload successful. Result: " . json_encode($result));
 
-                    // Store the full public_id from Cloudinary (includes folder path if specified by 'folder' option)
+                    // Store the Cloudinary URL in the imageName field 
+                    $cloudinaryUrl = $result['secure_url'] ?? $result['url'];
+                    error_log("DEBUG: Setting imageName to: " . $cloudinaryUrl);
                     $article->setImageName($result['public_id']);
                     $article->setImageSize($result['bytes']);
                     $article->setImageMimeType($imageFile->getMimeType());
                     $article->setImageOriginalName($imageFile->getClientOriginalName());
 
-                    // Update article with Cloudinary info
+                    // Store metadata in MongoDB
                     $em->persist($article);
                     $em->flush();
-
-                    // Store metadata in MongoDB
+                    
                     $photo = new Photo();
-                    $photo->setFilename($result['public_id']); // This will now include the folder from CloudinaryUploader
+                    $photo->setFilename($result['public_id']);
                     $photo->setOriginalFilename($imageFile->getClientOriginalName());
                     $photo->setMimeType($imageFile->getMimeType());
                     $photo->setSize($result['bytes']);
@@ -92,8 +122,17 @@ class ArticleController extends AbstractController
                     $documentManager->flush();
 
                 } catch (\Exception $e) {
+                    error_log("DEBUG: Cloudinary upload failed: " . $e->getMessage());
                     $this->addFlash('warning', 'L\'image n\'a pas pu être téléchargée: ' . $e->getMessage());
                 }
+            } else {
+                error_log("DEBUG: No image file found in form data or not an uploaded file instance");
+            }
+
+            // If no image was uploaded or upload failed, still persist the article
+            if (!$article->getId()) {
+                $em->persist($article);
+                $em->flush();
             }
 
             $this->addFlash('success', 'L\'article a été créé avec succès.');
@@ -115,6 +154,9 @@ class ArticleController extends AbstractController
         DocumentManager $documentManager,
         ArticleRepository $articleRepository
     ): Response {
+        error_log("DEBUG: ArticleController::edit method called for slug: " . $slug);
+        error_log("DEBUG: Request method in edit: " . $request->getMethod());
+        
         // Récupération explicite de l'article par slug
         $article = $articleRepository->findOneBy(['slug' => $slug]);
         
@@ -230,7 +272,8 @@ class ArticleController extends AbstractController
     public function list(
         Request $request, // Injection de la requête HTTP
         ArticleRepository $articleRepository,
-        PaginatorInterface $paginator // Injection du service de pagination
+        PaginatorInterface $paginator, // Injection du service de pagination
+        CloudinaryUploader $cloudinaryUploader // Inject CloudinaryUploader for image URLs
     ): Response {
         // préparer la requête (au lieu de récupérer tous les résultats d'un coup)
         $query = $articleRepository->createQueryBuilder('a')
@@ -246,7 +289,8 @@ class ArticleController extends AbstractController
         );
 
         return $this->render('article/list.html.twig', [
-            'pagination' => $pagination // envoyer la pagination à la vue
+            'pagination' => $pagination, // envoyer la pagination à la vue
+            'cloudinaryUploader' => $cloudinaryUploader // Pass CloudinaryUploader to template
         ]);
     }
 
@@ -259,6 +303,9 @@ class ArticleController extends AbstractController
         EntityManagerInterface $em,
         CloudinaryUploader $cloudinaryUploader // *** IMPORTANT: Inject the service here ***
     ): Response {
+        error_log("DEBUG: ArticleController::show method called for slug: " . $slug);
+        error_log("DEBUG: Request method in show: " . $request->getMethod());
+        
         $article = $articleRepository->findOneBy(['slug' => $slug]);
 
         if (!$article) {

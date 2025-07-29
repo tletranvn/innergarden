@@ -7,7 +7,7 @@
                     <div class="card h-100 shadow-lg card-custom">
                         {# Affichage de l'image uploadée ou fallback #}
                         {% if article.imageName %}
-                            <img src="{{ vich_uploader_asset(article, 'imageFile') }}" class="card-img-top" alt="Image pour {{ article.title }}">
+                            <img src="{{ article.imageUrl ?: asset('images/placeholder.png') }}" class="card-img-top" alt="Image pour {{ article.title }}">
                         {% else %}
                             <img src="{{ asset('images/placeholder.png') }}" class="card-img-top" alt="Image pour {{ article.title }}">
                         {% endif %}

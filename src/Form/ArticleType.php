@@ -13,10 +13,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\FileType; // NOUVEAU : Importez FileType
+use Symfony\Component\Form\Extension\Core\Type\FileType; // Import for file upload
 use Symfony\Component\Validator\Constraints as Assert;
-use Vich\UploaderBundle\Form\Type\VichImageType; // NOUVEAU : Importez VichImageType si nécessaire
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType; // NOUVEAU : Import pour le champ publishedAt
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType; // Import for publishedAt field
 
 class ArticleType extends AbstractType
 {
@@ -61,23 +60,11 @@ class ArticleType extends AbstractType
                 'attr' => ['placeholder' => 'Laisser vide pour auto-générer (ex: mon-super-article)'],
                 'help' => 'L\'identifiant unique dans l\'URL de l\'article.'
             ])
-            // ANCIEN : Le champ imageUrl est remplacé par imageFile pour l'upload via VichUploader
-            // ->add('imageUrl', TextType::class, [
-            //     'label' => 'URL de l\'image',
-            //     'required' => false,
-            //     'constraints' => [
-            //         new Assert\Url(message: 'L\'URL de l\'image n\'est pas valide.'),
-            //     ]
-            // ])
-            // CORRECTION ICI : Utilisez VichImageType::class et RETIREZ 'mapped' => false
-            ->add('imageFile', VichImageType::class, [ // IMPORTANT : Utilisez VichImageType
-                'label' => 'Image de l\'article (JPG, PNG, GIF)',
-                // 'mapped' => false, // CETTE LIGNE DOIT ÊTRE SUPPRIMÉE OU COMMENTÉE !
+            // Image upload field - using standard FileType since we handle upload via Cloudinary
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image de l\'article (JPG, PNG, GIF, WebP)',
+                'mapped' => false, // Not mapped to entity property since we handle upload manually
                 'required' => false,
-                'allow_delete' => true, // Permet de supprimer l'image existante via un checkbox
-                'download_uri' => true, // Affiche un lien pour télécharger l'image
-                'image_uri' => true, // Affiche l'image existante si présente
-                'asset_helper' => true, // Utilise le helper asset() de Symfony pour générer l'URL de l'image
                 'attr' => [
                     'accept' => 'image/*'
                 ],
@@ -88,8 +75,9 @@ class ArticleType extends AbstractType
                             'image/jpeg',
                             'image/png',
                             'image/gif',
+                            'image/webp',
                         ],
-                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, GIF).',
+                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, GIF, WebP).',
                     ])
                 ]
             ])

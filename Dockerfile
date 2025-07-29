@@ -1,14 +1,14 @@
 FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
-    libzip-dev unzip git libpng-dev libonig-dev libxml2-dev libicu-dev libjpeg-dev libfreetype6-dev libwebp-dev \
-    pkg-config libssl-dev \
- && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
- && docker-php-ext-install pdo pdo_mysql intl opcache zip gd \
- # MONGODB AVEC PECL
- && pecl install mongodb \
- && docker-php-ext-enable mongodb \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+libzip-dev unzip git libpng-dev libonig-dev libxml2-dev libicu-dev libjpeg-dev libfreetype6-dev libwebp-dev \
+pkg-config libssl-dev \
+&& docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+&& docker-php-ext-install pdo pdo_mysql intl opcache zip gd \
+# MONGODB AVEC PECL
+&& pecl install mongodb \
+&& docker-php-ext-enable mongodb \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN a2enmod rewrite
 
@@ -36,21 +36,29 @@ ENV DATABASE_URL="sqlite:///:memory:"
 # Cela doit être syntaxiquement valide mais ne pointer vers rien de réel
 ENV MONGODB_URL="mongodb://localhost:27017/fake_db"
 
+# NOUVEAU : Définir un CLOUDINARY_URL pour le BUILD
+# Cela doit être syntaxiquement valide mais ne pointer vers rien de réel
+ENV CLOUDINARY_URL="cloudinary://fake_key:fake_secret@fake_cloud"
+
 # Installer les dépendances Composer sans dev dependencies
 # Définir APP_ENV=prod spécifiquement pour cette commande RUN
 # Cela garantit que les scripts Symfony liés au build se comportent comme en prod
 
 # Install all Composer dependencies (including dev dependencies for local development)
-RUN composer install --optimize-autoloader --no-interaction
-# RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
+# RUN composer install --optimize-autoloader --no-interaction
+RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
 
 # CORRECTION ICI : Définir le document root d'Apache à /var/www/public
 ENV APACHE_DOCUMENT_ROOT=/var/www/public
 
-# CORRECTION ICI : Ajuster la configuration Apache pour utiliser le nouveau document root
-RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/000-default.conf
+# Copy and use the existing Apache configuration
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 
-# CORRECTION ICI : Changer les permissions pour le répertoire de code correct
-RUN chown -R www-data:www-data /var/www
+# Update the document root in the copied config to match our structure
+RUN sed -i 's|/var/www/html|/var/www|g' /etc/apache2/sites-available/000-default.conf
 
-CMD ["start.sh"]
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
+
+# Use the start script as entrypoint
+CMD ["/usr/local/bin/start.sh"]

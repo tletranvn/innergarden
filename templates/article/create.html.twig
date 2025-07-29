@@ -21,7 +21,7 @@
                     </div>
                 {% endif %}
 
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
                     <div class="mb-3">
                         {{ form_row(form.title, {
                             'label': 'Titre de l\'article',
