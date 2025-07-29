@@ -45,8 +45,8 @@ ENV CLOUDINARY_URL="cloudinary://fake_key:fake_secret@fake_cloud"
 # Cela garantit que les scripts Symfony liés au build se comportent comme en prod
 
 # Install all Composer dependencies (including dev dependencies for local development)
-# RUN composer install --optimize-autoloader --no-interaction
-RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --optimize-autoloader --no-interaction
+# RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
 
 # CORRECTION ICI : Définir le document root d'Apache à /var/www/public
 ENV APACHE_DOCUMENT_ROOT=/var/www/public
