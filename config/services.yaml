@@ -39,17 +39,6 @@ services:
         # No explicit arguments needed here if App\Service\CloudinaryUploader
         # has a constructor that accepts Cloudinary\Cloudinary
 
-    # Session handler for production (Heroku)
-    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
-        arguments:
-            - '%env(DATABASE_URL)%'
-            -
-                table_name: 'sessions'
-                id_col: 'sess_id'
-                data_col: 'sess_data'
-                time_col: 'sess_time'
-                lifetime_col: 'sess_lifetime'
-
     # Injection du client MongoDB en récupérant la variable d'environnement
     MongoDB\Client:
         arguments:
