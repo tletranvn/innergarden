@@ -21,14 +21,16 @@ class ContactType extends AbstractType
                 'label' => 'Prénom',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Votre prénom'
+                    'placeholder' => 'Votre prénom',
+                    'autocomplete' => 'given-name' // RGAA 11.13
                 ]
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Adresse email',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'votre.email@exemple.com'
+                    'placeholder' => 'votre.email@exemple.com',
+                    'autocomplete' => 'email' // RGAA 11.13
                 ]
             ])
             ->add('message', TextareaType::class, [

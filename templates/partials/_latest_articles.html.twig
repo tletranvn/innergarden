@@ -1,21 +1,26 @@
-<section class="latest-articles-section py-5 mb-5 text-center rounded-3 shadow-sm">
+<section class="latest-articles-section py-5 mb-5 text-center rounded-3 shadow-sm" aria-labelledby="latest-articles-heading">
     <div class="container">
-        <h2 class="section-title display-4 mb-5">Nos derniers articles</h2>
+        <h2 class="section-title display-4 mb-5" id="latest-articles-heading">Nos derniers articles</h2>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
             {% for article in latest_articles %}
                 <div class="col">
                     <div class="card h-100 shadow-lg card-custom">
-                        {# Affichage de l'image uploadée ou fallback #}
+                        {# Affichage de l'image uploadée ou fallback - RGAA 1.1 + ECO-CONCEPTION #}
                         {% if article.imageName %}
                             <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
                                  class="card-img-top"
-                                 alt="{{ article.title }}"
+                                 alt="Illustration de l'article : {{ article.title }}"
+                                 loading="lazy"
+                                 decoding="async"
+                                 width="400"
+                                 height="220"
                                  style="object-fit: cover; height: 220px;">
                         {% else %}
-                            <img src="{{ asset('images/placeholder.png') }}"
-                                 class="card-img-top"
-                                 alt="Image par défaut pour {{ article.title }}"
-                                 style="object-fit: cover; height: 220px;">
+                            {# ECO: Inline SVG au lieu de PNG 382KB - économie 99.9% #}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" class="card-img-top" style="height: 220px;" role="presentation" aria-hidden="true">
+                                <rect fill="#4A5C6F" width="800" height="600"/>
+                                <text fill="#FFF" font-size="36" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle">Inner Garden</text>
+                            </svg>
                         {% endif %}
                         
                         <div class="card-body text-start">
@@ -25,7 +30,9 @@
                                 Publié le {{ article.publishedAt|date('d/m/Y') }}
                                 {% if article.author %}par {{ article.author.pseudo }}{% endif %}
                             </p>
-                            <a href="{{ path('articles_show', {'slug': article.slug}) }}" class="btn btn-custom">Lire la suite</a>
+                            <a href="{{ path('articles_show', {'slug': article.slug}) }}"
+                               class="btn btn-custom"
+                               aria-label="Lire l'article : {{ article.title }}">Lire la suite</a>
                         </div>
                     </div>
                 </div>

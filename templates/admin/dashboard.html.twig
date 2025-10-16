@@ -160,17 +160,22 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                <div class="d-flex align-items-center">                                    
+                                                <div class="d-flex align-items-center">
                                                     {% if article.imageName %}
-                                                        <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}" 
-                                                            alt="Image" 
-                                                            class="rounded me-2" 
+                                                        <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                                                            alt="Image"
+                                                            class="rounded me-2"
+                                                            loading="lazy"
+                                                            decoding="async"
+                                                            width="40"
+                                                            height="40"
                                                             style="width: 40px; height: 40px; object-fit: cover;">
                                                     {% else %}
-                                                        <img src="{{ asset('images/placeholder.png') }}" 
-                                                            alt="Pas d'image" 
-                                                            class="rounded me-2" 
-                                                            style="width: 40px; height: 40px; object-fit: cover;">
+                                                        {# ECO: Inline SVG placeholder #}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" class="rounded me-2" style="width: 40px; height: 40px;" role="presentation" aria-hidden="true">
+                                                            <rect fill="#4A5C6F" width="40" height="40"/>
+                                                            <text fill="#FFF" font-size="10" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle">IG</text>
+                                                        </svg>
                                                     {% endif %}
                                                     <div>
                                                         <strong>{{ article.title }}</strong>

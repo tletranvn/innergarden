@@ -1,22 +1,45 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ article.title }}{% endblock %}
+{% block title %}{{ article.title }} - Inner Garden{% endblock %}
+
+{% block meta_description %}{{ article.content|striptags|slice(0, 155) }}...{% endblock %}
 
 {% block body %}
 <div class="container mt-5">
+    {# Breadcrumb - RGAA 12.3 #}
+    {% embed 'partials/_breadcrumb.html.twig' %}
+        {% block breadcrumb_items %}
+            <li class="breadcrumb-item">
+                <a href="{{ path('articles_list') }}">Articles</a>
+            </li>
+            {% if article.category %}
+                <li class="breadcrumb-item">
+                    {{ article.category.name }}
+                </li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ article.title|length > 50 ? article.title|slice(0, 50) ~ '...' : article.title }}
+            </li>
+        {% endblock %}
+    {% endembed %}
+
     <div class="row justify-content-center">
         <div class="col-md-10">
             {# Article détaillé #}
             <div class="card shadow-sm mb-4">
-                {# Display article image if available #}
+                {# Display article image if available - RGAA 1.1 + ECO-CONCEPTION #}
                 {% if article.imageName %}
                     <div class="text-center mb-4">
                         {# Use the CloudinaryUploader service to generate the correct URL #}
-                        <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}" 
-                             class="img-fluid rounded shadow-sm" 
-                             alt="{{ article.title }}"
+                        <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                             class="img-fluid rounded shadow-sm"
+                             alt="Image de l'article : {{ article.title }}"
+                             loading="lazy"
+                             decoding="async"
+                             width="1200"
+                             height="800"
                              style="max-height: 400px; width: auto;"
-                             onerror="this.style.display='none'; this.onerror=null;">
+                             onerror="this.style.display='none'; this.onerror=null; this.alt='Image non disponible';">
                     </div>
                 {% endif %}
                 <div class="card-body">
@@ -45,7 +68,9 @@
                     {% if is_granted('ROLE_ADMIN') %}
                     <div class="mt-3 d-flex gap-2">
                         {% if article.slug %}
-                            <a href="{{ path('articles_edit', { slug: article.slug }) }}" class="btn btn-warning"><i class="bi bi-pencil-square"></i>Éditer</a>
+                            <a href="{{ path('articles_edit', { slug: article.slug }) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil-square" aria-hidden="true"></i> Éditer
+                            </a>
                         {% else %}
                             <button class="btn btn-warning" disabled>Éditer (slug manquant)</button>
                         {% endif %}
@@ -56,13 +81,13 @@
                                 action="{{ path('articles_delete', { slug: article.slug }) }}"
                                 onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
-                                <button class="btn btn-danger">
-                                    <i class="bi bi-trash"></i> Supprimer
+                                <button class="btn btn-danger" aria-label="Supprimer l'article">
+                                    <i class="bi bi-trash" aria-hidden="true"></i> Supprimer
                                 </button>
                             </form>
                         {% else %}
                             <button class="btn btn-danger" disabled>
-                                <i class="bi bi-trash"></i> Supprimer (slug manquant)
+                                <i class="bi bi-trash" aria-hidden="true"></i> Supprimer (slug manquant)
                             </button>
                         {% endif %}
                     </div>
@@ -70,9 +95,9 @@
                 </div>
             </div>
 
-            {# Section Commentaires #}
-            <section class="comments-section bg-light p-4 rounded shadow-sm">
-                <h2 class="h4 mb-4" style="color: var(--color-section-title);">Commentaires ({{ article.comments|length }})</h2>
+            {# Section Commentaires - RGAA 9.1 #}
+            <section class="comments-section bg-light p-4 rounded shadow-sm" aria-labelledby="comments-heading">
+                <h2 class="h4 mb-4" id="comments-heading" style="color: var(--color-section-title);">Commentaires ({{ article.comments|length }})</h2>
                 <div id="comment-form-messages" class="mb-3"></div>
 
                 {% if app.user %}
@@ -102,9 +127,18 @@
                                 <div class="card-body d-flex">
                                     <div class="me-3">
                                         {% if comment.author.avatar %}
-                                            <img src="{{ asset('uploads/avatars/' ~ comment.author.avatar) }}" alt="Avatar" class="rounded-circle" width="50" height="50">
+                                            <img src="{{ asset('uploads/avatars/' ~ comment.author.avatar) }}"
+                                                 alt="Photo de profil de {{ comment.author.pseudo }}"
+                                                 class="rounded-circle"
+                                                 width="50"
+                                                 height="50"
+                                                 loading="lazy"
+                                                 decoding="async">
                                         {% else %}
-                                            <div class="avatar-placeholder rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+                                            <div class="avatar-placeholder rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                                                 style="width:50px; height:50px;"
+                                                 role="img"
+                                                 aria-label="Avatar par défaut de {{ comment.author.pseudo }}">
                                                 {{ comment.author.pseudo[:1]|upper }}
                                             </div>
                                         {% endif %}

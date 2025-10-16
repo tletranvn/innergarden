@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de confidentialité - Inner Garden{% endblock %}
+
+{% block body %}
+    <main>
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <h1 class="display-4 fw-bold mb-4 text-center">Politique de confidentialité</h1>
+                    <p class="text-muted text-center mb-5">Dernière mise à jour : {{ "now"|date("d/m/Y") }}</p>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">1. Introduction</h2>
+                            <p>
+                                Chez Inner Garden, nous nous engageons à protéger votre vie privée et vos données personnelles
+                                conformément au Règlement Général sur la Protection des Données (RGPD) de l'Union Européenne.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">2. Données collectées</h2>
+                            <p>Nous collectons les informations suivantes lorsque vous utilisez notre site :</p>
+                            <ul>
+                                <li><strong>Données d'identification :</strong> nom, prénom, adresse e-mail</li>
+                                <li><strong>Données de connexion :</strong> adresse IP, logs de connexion</li>
+                                <li><strong>Données de navigation :</strong> pages visitées, temps passé sur le site</li>
+                                <li><strong>Contenu généré :</strong> commentaires, articles, interactions sur la plateforme</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">3. Utilisation des données</h2>
+                            <p>Vos données personnelles sont utilisées pour :</p>
+                            <ul>
+                                <li>Gérer votre compte utilisateur et votre authentification</li>
+                                <li>Vous fournir les services demandés (articles, commentaires, etc.)</li>
+                                <li>Améliorer notre site web et votre expérience utilisateur</li>
+                                <li>Vous envoyer des communications liées à nos services (si vous avez donné votre consentement)</li>
+                                <li>Respecter nos obligations légales</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">4. Base légale du traitement</h2>
+                            <p>Conformément au RGPD, nous traitons vos données sur les bases légales suivantes :</p>
+                            <ul>
+                                <li><strong>Consentement :</strong> vous avez donné votre accord explicite pour le traitement de vos données</li>
+                                <li><strong>Exécution d'un contrat :</strong> le traitement est nécessaire pour fournir nos services</li>
+                                <li><strong>Obligation légale :</strong> nous devons traiter vos données pour respecter la loi</li>
+                                <li><strong>Intérêts légitimes :</strong> amélioration de nos services et sécurité du site</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">5. Vos droits RGPD</h2>
+                            <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+                            <ul>
+                                <li><strong>Droit d'accès :</strong> obtenir une copie de vos données personnelles</li>
+                                <li><strong>Droit de rectification :</strong> corriger vos données inexactes ou incomplètes</li>
+                                <li><strong>Droit à l'effacement :</strong> demander la suppression de vos données (« droit à l'oubli »)</li>
+                                <li><strong>Droit à la limitation :</strong> limiter le traitement de vos données</li>
+                                <li><strong>Droit à la portabilité :</strong> recevoir vos données dans un format structuré</li>
+                                <li><strong>Droit d'opposition :</strong> vous opposer au traitement de vos données</li>
+                                <li><strong>Droit de retirer votre consentement :</strong> à tout moment</li>
+                            </ul>
+                            <p class="mt-3">
+                                Pour exercer ces droits, contactez-nous à :
+                                <a href="mailto:tletranvn@gmail.com">tletranvn@gmail.com</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">6. Conservation des données</h2>
+                            <p>
+                                Nous conservons vos données personnelles uniquement pendant la durée nécessaire aux finalités
+                                pour lesquelles elles ont été collectées, ou conformément aux obligations légales de conservation.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">7. Sécurité des données</h2>
+                            <p>
+                                Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger
+                                vos données contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation,
+                                l'altération ou la destruction.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">8. Cookies</h2>
+                            <p>
+                                Notre site utilise des cookies pour améliorer votre expérience de navigation. Vous pouvez
+                                gérer vos préférences de cookies dans les paramètres de votre navigateur.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">9. Partage des données</h2>
+                            <p>
+                                Nous ne vendons ni ne louons vos données personnelles à des tiers. Nous pouvons partager
+                                vos données uniquement avec des prestataires de services qui nous aident à exploiter notre
+                                site, dans le respect strict du RGPD.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3">10. Contact</h2>
+                            <p>
+                                Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits,
+                                vous pouvez nous contacter :
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><strong>Email :</strong> <a href="mailto:tletranvn@gmail.com">tletranvn@gmail.com</a></li>
+                                <li><strong>Site web :</strong> Inner Garden</li>
+                            </ul>
+                            <p class="mt-3">
+                                Vous avez également le droit de déposer une plainte auprès de la Commission Nationale de
+                                l'Informatique et des Libertés (CNIL) si vous estimez que vos droits ne sont pas respectés.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

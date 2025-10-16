@@ -11,14 +11,22 @@
             {% for article in pagination %}
                 <div class="col">
                     <div class="card h-100 shadow-sm card-custom">
-                        {# Affichage de l'image de l'article ou d'un placeholder #}
+                        {# Affichage de l'image de l'article ou d'un placeholder - ECO-CONCEPTION #}
                         {% if article.imageName %}
                             {# Use CloudinaryUploader service to generate the correct URL #}
-                            <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}" 
-                                 class="card-img-top" 
-                                 alt="{{ article.title }}">
+                            <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                                 class="card-img-top"
+                                 alt="{{ article.title }}"
+                                 loading="lazy"
+                                 decoding="async"
+                                 width="400"
+                                 height="300">
                         {% else %}
-                            <img src="{{ asset('images/placeholder.png') }}" class="card-img-top" alt="Image par défaut pour {{ article.title }}">
+                            {# ECO: Inline SVG au lieu de PNG 382KB - économie 99.9% #}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" class="card-img-top" role="presentation" aria-hidden="true">
+                                <rect fill="#4A5C6F" width="800" height="600"/>
+                                <text fill="#FFF" font-size="36" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle">Inner Garden</text>
+                            </svg>
                         {% endif %}
                         <div class="card-body text-start">
                             <h3 class="card-title card-title-custom">{{ article.title }}</h3>

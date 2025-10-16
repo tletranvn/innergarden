@@ -2,11 +2,13 @@
 
 {% block title %}Accueil - Inner Garden{% endblock %}
 
+{% block meta_description %}Inner Garden - Découvrez un monde de transformation et de nature. Cultivez votre jardin intérieur avec nos articles sur le jardinage, bien-être, développement personnel et voyages nature.{% endblock %}
+
 {% block body %}
     <main>
-        <section class="hero-section text-center py-5 mb-5 rounded-3 shadow-lg">
+        <section class="hero-section text-center py-5 mb-5 rounded-3 shadow-lg" aria-labelledby="hero-title">
             <div class="container">
-                <h1 class="hero-title display-3 fw-bold">
+                <h1 class="hero-title display-3 fw-bold" id="hero-title">
                     Découvrez un monde de transformation et de nature
                 </h1>
                 <p class="hero-subtitle lead">
@@ -15,9 +17,9 @@
             </div>
         </section>
 
-        <section class="categories-section py-5 mb-5 text-center rounded-3 shadow-sm">
+        <section class="categories-section py-5 mb-5 text-center rounded-3 shadow-sm" aria-labelledby="categories-heading">
             <div class="container">
-                <h2 class="section-title display-4 mb-5">Nos catégories phares</h2>
+                <h2 class="section-title display-4 mb-5" id="categories-heading">Nos catégories phares</h2>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center">
                     
                     {% set categories = [

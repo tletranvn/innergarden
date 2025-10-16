@@ -32,7 +32,8 @@ class RegistrationForm extends AbstractType
                     ),
                 ],
                 'attr' => [
-                    'placeholder' => 'Entrez votre pseudo'
+                    'placeholder' => 'Entrez votre pseudo',
+                    'autocomplete' => 'username' // RGAA 11.13
                 ]
             ])
             ->add('email', EmailType::class, [
@@ -42,7 +43,8 @@ class RegistrationForm extends AbstractType
                     new Email(message: 'Veuillez entrer une adresse email valide.'),
                 ],
                 'attr' => [
-                    'placeholder' => 'Entrez votre adresse email'
+                    'placeholder' => 'Entrez votre adresse email',
+                    'autocomplete' => 'email' // RGAA 11.13
                 ]
             ])
             ->add('agreeTerms', CheckboxType::class, [
