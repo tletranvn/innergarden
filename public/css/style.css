@@ -42,6 +42,61 @@ a:visited {
     color: var(--color-link-visited);
 }
 
+/* Fix: Prevent link styles from overriding Bootstrap button colors */
+.btn,
+a.btn,
+a.btn:visited,
+a.btn:hover,
+a.btn:focus,
+a.btn:active {
+    color: inherit !important;
+}
+
+/* Restore specific Bootstrap button colors */
+a.btn-warning,
+a.btn-warning:visited {
+    color: #000 !important;
+    background-color: #ffc107 !important;
+}
+
+a.btn-warning:hover {
+    color: #000 !important;
+    background-color: #ffca2c !important;
+}
+
+a.btn-danger,
+a.btn-danger:visited {
+    color: #fff !important;
+    background-color: #dc3545 !important;
+}
+
+a.btn-danger:hover {
+    color: #fff !important;
+    background-color: #bb2d3b !important;
+}
+
+a.btn-success,
+a.btn-success:visited {
+    color: #fff !important;
+    background-color: #198754 !important;
+}
+
+a.btn-success:hover {
+    color: #fff !important;
+    background-color: #157347 !important;
+}
+
+a.btn-primary,
+a.btn-primary:visited {
+    color: #fff !important;
+    background-color: #0d6efd !important;
+}
+
+a.btn-primary:hover {
+    color: #fff !important;
+    background-color: #0b5ed7 !important;
+}
+
 /* ACCESSIBILITY: Focus visible - WCAG 2.4.7 */
 a:focus,
 button:focus,
@@ -281,6 +336,16 @@ select:focus-visible {
 .admin-dashboard .btn-outline-warning:hover,
 .admin-dashboard .btn-outline-danger:hover {
     transform: scale(1.1);
+}
+
+/* Hover effect for cards */
+.hover-shadow {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* RESPONSIVE */

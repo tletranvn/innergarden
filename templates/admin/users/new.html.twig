@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel Utilisateur - Admin{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-person-plus-fill" aria-hidden="true"></i> Créer un Nouvel Utilisateur
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                    <div class="mb-3">
+                        {{ form_label(form.pseudo) }}
+                        {{ form_widget(form.pseudo) }}
+                        {{ form_errors(form.pseudo) }}
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i> Le pseudo doit contenir entre 3 et 50 caractères
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email) }}
+                        {{ form_errors(form.email) }}
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i> L'email sera utilisé pour la connexion
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.plainPassword) }}
+                        {{ form_widget(form.plainPassword) }}
+                        {{ form_errors(form.plainPassword) }}
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i> Le mot de passe doit contenir au moins 6 caractères
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.roles) }}
+                        {{ form_widget(form.roles) }}
+                        {{ form_errors(form.roles) }}
+                        {{ form_help(form.roles) }}
+                        <small class="form-text text-muted d-block mt-2">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i>
+                            <strong>ROLE_USER :</strong> Utilisateur standard (peut commenter, voir les articles)<br>
+                            <strong>ROLE_ADMIN :</strong> Administrateur (accès complet au dashboard et gestion)
+                        </small>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ path('admin_users_list') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle" aria-hidden="true"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle" aria-hidden="true"></i> Créer l'Utilisateur
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

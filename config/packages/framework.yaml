@@ -10,8 +10,8 @@ framework:
         cookie_samesite: lax
         cookie_lifetime: 3600
         gc_maxlifetime: 3600
-        # Store sessions in database for Heroku reliability
-        handler_id: null
+        # Store sessions in database for Heroku reliability (use PDO handler)
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         
     csrf_protection:
         enabled: true

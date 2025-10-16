@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Utilisateurs - Admin{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-4">
+                <i class="bi bi-people-fill" aria-hidden="true"></i> Gestion des Utilisateurs
+            </h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('admin_users_new') }}" class="btn btn-success btn-lg">
+                <i class="bi bi-person-plus-fill" aria-hidden="true"></i> Nouvel Utilisateur
+            </a>
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endfor %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Pseudo</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Rôles</th>
+                            <th scope="col">Créé le</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>
+                                    <strong>{{ user.pseudo }}</strong>
+                                    {% if user.id == app.user.id %}
+                                        <span class="badge bg-info ms-2">Vous</span>
+                                    {% endif %}
+                                    {% if articleCounts[user.id] > 0 %}
+                                        <span class="badge bg-secondary ms-2" title="Cet utilisateur a {{ articleCounts[user.id] }} article(s)">
+                                            <i class="bi bi-file-text" aria-hidden="true"></i> {{ articleCounts[user.id] }}
+                                        </span>
+                                    {% endif %}
+                                    {% if commentCounts[user.id] > 0 %}
+                                        <span class="badge bg-warning ms-2" title="Cet utilisateur a {{ commentCounts[user.id] }} commentaire(s)">
+                                            <i class="bi bi-chat-left-text" aria-hidden="true"></i> {{ commentCounts[user.id] }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% for role in user.roles %}
+                                        {% if role == 'ROLE_ADMIN' %}
+                                            <span class="badge bg-danger">Admin</span>
+                                        {% elseif role == 'ROLE_USER' %}
+                                            <span class="badge bg-primary">User</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ user.createdAt ? user.createdAt|date('d/m/Y') : 'N/A' }}</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group" aria-label="Actions utilisateur">
+                                        <a href="{{ path('admin_users_edit', {id: user.id}) }}"
+                                           class="btn btn-sm btn-warning"
+                                           aria-label="Modifier l'utilisateur {{ user.pseudo }}">
+                                            <i class="bi bi-pencil-square" aria-hidden="true"></i> Modifier
+                                        </a>
+
+                                        {% if user.id == app.user.id %}
+                                            <button class="btn btn-sm btn-secondary" disabled title="Vous ne pouvez pas supprimer votre propre compte">
+                                                <i class="bi bi-trash" aria-hidden="true"></i> Supprimer
+                                            </button>
+                                        {% elseif articleCounts[user.id] > 0 %}
+                                            <button class="btn btn-sm btn-secondary" disabled title="Cet utilisateur a {{ articleCounts[user.id] }} article(s). Impossible de le supprimer.">
+                                                <i class="bi bi-trash" aria-hidden="true"></i> Supprimer
+                                            </button>
+                                        {% elseif commentCounts[user.id] > 0 %}
+                                            <button class="btn btn-sm btn-secondary" disabled title="Cet utilisateur a {{ commentCounts[user.id] }} commentaire(s). Impossible de le supprimer.">
+                                                <i class="bi bi-trash" aria-hidden="true"></i> Supprimer
+                                            </button>
+                                        {% else %}
+                                            <form method="post"
+                                                  action="{{ path('admin_users_delete', {id: user.id}) }}"
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');"
+                                                  style="display: inline;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                                <button class="btn btn-sm btn-danger"
+                                                        aria-label="Supprimer l'utilisateur {{ user.pseudo }}">
+                                                    <i class="bi bi-trash" aria-hidden="true"></i> Supprimer
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox" aria-hidden="true"></i> Aucun utilisateur trouvé.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Retour au Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
