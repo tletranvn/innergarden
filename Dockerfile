@@ -60,5 +60,10 @@ RUN sed -i 's|/var/www/html|/var/www|g' /etc/apache2/sites-available/000-default
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
+# Ensure var/log directory exists with proper permissions
+RUN mkdir -p /var/www/var/log && \
+    chown -R www-data:www-data /var/www/var && \
+    chmod -R 775 /var/www/var
+
 # Use the start script as entrypoint
 CMD ["/usr/local/bin/start.sh"]

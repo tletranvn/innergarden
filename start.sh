@@ -1,7 +1,18 @@
 #!/bin/bash
 
+# Ensure var/log and var/cache directories exist with proper permissions
+# Only set permissions if running as root (Heroku), skip if running as www-data (Docker Compose)
+if [ "$(id -u)" = "0" ]; then
+    mkdir -p /var/www/var/log /var/www/var/cache
+    chown -R www-data:www-data /var/www/var
+    chmod -R 775 /var/www/var
+fi
+
+# Set default port to 80 if PORT is not defined (local development)
 # Heroku fournit le port via la variable d'environnement $PORT.
-# Nous devons nous assurer qu'Apache écoute sur CE PORT et non sur 80.
+if [ -z "$PORT" ]; then
+    PORT=80
+fi
 
 # 1. Modifiez la directive Listen globale (souvent dans ports.conf ou apache2.conf)
 # Remplace toutes les occurrences de "Listen 80" par "Listen $PORT"

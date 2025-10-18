@@ -12,7 +12,6 @@ services:
       - ./docker/php/vhosts:/etc/apache2/sites-enabled # Mount the Apache vhosts config
       - /var/www/vendor # This creates an anonymous volume for vendor, preventing host override
       - /var/www/var/cache # This creates an anonymous volume for var/cache
-      - /var/www/var/log # NEW: This creates an anonymous volume for var/log
       # consider adding ':delegated' to volumes on macOS for better performance/stability
       # Example: - ./:/var/www:delegated
     networks:
@@ -30,7 +29,6 @@ services:
       MONGODB_DB: ${MONGODB_DB}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    user: "www-data"
 
   db:
     image: mysql:latest # Version spécifique correspondant à la version de MySQL utilisée dans DATABASE_URL
