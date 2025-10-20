@@ -79,6 +79,7 @@ class UserEditType extends AbstractType
                         'min' => 6,
                         'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
                         'max' => 4096,
+                        'allowEmptyString' => true,
                     ]),
                 ],
             ])
