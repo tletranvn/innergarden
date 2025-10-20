@@ -13,6 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class UserEditType extends AbstractType
 {
@@ -75,12 +77,19 @@ class UserEditType extends AbstractType
                         'max' => 4096,
                     ]),
                 ] : [
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères',
-                        'max' => 4096,
-                        'allowEmptyString' => true,
-                    ]),
+                    new Callback(function ($value, ExecutionContextInterface $context) {
+                        // Only validate length if a password is actually provided
+                        if (!empty($value)) {
+                            if (strlen($value) < 6) {
+                                $context->buildViolation('Le mot de passe doit contenir au moins 6 caractères')
+                                    ->addViolation();
+                            }
+                            if (strlen($value) > 4096) {
+                                $context->buildViolation('Le mot de passe est trop long')
+                                    ->addViolation();
+                            }
+                        }
+                    }),
                 ],
             ])
             ->add('roles', ChoiceType::class, [
