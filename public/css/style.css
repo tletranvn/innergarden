@@ -17,8 +17,8 @@
 
     /* New accessibility colors */
     --color-link-visited: #9FCDCD;
-    --color-focus-outline: #FFD700;     /* Gold - highly visible */
-    --color-focus-bg: rgba(255, 215, 0, 0.1);
+    --color-focus-outline: #7DD4D4;     /* Turquoise - matches accent color */
+    --color-focus-bg: rgba(125, 212, 212, 0.15);
 }
 
 /* Corps de page */
@@ -97,19 +97,26 @@ a.btn-primary:hover {
     background-color: #0b5ed7 !important;
 }
 
-/* ACCESSIBILITY: Focus visible - WCAG 2.4.7 */
+/* ACCESSIBILITY: Focus visible - WCAG 2.4.7 - Style élégant et harmonieux */
 a:focus,
 button:focus,
+.btn:focus,
+.nav-link:focus {
+    outline: 2px solid var(--color-focus-outline) !important;
+    outline-offset: 3px;
+    box-shadow: 0 0 8px var(--color-focus-bg) !important;
+}
+
+/* Focus pour les champs de formulaire - style plus doux */
 input:focus,
 textarea:focus,
 select:focus,
-.btn:focus,
-.nav-link:focus,
 .form-control:focus,
 .form-check-input:focus {
-    outline: 3px solid var(--color-focus-outline) !important;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px var(--color-focus-bg) !important;
+    outline: none !important;
+    border-color: var(--color-focus-outline) !important;
+    box-shadow: 0 0 0 3px var(--color-focus-bg), 0 0 10px rgba(125, 212, 212, 0.3) !important;
+    transition: all 0.2s ease;
 }
 
 a:focus-visible,
@@ -117,9 +124,8 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-    outline: 3px solid var(--color-focus-outline) !important;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px var(--color-focus-bg) !important;
+    outline: 2px solid var(--color-focus-outline) !important;
+    outline-offset: 3px;
 }
 
 /* Skip link styles - RGAA 12.7 - Completely hidden until keyboard focus */
