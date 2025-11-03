@@ -89,55 +89,38 @@ class ArticleController extends AbstractController
             // 3. Si isPublished = false ET publishedAt = NULL → brouillon non programmé
             // (Pas besoin de code supplémentaire, le formulaire gère publishedAt)
 
-            // Handle Cloudinary image upload BEFORE persisting the article
+            // Persist article first (to get ID for MongoDB reference)
+            $em->persist($article);
+            $em->flush();
+
+            // Handle Cloudinary image upload AFTER persisting article
             $imageFile = $form->get('imageFile')->getData();
-            error_log("DEBUG: Form imageFile data type: " . gettype($imageFile));
-            if ($imageFile !== null) {
-                error_log("DEBUG: Form imageFile class: " . get_class($imageFile));
-            }
-            error_log("DEBUG: Form imageFile instanceof UploadedFile: " . ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile ? 'true' : 'false'));
-            
+
             if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
-                error_log("DEBUG: Starting Cloudinary upload for file: " . $imageFile->getClientOriginalName());
                 try {
-                    // Upload to Cloudinary - let Cloudinary manage the public_id
+                    // Upload to Cloudinary
                     $result = $cloudinaryUploader->upload($imageFile);
-                    error_log("DEBUG: Cloudinary upload successful. Result: " . json_encode($result));
 
-                    // Store the Cloudinary URL in the imageName field 
-                    $cloudinaryUrl = $result['secure_url'] ?? $result['url'];
-                    error_log("DEBUG: Setting imageName to: " . $cloudinaryUrl);
-                    $article->setImageName($result['public_id']);
-                    $article->setImageSize($result['bytes']);
-                    $article->setImageMimeType($imageFile->getMimeType());
-                    $article->setImageOriginalName($imageFile->getClientOriginalName());
-
-                    // Store metadata in MongoDB
-                    $em->persist($article);
+                    // Store only the public_id in MySQL
+                    $article->setImagePublicId($result['public_id']);
                     $em->flush();
-                    
+
+                    // Store full metadata in MongoDB (separate transaction)
                     $photo = new Photo();
                     $photo->setFilename($result['public_id']);
                     $photo->setOriginalFilename($imageFile->getClientOriginalName());
                     $photo->setMimeType($imageFile->getMimeType());
                     $photo->setSize($result['bytes']);
                     $photo->setRelatedArticleId((string)$article->getId());
+                    $photo->setUrl($result['secure_url'] ?? $result['url']);
 
                     $documentManager->persist($photo);
                     $documentManager->flush();
 
                 } catch (\Exception $e) {
-                    error_log("DEBUG: Cloudinary upload failed: " . $e->getMessage());
+                    error_log("ERROR: Image upload failed: " . $e->getMessage());
                     $this->addFlash('warning', 'L\'image n\'a pas pu être téléchargée: ' . $e->getMessage());
                 }
-            } else {
-                error_log("DEBUG: No image file found in form data or not an uploaded file instance");
-            }
-
-            // If no image was uploaded or upload failed, still persist the article
-            if (!$article->getId()) {
-                $em->persist($article);
-                $em->flush();
             }
 
             $this->addFlash('success', 'L\'article a été créé avec succès.');
@@ -157,7 +140,8 @@ class ArticleController extends AbstractController
         EntityManagerInterface $em,
         SluggerInterface $slugger,
         DocumentManager $documentManager,
-        ArticleRepository $articleRepository
+        ArticleRepository $articleRepository,
+        CloudinaryUploader $cloudinaryUploader
     ): Response {
         error_log("DEBUG: ArticleController::edit method called for slug: " . $slug);
         error_log("DEBUG: Request method in edit: " . $request->getMethod());
@@ -169,11 +153,10 @@ class ArticleController extends AbstractController
             throw $this->createNotFoundException('Article non trouvé avec le slug: ' . $slug);
         }
         
-        $form = $this->createForm(ArticleType::class, $article);
-        
         // Sauvegarder l'état initial de l'image pour détecter les suppressions
-        $originalImageName = $article->getImageName();
-        
+        $originalImagePublicId = $article->getImagePublicId();
+
+        $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -192,49 +175,49 @@ class ArticleController extends AbstractController
             // 3. Si isPublished = false ET publishedAt = NULL → brouillon non programmé
             // (Pas besoin de code supplémentaire, le formulaire gère publishedAt)
 
-            try {
-                $em->flush(); // Pas besoin de persist car l'entité est déjà gérée par l'EntityManager
-                              // À ce stade, VichUploader a traité l'image si une nouvelle a été soumise.
-            } catch (\Exception $e) {
-                error_log("ERROR: Failed to flush article: " . $e->getMessage());
-                $this->addFlash('error', 'Erreur lors de la sauvegarde de l\'article: ' . $e->getMessage());
-                return $this->redirectToRoute('articles_list');
-            }
+            // Sauvegarder MySQL d'abord
+            $em->flush();
 
-            // Mise à jour/création/suppression des métadonnées dans MongoDB pour l'image de l'article
-            // Si une nouvelle image a été soumise, $article->getImageName() ne sera pas null après le flush.
-            try {
-                if ($article->getImageName() !== null) {
-                    // Tente de trouver un document Photo existant lié à cet article
+            // Gérer l'upload d'une nouvelle image (MongoDB dans transaction séparée)
+            $imageFile = $form->get('imageFile')->getData();
+
+            if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+                try {
+                    // Supprimer l'ancienne image de Cloudinary si elle existe
+                    if ($originalImagePublicId) {
+                        // TODO: Implémenter la suppression Cloudinary
+                        // $cloudinaryUploader->delete($originalImagePublicId);
+                    }
+
+                    // Upload nouvelle image vers Cloudinary
+                    $result = $cloudinaryUploader->upload($imageFile);
+
+                    // Mettre à jour le public_id dans MySQL
+                    $article->setImagePublicId($result['public_id']);
+                    $em->flush();
+
+                    // Mettre à jour/créer les métadonnées dans MongoDB
                     $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
 
                     if (!$photo) {
-                        // Si aucun document Photo n'existe, on en crée un nouveau
                         $photo = new Photo();
                         $photo->setRelatedArticleId((string)$article->getId());
                     }
 
-                    // Met à jour les métadonnées de la photo
-                    $photo->setFilename($article->getImageName());
-                    $photo->setOriginalFilename($article->getImageOriginalName());
-                    $photo->setMimeType($article->getImageMimeType());
-                    $photo->setSize($article->getImageSize());
+                    $photo->setFilename($result['public_id']);
+                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
+                    $photo->setMimeType($imageFile->getMimeType());
+                    $photo->setSize($result['bytes']);
+                    $photo->setUrl($result['secure_url'] ?? $result['url']);
 
                     $documentManager->persist($photo);
                     $documentManager->flush();
-                } elseif ($originalImageName !== null && $article->getImageName() === null) {
-                    // L'article avait une image avant mais plus maintenant = suppression d'image
-                    $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
-                    if ($photo) {
-                        $documentManager->remove($photo);
-                        $documentManager->flush();
-                    }
-                }
-            } catch (\Exception $e) {
-                error_log("WARNING: Failed to update MongoDB photo metadata: " . $e->getMessage());
-                // L'article est déjà sauvegardé, donc on continue malgré l'erreur MongoDB
-            }
 
+                } catch (\Exception $e) {
+                    error_log("ERROR: Image update failed: " . $e->getMessage());
+                    $this->addFlash('warning', 'L\'image n\'a pas pu être mise à jour: ' . $e->getMessage());
+                }
+            }
 
             $this->addFlash('success', 'L\'article a été modifié avec succès.');
             return $this->redirectToRoute('articles_list');
@@ -269,17 +252,27 @@ class ArticleController extends AbstractController
         if (!$this->isCsrfTokenValid('delete' . $article->getId(), $submittedToken)) {
             throw $this->createAccessDeniedException('Jeton CSRF invalide.');
         }
-        // Supprimer l'article de la base de données
-        // L'EntityManager gère la suppression de l'article
-        // et VichUploaderBundle s'occupe de la suppression de l'image associée.
-        $em->remove($article);
-        $em->flush();
+        // Supprimer d'abord les métadonnées MongoDB (avant de supprimer l'article MySQL)
+        $articleId = $article->getId();
+        try {
+            $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$articleId]);
+            if ($photo) {
+                $documentManager->remove($photo);
+                $documentManager->flush();
+            }
+        } catch (\Exception $e) {
+            error_log("WARNING: Failed to delete MongoDB photo metadata: " . $e->getMessage());
+            // Continue quand même pour supprimer l'article
+        }
 
-        // NOUVEAU : Supprimer les métadonnées de la photo de MongoDB
-        $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
-        if ($photo) {
-            $documentManager->remove($photo);
-            $documentManager->flush();
+        // Supprimer l'article de la base de données MySQL
+        try {
+            $em->remove($article);
+            $em->flush();
+        } catch (\Exception $e) {
+            error_log("ERROR: Failed to delete article: " . $e->getMessage());
+            $this->addFlash('error', 'Erreur lors de la suppression de l\'article: ' . $e->getMessage());
+            return $this->redirectToRoute('articles_list');
         }
 
         $this->addFlash('success', 'L\'article a été supprimé avec succès.');

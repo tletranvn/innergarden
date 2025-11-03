@@ -31,7 +31,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
 
   db:
-    image: mysql:latest # Version spécifique correspondant à la version de MySQL utilisée dans DATABASE_URL
+    image: mysql:9.4 # Version correspondant aux données existantes
     # platform: linux/arm64
     container_name: innergarden_symfony_mysql
     volumes:

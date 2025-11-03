@@ -43,34 +43,9 @@ class Article
     #[ORM\Column]
     private ?bool $isPublished = false;
 
-    // ANCIEN : #[ORM\Column(length: 255, nullable: true)]
-    // ANCIEN : private ?string $imageUrl = null;
-
-    // NOUVEAU : Cette propriété stocke le nom du fichier image généré par VichUploader
+    // Référence Cloudinary public_id uniquement (les métadonnées sont dans MongoDB)
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageName = null;
-
-    // NOUVEAU : Propriété pour stocker la taille du fichier (ajouté pour les métadonnées)
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $imageSize = null;
-
-    // NOUVEAU : Propriété pour stocker le type MIME du fichier (ajouté pour les métadonnées)
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageMimeType = null;
-
-    // NOUVEAU : Propriété pour stocker le nom original du fichier (ajouté pour les métadonnées)
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageOriginalName = null;
-
-    // Simple file property for form handling (not persisted to database)
-    // This is used to capture the uploaded file from the form
-    #[Assert\File(
-        maxSize: '5M',
-        mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-        mimeTypesMessage: 'Veuillez télécharger une image valide (JPEG, PNG, GIF, WebP)',
-        maxSizeMessage: 'La taille du fichier ne doit pas dépasser 5 MB'
-    )]
-    private ?File $imageFile = null;
+    private ?string $imagePublicId = null;
 
     #[ORM\Column]
     private ?int $viewCount = null;
@@ -199,99 +174,33 @@ class Article
         return $this;
     }
 
-    // NOUVEAU : Getter et Setter pour imageName
-    public function getImageName(): ?string
+    // Getter et Setter pour imagePublicId
+    public function getImagePublicId(): ?string
     {
-        return $this->imageName;
+        return $this->imagePublicId;
     }
 
-    public function setImageName(?string $imageName): static
+    public function setImagePublicId(?string $imagePublicId): static
     {
-        $this->imageName = $imageName;
+        $this->imagePublicId = $imagePublicId;
 
         return $this;
     }
 
-    // NOUVEAU : Getter et Setter pour imageSize
-    public function getImageSize(): ?int
-    {
-        return $this->imageSize;
-    }
-
-    public function setImageSize(?int $imageSize): static
-    {
-        $this->imageSize = $imageSize;
-
-        return $this;
-    }
-
-    // NOUVEAU : Getter et Setter pour imageMimeType
-    public function getImageMimeType(): ?string
-    {
-        return $this->imageMimeType;
-    }
-
-    public function setImageMimeType(?string $imageMimeType): static
-    {
-        $this->imageMimeType = $imageMimeType;
-
-        return $this;
-    }
-
-    // NOUVEAU : Getter et Setter pour imageOriginalName
-    public function getImageOriginalName(): ?string
-    {
-        return $this->imageOriginalName;
-    }
-
-    public function setImageOriginalName(?string $imageOriginalName): static
-    {
-        $this->imageOriginalName = $imageOriginalName;
-
-        return $this;
-    }
-
-    /**
-     * NOUVEAU : Getter et Setter pour imageFile.
-     * Cette méthode est appelée par VichUploader lorsque on soumet un fichier.
-     * Si télécharger manuellement un fichier (par exemple, depuis une requête API)
-     * assurez-vous qu'une instance de 'UploadedFile' est injectée dans ce setter pour déclencher la mise à jour.
-     *
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
-     */
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-
-        if (null !== $imageFile) {
-            // C'est nécessaire pour déclencher les événements de Doctrine,
-            // sinon les listeners de VichUploader ne seront pas appelés et le fichier est perdu.
-            $this->updatedAt = new \DateTimeImmutable();
-        }
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    // Method to get the complete image URL - now returns the stored Cloudinary URL directly
+    // Méthode helper pour obtenir l'URL Cloudinary depuis le public_id
     public function getImageUrl(): ?string
     {
-        if ($this->imageName) {
-            // Since we now store the full Cloudinary URL in imageName, return it directly
-            return $this->imageName;
+        if ($this->imagePublicId) {
+            // Construire l'URL Cloudinary depuis le public_id
+            // Format: https://res.cloudinary.com/{cloud_name}/image/upload/{public_id}
+            return sprintf(
+                'https://res.cloudinary.com/%s/image/upload/%s',
+                $_ENV['CLOUDINARY_CLOUD_NAME'] ?? 'dunb0wzvm',
+                $this->imagePublicId
+            );
         }
         return null;
     }
-
-    // ANCIEN : Setter pour imageUrl (laisser au cas où d'autres parties du code s'y fient,
-    // mais il ne sera plus utilisé directement pour l'upload par VichUploader)
-    // public function setImageUrl(?string $imageUrl): static
-    // {
-    //     $this->imageUrl = $imageUrl;
-    //     return $this;
-    // }
 
 
     public function getViewCount(): ?int

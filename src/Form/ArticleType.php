@@ -60,25 +60,20 @@ class ArticleType extends AbstractType
                 'attr' => ['placeholder' => 'Laisser vide pour auto-générer (ex: mon-super-article)'],
                 'help' => 'L\'identifiant unique dans l\'URL de l\'article.'
             ])
-            // Image upload field - using standard FileType since we handle upload via Cloudinary
+            // Image upload field - direct Cloudinary upload
             ->add('imageFile', FileType::class, [
                 'label' => 'Image de l\'article (JPG, PNG, GIF, WebP)',
-                'mapped' => false, // Not mapped to entity property since we handle upload manually
+                'mapped' => false, // Not mapped to entity, handled in controller
                 'required' => false,
                 'attr' => [
                     'accept' => 'image/*'
                 ],
                 'constraints' => [
-                    new Assert\File([
-                        'maxSize' => '5M',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                            'image/gif',
-                            'image/webp',
-                        ],
-                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, GIF, WebP).',
-                    ])
+                    new Assert\File(
+                        maxSize: '5M',
+                        mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                        mimeTypesMessage: 'Veuillez télécharger une image valide (JPG, PNG, GIF, WebP)'
+                    )
                 ]
             ])
             ->add('author', EntityType::class, [

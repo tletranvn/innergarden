@@ -27,8 +27,11 @@ class Photo
     #[Field(type: "string", name: "related_article_id")] // ID de l'article MySQL lié, stocké comme string
     protected ?string $relatedArticleId = null;
 
-    #[Field(type: "string")] // Store base64 encoded image data
+    #[Field(type: "string")] // Store base64 encoded image data (optional, for old system)
     protected ?string $imageData = null;
+
+    #[Field(type: "string")] // Cloudinary secure URL
+    protected ?string $url = null;
 
     public function getId(): ?string
     {
@@ -98,6 +101,17 @@ class Photo
     public function setImageData(?string $imageData): self
     {
         $this->imageData = $imageData;
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): self
+    {
+        $this->url = $url;
         return $this;
     }
 }
