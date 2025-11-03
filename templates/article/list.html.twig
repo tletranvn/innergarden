@@ -12,9 +12,9 @@
                 <div class="col">
                     <div class="card h-100 shadow-sm card-custom">
                         {# Affichage de l'image de l'article ou d'un placeholder - ECO-CONCEPTION #}
-                        {% if article.imageName %}
+                        {% if article.imagePublicId %}
                             {# Use CloudinaryUploader service to generate the correct URL #}
-                            <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                            <img src="{{ cloudinaryUploader.getUrl(article.imagePublicId) }}"
                                  class="card-img-top"
                                  alt="{{ article.title }}"
                                  loading="lazy"

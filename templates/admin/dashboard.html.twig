@@ -178,8 +178,8 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    {% if article.imageName %}
-                                                        <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                                                    {% if article.imagePublicId %}
+                                                        <img src="{{ cloudinaryUploader.getUrl(article.imagePublicId) }}"
                                                             alt="Image"
                                                             class="rounded me-2"
                                                             loading="lazy"

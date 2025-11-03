@@ -25,8 +25,16 @@ echo "[$TIMESTAMP] Exécution de la commande de publication..." >> "$LOG_FILE"
 
 cd "$PROJECT_DIR" || exit 1
 
-# Exécuter la commande via php bin/console
-php bin/console app:publish-scheduled-articles >> "$LOG_FILE" 2>&1
+# Détecter si Docker Compose est disponible et le conteneur est en cours d'exécution
+if command -v docker &> /dev/null && docker compose ps www 2>/dev/null | grep -q "Up"; then
+    # Environnement Docker - utiliser docker compose exec
+    echo "[$TIMESTAMP] Environnement Docker détecté, utilisation de docker compose" >> "$LOG_FILE"
+    docker compose exec -T www php bin/console app:publish-scheduled-articles >> "$LOG_FILE" 2>&1
+else
+    # Environnement natif ou Heroku - utiliser php directement
+    echo "[$TIMESTAMP] Environnement natif détecté, utilisation de php directement" >> "$LOG_FILE"
+    php bin/console app:publish-scheduled-articles >> "$LOG_FILE" 2>&1
+fi
 
 # Vérifier le code de sortie
 if [ $? -eq 0 ]; then

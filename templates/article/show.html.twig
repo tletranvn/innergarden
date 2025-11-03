@@ -28,10 +28,10 @@
             {# Article détaillé #}
             <div class="card shadow-sm mb-4">
                 {# Display article image if available - RGAA 1.1 + ECO-CONCEPTION #}
-                {% if article.imageName %}
+                {% if article.imagePublicId %}
                     <div class="text-center mb-4">
                         {# Use the CloudinaryUploader service to generate the correct URL #}
-                        <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                        <img src="{{ cloudinaryUploader.getUrl(article.imagePublicId) }}"
                              class="img-fluid rounded shadow-sm"
                              alt="Image de l'article : {{ article.title }}"
                              loading="lazy"

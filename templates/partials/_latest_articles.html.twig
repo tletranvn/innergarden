@@ -6,8 +6,8 @@
                 <div class="col">
                     <div class="card h-100 shadow-lg card-custom">
                         {# Affichage de l'image uploadée ou fallback - RGAA 1.1 + ECO-CONCEPTION #}
-                        {% if article.imageName %}
-                            <img src="{{ cloudinaryUploader.getUrl(article.imageName) }}"
+                        {% if article.imagePublicId %}
+                            <img src="{{ cloudinaryUploader.getUrl(article.imagePublicId) }}"
                                  class="card-img-top"
                                  alt="Illustration de l'article : {{ article.title }}"
                                  loading="lazy"

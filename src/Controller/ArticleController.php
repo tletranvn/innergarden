@@ -220,7 +220,7 @@ class ArticleController extends AbstractController
             }
 
             $this->addFlash('success', 'L\'article a été modifié avec succès.');
-            return $this->redirectToRoute('articles_list');
+            return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
         }
 
         return $this->render('article/edit.html.twig', [
