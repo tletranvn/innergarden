@@ -192,36 +192,47 @@ class ArticleController extends AbstractController
             // 3. Si isPublished = false ET publishedAt = NULL → brouillon non programmé
             // (Pas besoin de code supplémentaire, le formulaire gère publishedAt)
 
-            $em->flush(); // Pas besoin de persist car l'entité est déjà gérée par l'EntityManager
-                          // À ce stade, VichUploader a traité l'image si une nouvelle a été soumise.
+            try {
+                $em->flush(); // Pas besoin de persist car l'entité est déjà gérée par l'EntityManager
+                              // À ce stade, VichUploader a traité l'image si une nouvelle a été soumise.
+            } catch (\Exception $e) {
+                error_log("ERROR: Failed to flush article: " . $e->getMessage());
+                $this->addFlash('error', 'Erreur lors de la sauvegarde de l\'article: ' . $e->getMessage());
+                return $this->redirectToRoute('articles_list');
+            }
 
             // Mise à jour/création/suppression des métadonnées dans MongoDB pour l'image de l'article
             // Si une nouvelle image a été soumise, $article->getImageName() ne sera pas null après le flush.
-            if ($article->getImageName() !== null) {
-                // Tente de trouver un document Photo existant lié à cet article
-                $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
+            try {
+                if ($article->getImageName() !== null) {
+                    // Tente de trouver un document Photo existant lié à cet article
+                    $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
 
-                if (!$photo) {
-                    // Si aucun document Photo n'existe, on en crée un nouveau
-                    $photo = new Photo();
-                    $photo->setRelatedArticleId((string)$article->getId());
-                }
+                    if (!$photo) {
+                        // Si aucun document Photo n'existe, on en crée un nouveau
+                        $photo = new Photo();
+                        $photo->setRelatedArticleId((string)$article->getId());
+                    }
 
-                // Met à jour les métadonnées de la photo
-                $photo->setFilename($article->getImageName());
-                $photo->setOriginalFilename($article->getImageOriginalName());
-                $photo->setMimeType($article->getImageMimeType());
-                $photo->setSize($article->getImageSize());
+                    // Met à jour les métadonnées de la photo
+                    $photo->setFilename($article->getImageName());
+                    $photo->setOriginalFilename($article->getImageOriginalName());
+                    $photo->setMimeType($article->getImageMimeType());
+                    $photo->setSize($article->getImageSize());
 
-                $documentManager->persist($photo);
-                $documentManager->flush();
-            } elseif ($originalImageName !== null && $article->getImageName() === null) {
-                // L'article avait une image avant mais plus maintenant = suppression d'image
-                $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
-                if ($photo) {
-                    $documentManager->remove($photo);
+                    $documentManager->persist($photo);
                     $documentManager->flush();
+                } elseif ($originalImageName !== null && $article->getImageName() === null) {
+                    // L'article avait une image avant mais plus maintenant = suppression d'image
+                    $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
+                    if ($photo) {
+                        $documentManager->remove($photo);
+                        $documentManager->flush();
+                    }
                 }
+            } catch (\Exception $e) {
+                error_log("WARNING: Failed to update MongoDB photo metadata: " . $e->getMessage());
+                // L'article est déjà sauvegardé, donc on continue malgré l'erreur MongoDB
             }
 
 
