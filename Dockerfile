@@ -40,6 +40,9 @@ ENV MONGODB_URL="mongodb://localhost:27017/fake_db"
 # Cela doit être syntaxiquement valide mais ne pointer vers rien de réel
 ENV CLOUDINARY_URL="cloudinary://fake_key:fake_secret@fake_cloud"
 
+# Configure PHP timezone (will be overridden by TZ env var if set)
+RUN echo "date.timezone = Europe/Paris" > /usr/local/etc/php/conf.d/timezone.ini
+
 # Installer les dépendances Composer sans dev dependencies
 # Définir APP_ENV=prod spécifiquement pour cette commande RUN
 # Cela garantit que les scripts Symfony liés au build se comportent comme en prod
