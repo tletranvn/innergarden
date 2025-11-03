@@ -105,9 +105,9 @@ class ArticleController extends AbstractController
                     $article->setImagePublicId($result['public_id']);
                     $em->flush();
 
-                    // IMPORTANT: Clear the EntityManager to release MySQL transaction
+                    // IMPORTANT: Close MySQL connection to release transaction
                     // This prevents "There is already an active transaction" on Heroku
-                    $em->clear();
+                    $em->getConnection()->close();
 
                     // Store full metadata in MongoDB (separate transaction)
                     $photo = new Photo();
@@ -200,9 +200,9 @@ class ArticleController extends AbstractController
                     $article->setImagePublicId($result['public_id']);
                     $em->flush();
 
-                    // IMPORTANT: Clear the EntityManager to release MySQL transaction
+                    // IMPORTANT: Close MySQL connection to release transaction
                     // This prevents "There is already an active transaction" on Heroku
-                    $em->clear();
+                    $em->getConnection()->close();
 
                     // Mettre à jour/créer les métadonnées dans MongoDB
                     $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
