@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Configure PHP timezone from environment variable (defaults to Europe/Paris)
+TIMEZONE="${TZ:-Europe/Paris}"
+echo "date.timezone = $TIMEZONE" > /usr/local/etc/php/conf.d/timezone.ini
+
 # Ensure var/log and var/cache directories exist with proper permissions
 # Only set permissions if running as root (Heroku), skip if running as www-data (Docker Compose)
 if [ "$(id -u)" = "0" ]; then

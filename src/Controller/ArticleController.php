@@ -79,11 +79,15 @@ class ArticleController extends AbstractController
                 $article->setCreatedAt(new \DateTimeImmutable());
             }
             $article->setUpdatedAt(new \DateTimeImmutable());
+
+            // Logique de publication :
+            // 1. Si isPublished = true ET publishedAt = NULL → publier immédiatement
             if ($article->isPublished() && null === $article->getPublishedAt()) {
                 $article->setPublishedAt(new \DateTimeImmutable());
-            } elseif (!$article->isPublished() && null !== $article->getPublishedAt()) {
-                $article->setPublishedAt(null);
             }
+            // 2. Si isPublished = false ET publishedAt est dans le futur → article programmé
+            // 3. Si isPublished = false ET publishedAt = NULL → brouillon non programmé
+            // (Pas besoin de code supplémentaire, le formulaire gère publishedAt)
 
             // Handle Cloudinary image upload BEFORE persisting the article
             $imageFile = $form->get('imageFile')->getData();
@@ -178,11 +182,15 @@ class ArticleController extends AbstractController
                 $article->setSlug($slugger->slug($article->getTitle())->lower());
             }
             $article->setUpdatedAt(new \DateTimeImmutable());
+
+            // Logique de publication :
+            // 1. Si isPublished = true ET publishedAt = NULL → publier immédiatement
             if ($article->isPublished() && null === $article->getPublishedAt()) {
                 $article->setPublishedAt(new \DateTimeImmutable());
-            } elseif (!$article->isPublished() && null !== $article->getPublishedAt()) {
-                $article->setPublishedAt(null);
             }
+            // 2. Si isPublished = false ET publishedAt est dans le futur → article programmé
+            // 3. Si isPublished = false ET publishedAt = NULL → brouillon non programmé
+            // (Pas besoin de code supplémentaire, le formulaire gère publishedAt)
 
             $em->flush(); // Pas besoin de persist car l'entité est déjà gérée par l'EntityManager
                           // À ce stade, VichUploader a traité l'image si une nouvelle a été soumise.
