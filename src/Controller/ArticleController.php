@@ -70,6 +70,13 @@ class ArticleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $connection = $em->getConnection();
 
+            // CORRECTION 1: Nettoyer toute transaction héritée avant de commencer
+            // C'est la ligne clé pour Heroku - évite "There is already an active transaction"
+            if ($connection->isTransactionActive()) {
+                error_log("DEBUG: Rollback sur connexion active héritée dans create().");
+                $connection->rollBack();
+            }
+
             // Génération du slug
             if (!$article->getSlug()) {
                 $article->setSlug($slugger->slug($article->getTitle())->lower());
@@ -112,9 +119,6 @@ class ArticleController extends AbstractController
                 // Commit la transaction MySQL
                 $connection->commit();
 
-                // IMPORTANT: Clear EntityManager après commit pour libérer complètement la transaction
-                $em->clear();
-
                 // Store full metadata in MongoDB (separate transaction, after MySQL commit)
                 if (isset($imageFile) && $imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
                     try {
@@ -138,8 +142,10 @@ class ArticleController extends AbstractController
                 return $this->redirectToRoute('articles_list');
 
             } catch (\Exception $e) {
-                // TOUJOURS appeler rollback en cas d'échec
-                $connection->rollBack();
+                // CORRECTION 2: Vérifier si transaction active avant rollback
+                if ($connection->isTransactionActive()) {
+                    $connection->rollBack();
+                }
                 error_log("ERROR: Article creation failed: " . $e->getMessage());
                 $this->addFlash('error', 'Erreur lors de la création de l\'article: ' . $e->getMessage());
                 // Re-render le formulaire avec les données
@@ -180,6 +186,13 @@ class ArticleController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $connection = $em->getConnection();
+
+            // CORRECTION 1: Nettoyer toute transaction héritée avant de commencer
+            // C'est la ligne clé pour Heroku - évite "There is already an active transaction"
+            if ($connection->isTransactionActive()) {
+                error_log("DEBUG: Rollback sur connexion active héritée dans edit().");
+                $connection->rollBack();
+            }
 
             // Génération du slug (si vous autorisez la modification du titre)
             if (!$article->getSlug()) {
@@ -222,9 +235,6 @@ class ArticleController extends AbstractController
                 // Commit la transaction MySQL
                 $connection->commit();
 
-                // IMPORTANT: Clear EntityManager après commit pour libérer complètement la transaction
-                $em->clear();
-
                 // Mettre à jour/créer les métadonnées dans MongoDB (si une image a été uploadée)
                 if (isset($imageFile) && $imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
                     try {
@@ -254,8 +264,10 @@ class ArticleController extends AbstractController
                 return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
 
             } catch (\Exception $e) {
-                // TOUJOURS appeler rollback en cas d'échec
-                $connection->rollBack();
+                // CORRECTION 2: Vérifier si transaction active avant rollback
+                if ($connection->isTransactionActive()) {
+                    $connection->rollBack();
+                }
                 error_log("ERROR: Article edit failed: " . $e->getMessage());
                 $this->addFlash('error', 'Erreur lors de la modification de l\'article: ' . $e->getMessage());
                 // Re-render le formulaire avec les données
