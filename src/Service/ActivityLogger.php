@@ -77,6 +77,7 @@ class ActivityLogger
 
             $this->documentManager->persist($activityLog);
             $this->documentManager->flush();
+            $this->documentManager->clear(); // Clear to avoid transaction conflicts
 
         } catch (\Exception $e) {
             // Log silencieusement les erreurs MongoDB pour ne pas casser l'app
