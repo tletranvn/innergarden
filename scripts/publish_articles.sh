@@ -11,11 +11,11 @@ if [ -f "$PROJECT_DIR/.env" ]; then
     export $(grep -v '^#' "$PROJECT_DIR/.env" | xargs)
 fi
 
-# Fichier de log
-LOG_FILE="$PROJECT_DIR/var/log/publish_articles.log"
+# Fichier de log dans /tmp pour éviter les problèmes de permissions
+LOG_FILE="/tmp/innergarden_publish_articles.log"
 
-# Créer le dossier de logs s'il n'existe pas
-mkdir -p "$PROJECT_DIR/var/log"
+# Créer le fichier de log s'il n'existe pas
+touch "$LOG_FILE" 2>/dev/null || true
 
 # Timestamp
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')

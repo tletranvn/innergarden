@@ -93,7 +93,6 @@ class ArticleType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Article::class,
-            'csrf_protection' => false, // Disable CSRF for Heroku compatibility
         ]);
     }
 }

@@ -17,6 +17,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\CloudinaryUploader;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use App\Document\ActivityLog;
 
 #[Route('/admin', name: 'admin_')]
 #[IsGranted('ROLE_ADMIN')]
@@ -197,5 +199,24 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_users_list');
+    }
+
+    // ==================== LOGS D'ACTIVITÉ ====================
+
+    #[Route('/activity/logs', name: 'activity_logs')]
+    public function activityLogs(DocumentManager $documentManager): Response
+    {
+        // DEBUG: Ne pas catcher l'exception pour voir l'erreur exacte
+        // Récupérer les derniers 100 logs, triés par date décroissante
+        $logs = $documentManager->getRepository(ActivityLog::class)
+            ->createQueryBuilder()
+            ->sort('timestamp', 'DESC')
+            ->limit(100)
+            ->getQuery()
+            ->execute();
+
+        return $this->render('admin/activity_logs.html.twig', [
+            'logs' => $logs
+        ]);
     }
 }

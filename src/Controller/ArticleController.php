@@ -15,10 +15,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Repository\ArticleRepository;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Doctrine\ODM\MongoDB\DocumentManager;
-use App\Document\Photo;
 use Knp\Component\Pager\PaginatorInterface;
 use App\Service\CloudinaryUploader;
+use App\Service\ActivityLogger;
 
 
 
@@ -41,8 +40,8 @@ class ArticleController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         SluggerInterface $slugger,
-        DocumentManager $documentManager,
-        CloudinaryUploader $cloudinaryUploader
+        CloudinaryUploader $cloudinaryUploader,
+        ActivityLogger $activityLogger
     ): Response {
         // Enable PHP logging for debugging
         ini_set('log_errors', 1);
@@ -107,24 +106,8 @@ class ArticleController extends AbstractController
                     $em->flush();
                 }
 
-                // Store full metadata in MongoDB (separate operation, after MySQL)
-                if (isset($imageFile) && $imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
-                    try {
-                        $photo = new Photo();
-                        $photo->setFilename($result['public_id']);
-                        $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                        $photo->setMimeType($imageFile->getMimeType());
-                        $photo->setSize($result['bytes']);
-                        $photo->setRelatedArticleId((string)$article->getId());
-                        $photo->setUrl($result['secure_url'] ?? $result['url']);
-
-                        $documentManager->persist($photo);
-                        $documentManager->flush();
-                    } catch (\Exception $e) {
-                        error_log("ERROR: MongoDB metadata save failed: " . $e->getMessage());
-                        $this->addFlash('warning', 'L\'image a été uploadée mais les métadonnées n\'ont pas pu être sauvegardées.');
-                    }
-                }
+                // Log l'activité dans MongoDB (sans bloquer si ça échoue)
+                $activityLogger->logArticleCreate($article, $this->getUser());
 
                 $this->addFlash('success', 'L\'article a été créé avec succès.');
                 return $this->redirectToRoute('articles_list');
@@ -151,9 +134,9 @@ class ArticleController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         SluggerInterface $slugger,
-        DocumentManager $documentManager,
         ArticleRepository $articleRepository,
-        CloudinaryUploader $cloudinaryUploader
+        CloudinaryUploader $cloudinaryUploader,
+        ActivityLogger $activityLogger
     ): Response {
         error_log("DEBUG: ArticleController::edit method called for slug: " . $slug);
         error_log("DEBUG: Request method in edit: " . $request->getMethod());
@@ -208,30 +191,8 @@ class ArticleController extends AbstractController
                 // Sauvegarder toutes les modifications MySQL en une seule fois
                 $em->flush();
 
-                // Mettre à jour/créer les métadonnées dans MongoDB (si une image a été uploadée)
-                if (isset($imageFile) && $imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
-                    try {
-                        $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
-
-                        if (!$photo) {
-                            $photo = new Photo();
-                            $photo->setRelatedArticleId((string)$article->getId());
-                        }
-
-                        $photo->setFilename($result['public_id']);
-                        $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                        $photo->setMimeType($imageFile->getMimeType());
-                        $photo->setSize($result['bytes']);
-                        $photo->setUrl($result['secure_url'] ?? $result['url']);
-
-                        $documentManager->persist($photo);
-                        $documentManager->flush();
-
-                    } catch (\Exception $e) {
-                        error_log("ERROR: MongoDB photo metadata update failed: " . $e->getMessage());
-                        $this->addFlash('warning', 'Les métadonnées de l\'image n\'ont pas pu être enregistrées: ' . $e->getMessage());
-                    }
-                }
+                // Log l'édition dans MongoDB
+                $activityLogger->logArticleEdit($article, $this->getUser());
 
                 $this->addFlash('success', 'L\'article a été modifié avec succès.');
                 return $this->redirectToRoute('articles_list');
@@ -258,8 +219,8 @@ class ArticleController extends AbstractController
         string $slug,
         Request $request,
         EntityManagerInterface $em,
-        DocumentManager $documentManager,
-        ArticleRepository $articleRepository
+        ArticleRepository $articleRepository,
+        ActivityLogger $activityLogger
     ): RedirectResponse {
         // Récupération explicite de l'article par slug
         $article = $articleRepository->findOneBy(['slug' => $slug]);
@@ -275,18 +236,9 @@ class ArticleController extends AbstractController
         if (!$this->isCsrfTokenValid('delete' . $article->getId(), $submittedToken)) {
             throw $this->createAccessDeniedException('Jeton CSRF invalide.');
         }
-        // Supprimer d'abord les métadonnées MongoDB (avant de supprimer l'article MySQL)
-        $articleId = $article->getId();
-        try {
-            $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$articleId]);
-            if ($photo) {
-                $documentManager->remove($photo);
-                $documentManager->flush();
-            }
-        } catch (\Exception $e) {
-            error_log("WARNING: Failed to delete MongoDB photo metadata: " . $e->getMessage());
-            // Continue quand même pour supprimer l'article
-        }
+
+        // Log la suppression AVANT de supprimer l'article (pour avoir accès aux données)
+        $activityLogger->logArticleDelete($article, $this->getUser());
 
         // Supprimer l'article de la base de données MySQL
         try {
@@ -337,7 +289,8 @@ class ArticleController extends AbstractController
         ArticleRepository $articleRepository,
         Request $request,
         EntityManagerInterface $em,
-        CloudinaryUploader $cloudinaryUploader // *** IMPORTANT: Inject the service here ***
+        CloudinaryUploader $cloudinaryUploader,
+        ActivityLogger $activityLogger
     ): Response {
         error_log("DEBUG: ArticleController::show method called for slug: " . $slug);
         error_log("DEBUG: Request method in show: " . $request->getMethod());
@@ -373,6 +326,9 @@ class ArticleController extends AbstractController
             $em->persist($comment);
             $em->flush();
 
+            // Log la création du commentaire
+            $activityLogger->logCommentCreate($comment, $this->getUser());
+
             $this->addFlash('success', 'Votre commentaire a été soumis avec succès et est en attente de modération.');
 
             // Rediriger vers l'article pour éviter la soumission multiple du formulaire
@@ -382,6 +338,9 @@ class ArticleController extends AbstractController
         // incrémenter le compteur de vues
         $article->setViewCount($article->getViewCount() + 1);
         $em->flush();
+
+        // Log la vue dans MongoDB (asynchrone, ne bloque pas)
+        $activityLogger->logArticleView($article, $this->getUser());
 
         return $this->render('article/show.html.twig', [
             'article' => $article,
