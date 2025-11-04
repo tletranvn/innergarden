@@ -179,10 +179,7 @@ class ArticleController extends AbstractController
             // 3. Si isPublished = false ET publishedAt = NULL → brouillon non programmé
             // (Pas besoin de code supplémentaire, le formulaire gère publishedAt)
 
-            // Sauvegarder MySQL d'abord
-            $em->flush();
-
-            // Gérer l'upload d'une nouvelle image (MongoDB dans transaction séparée)
+            // Gérer l'upload d'une nouvelle image si présente
             $imageFile = $form->get('imageFile')->getData();
 
             if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
@@ -198,13 +195,22 @@ class ArticleController extends AbstractController
 
                     // Mettre à jour le public_id dans MySQL
                     $article->setImagePublicId($result['public_id']);
-                    $em->flush();
+                } catch (\Exception $e) {
+                    error_log("ERROR: Image upload failed: " . $e->getMessage());
+                    $this->addFlash('warning', 'L\'image n\'a pas pu être mise à jour: ' . $e->getMessage());
+                }
+            }
 
-                    // IMPORTANT: Clear EntityManager to detach all entities and reset state
-                    // This prevents "There is already an active transaction" on Heroku
-                    $em->clear();
+            // Sauvegarder toutes les modifications MySQL en une seule fois
+            $em->flush();
 
-                    // Mettre à jour/créer les métadonnées dans MongoDB
+            // IMPORTANT: Clear EntityManager to detach all entities and reset state
+            // This prevents "There is already an active transaction" on Heroku
+            $em->clear();
+
+            // Mettre à jour/créer les métadonnées dans MongoDB (si une image a été uploadée)
+            if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
+                try {
                     $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
 
                     if (!$photo) {
@@ -222,8 +228,8 @@ class ArticleController extends AbstractController
                     $documentManager->flush();
 
                 } catch (\Exception $e) {
-                    error_log("ERROR: Image update failed: " . $e->getMessage());
-                    $this->addFlash('warning', 'L\'image n\'a pas pu être mise à jour: ' . $e->getMessage());
+                    error_log("ERROR: MongoDB photo metadata update failed: " . $e->getMessage());
+                    $this->addFlash('warning', 'Les métadonnées de l\'image n\'ont pas pu être enregistrées: ' . $e->getMessage());
                 }
             }
 
