@@ -68,6 +68,7 @@ class ArticleController extends AbstractController
         }
         
         if ($form->isSubmitted() && $form->isValid()) {
+            $connection = $em->getConnection();
 
             // Génération du slug
             if (!$article->getSlug()) {
@@ -89,46 +90,60 @@ class ArticleController extends AbstractController
             // 3. Si isPublished = false ET publishedAt = NULL → brouillon non programmé
             // (Pas besoin de code supplémentaire, le formulaire gère publishedAt)
 
-            // Persist article first (to get ID for MongoDB reference)
-            $em->persist($article);
-            $em->flush();
+            // Gestion explicite de la transaction MySQL
+            $connection->beginTransaction();
+            try {
+                // Persist article first (to get ID for MongoDB reference)
+                $em->persist($article);
+                $em->flush();
 
-            // Handle Cloudinary image upload AFTER persisting article
-            $imageFile = $form->get('imageFile')->getData();
+                // Handle Cloudinary image upload AFTER persisting article
+                $imageFile = $form->get('imageFile')->getData();
 
-            if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
-                try {
+                if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
                     // Upload to Cloudinary
                     $result = $cloudinaryUploader->upload($imageFile);
 
                     // Store only the public_id in MySQL
                     $article->setImagePublicId($result['public_id']);
                     $em->flush();
-
-                    // IMPORTANT: Clear EntityManager to detach all entities and reset state
-                    // This prevents "There is already an active transaction" on Heroku
-                    $em->clear();
-
-                    // Store full metadata in MongoDB (separate transaction)
-                    $photo = new Photo();
-                    $photo->setFilename($result['public_id']);
-                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                    $photo->setMimeType($imageFile->getMimeType());
-                    $photo->setSize($result['bytes']);
-                    $photo->setRelatedArticleId((string)$article->getId());
-                    $photo->setUrl($result['secure_url'] ?? $result['url']);
-
-                    $documentManager->persist($photo);
-                    $documentManager->flush();
-
-                } catch (\Exception $e) {
-                    error_log("ERROR: Image upload failed: " . $e->getMessage());
-                    $this->addFlash('warning', 'L\'image n\'a pas pu être téléchargée: ' . $e->getMessage());
                 }
-            }
 
-            $this->addFlash('success', 'L\'article a été créé avec succès.');
-            return $this->redirectToRoute('articles_list');
+                // Commit la transaction MySQL
+                $connection->commit();
+
+                // IMPORTANT: Clear EntityManager après commit pour libérer complètement la transaction
+                $em->clear();
+
+                // Store full metadata in MongoDB (separate transaction, after MySQL commit)
+                if (isset($imageFile) && $imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
+                    try {
+                        $photo = new Photo();
+                        $photo->setFilename($result['public_id']);
+                        $photo->setOriginalFilename($imageFile->getClientOriginalName());
+                        $photo->setMimeType($imageFile->getMimeType());
+                        $photo->setSize($result['bytes']);
+                        $photo->setRelatedArticleId((string)$article->getId());
+                        $photo->setUrl($result['secure_url'] ?? $result['url']);
+
+                        $documentManager->persist($photo);
+                        $documentManager->flush();
+                    } catch (\Exception $e) {
+                        error_log("ERROR: MongoDB metadata save failed: " . $e->getMessage());
+                        $this->addFlash('warning', 'L\'image a été uploadée mais les métadonnées n\'ont pas pu être sauvegardées.');
+                    }
+                }
+
+                $this->addFlash('success', 'L\'article a été créé avec succès.');
+                return $this->redirectToRoute('articles_list');
+
+            } catch (\Exception $e) {
+                // TOUJOURS appeler rollback en cas d'échec
+                $connection->rollBack();
+                error_log("ERROR: Article creation failed: " . $e->getMessage());
+                $this->addFlash('error', 'Erreur lors de la création de l\'article: ' . $e->getMessage());
+                // Re-render le formulaire avec les données
+            }
         }
 
         return $this->render('article/create.html.twig', [
@@ -164,6 +179,8 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $connection = $em->getConnection();
+
             // Génération du slug (si vous autorisez la modification du titre)
             if (!$article->getSlug()) {
                 $article->setSlug($slugger->slug($article->getTitle())->lower());
@@ -182,8 +199,10 @@ class ArticleController extends AbstractController
             // Gérer l'upload d'une nouvelle image si présente
             $imageFile = $form->get('imageFile')->getData();
 
-            if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
-                try {
+            // Gestion explicite de la transaction MySQL
+            $connection->beginTransaction();
+            try {
+                if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
                     // Supprimer l'ancienne image de Cloudinary si elle existe
                     if ($originalImagePublicId) {
                         // TODO: Implémenter la suppression Cloudinary
@@ -195,46 +214,52 @@ class ArticleController extends AbstractController
 
                     // Mettre à jour le public_id dans MySQL
                     $article->setImagePublicId($result['public_id']);
-                } catch (\Exception $e) {
-                    error_log("ERROR: Image upload failed: " . $e->getMessage());
-                    $this->addFlash('warning', 'L\'image n\'a pas pu être mise à jour: ' . $e->getMessage());
                 }
-            }
 
-            // Sauvegarder toutes les modifications MySQL en une seule fois
-            $em->flush();
+                // Sauvegarder toutes les modifications MySQL en une seule fois
+                $em->flush();
 
-            // IMPORTANT: Clear EntityManager to detach all entities and reset state
-            // This prevents "There is already an active transaction" on Heroku
-            $em->clear();
+                // Commit la transaction MySQL
+                $connection->commit();
 
-            // Mettre à jour/créer les métadonnées dans MongoDB (si une image a été uploadée)
-            if ($imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
-                try {
-                    $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
+                // IMPORTANT: Clear EntityManager après commit pour libérer complètement la transaction
+                $em->clear();
 
-                    if (!$photo) {
-                        $photo = new Photo();
-                        $photo->setRelatedArticleId((string)$article->getId());
+                // Mettre à jour/créer les métadonnées dans MongoDB (si une image a été uploadée)
+                if (isset($imageFile) && $imageFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile && isset($result)) {
+                    try {
+                        $photo = $documentManager->getRepository(Photo::class)->findOneBy(['relatedArticleId' => (string)$article->getId()]);
+
+                        if (!$photo) {
+                            $photo = new Photo();
+                            $photo->setRelatedArticleId((string)$article->getId());
+                        }
+
+                        $photo->setFilename($result['public_id']);
+                        $photo->setOriginalFilename($imageFile->getClientOriginalName());
+                        $photo->setMimeType($imageFile->getMimeType());
+                        $photo->setSize($result['bytes']);
+                        $photo->setUrl($result['secure_url'] ?? $result['url']);
+
+                        $documentManager->persist($photo);
+                        $documentManager->flush();
+
+                    } catch (\Exception $e) {
+                        error_log("ERROR: MongoDB photo metadata update failed: " . $e->getMessage());
+                        $this->addFlash('warning', 'Les métadonnées de l\'image n\'ont pas pu être enregistrées: ' . $e->getMessage());
                     }
-
-                    $photo->setFilename($result['public_id']);
-                    $photo->setOriginalFilename($imageFile->getClientOriginalName());
-                    $photo->setMimeType($imageFile->getMimeType());
-                    $photo->setSize($result['bytes']);
-                    $photo->setUrl($result['secure_url'] ?? $result['url']);
-
-                    $documentManager->persist($photo);
-                    $documentManager->flush();
-
-                } catch (\Exception $e) {
-                    error_log("ERROR: MongoDB photo metadata update failed: " . $e->getMessage());
-                    $this->addFlash('warning', 'Les métadonnées de l\'image n\'ont pas pu être enregistrées: ' . $e->getMessage());
                 }
-            }
 
-            $this->addFlash('success', 'L\'article a été modifié avec succès.');
-            return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+                $this->addFlash('success', 'L\'article a été modifié avec succès.');
+                return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+
+            } catch (\Exception $e) {
+                // TOUJOURS appeler rollback en cas d'échec
+                $connection->rollBack();
+                error_log("ERROR: Article edit failed: " . $e->getMessage());
+                $this->addFlash('error', 'Erreur lors de la modification de l\'article: ' . $e->getMessage());
+                // Re-render le formulaire avec les données
+            }
         }
 
         return $this->render('article/edit.html.twig', [
