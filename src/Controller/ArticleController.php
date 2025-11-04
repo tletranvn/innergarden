@@ -91,7 +91,9 @@ class ArticleController extends AbstractController
             try {
                 // Persist article first (to get ID for MongoDB reference)
                 $em->persist($article);
+                error_log("DEBUG: About to flush article to MySQL");
                 $em->flush();
+                error_log("DEBUG: Article flushed successfully, ID: " . $article->getId());
 
                 // Handle Cloudinary image upload AFTER persisting article
                 $imageFile = $form->get('imageFile')->getData();
@@ -129,10 +131,13 @@ class ArticleController extends AbstractController
 
             } catch (\Exception $e) {
                 error_log("ERROR: Article creation failed: " . $e->getMessage());
+                error_log("ERROR: Stack trace: " . $e->getTraceAsString());
                 $this->addFlash('error', 'Erreur lors de la création de l\'article: ' . $e->getMessage());
                 // Re-render le formulaire avec les données
             }
         }
+
+        error_log("DEBUG: Rendering create form (either initial load or after error)");
 
         return $this->render('article/create.html.twig', [
             'form' => $form->createView()
@@ -229,14 +234,17 @@ class ArticleController extends AbstractController
                 }
 
                 $this->addFlash('success', 'L\'article a été modifié avec succès.');
-                return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+                return $this->redirectToRoute('articles_list');
 
             } catch (\Exception $e) {
                 error_log("ERROR: Article edit failed: " . $e->getMessage());
+                error_log("ERROR: Stack trace: " . $e->getTraceAsString());
                 $this->addFlash('error', 'Erreur lors de la modification de l\'article: ' . $e->getMessage());
                 // Re-render le formulaire avec les données
             }
         }
+
+        error_log("DEBUG: Rendering edit form (either initial load or after error)");
 
         return $this->render('article/edit.html.twig', [
             'form' => $form->createView(),
