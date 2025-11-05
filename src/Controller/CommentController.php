@@ -31,7 +31,7 @@ class CommentController extends AbstractController
             ->setArticle($article)
             ->setAuthor($this->getUser())
             ->setCreatedAt(new \DateTimeImmutable())
-            ->setIsApproved(false); // Modération par défaut
+            ->setIsApproved(true); // Publication directe sans modération
 
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
@@ -42,7 +42,7 @@ class CommentController extends AbstractController
 
             return new JsonResponse([
                 'success' => true,
-                'message' => 'Commentaire ajouté avec succès et en attente de modération !',
+                'message' => 'Commentaire publié avec succès.',
                 'comment' => [
                     'id' => $comment->getId(),
                     'content' => $comment->getComment(),

@@ -4,8 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Form\ArticleType;
-use App\Entity\Comment;
-use App\Form\CommentType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -319,37 +317,7 @@ class ArticleController extends AbstractController
             throw $this->createNotFoundException('L\'article existe mais n\'est pas publié.');
         }
 
-        // --- Logique du formulaire de commentaire ---
-        $comment = new Comment();
-        $form = $this->createForm(CommentType::class, $comment);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // S'assurer que l'utilisateur est connecté pour commenter
-            if (!$this->getUser()) {
-                $this->addFlash('danger', 'Vous devez être connecté pour poster un commentaire.');
-                return $this->redirectToRoute('app_login'); // Rediriger vers la page de connexion
-            }
-
-            $comment->setArticle($article);
-            $comment->setAuthor($this->getUser()); // Associe l'utilisateur connecté comme auteur
-            $comment->setCreatedAt(new \DateTimeImmutable());
-            $comment->setIsApproved(false); // Par défaut, le commentaire n'est pas approuvé (pour la modération)
-
-            $em->persist($comment);
-            $em->flush();
-
-            // Log la création du commentaire
-            $activityLogger->logCommentCreate($comment, $this->getUser());
-
-            $this->addFlash('success', 'Votre commentaire a été soumis avec succès et est en attente de modération.');
-
-            // Rediriger vers l'article pour éviter la soumission multiple du formulaire
-            return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
-        }
-
-        // incrémenter le compteur de vues
+        // Incrémenter le compteur de vues
         $article->setViewCount($article->getViewCount() + 1);
         $em->flush();
 
@@ -358,11 +326,7 @@ class ArticleController extends AbstractController
 
         return $this->render('article/show.html.twig', [
             'article' => $article,
-            'commentForm' => $form->createView(),
-            'comments' => $article->getComments()->filter(function(Comment $comment) {
-                return $comment->isApproved();
-            })->toArray(),
-            'cloudinaryUploader' => $cloudinaryUploader // *** IMPORTANT: Pass the service to the Twig template ***
+            'cloudinaryUploader' => $cloudinaryUploader
         ]);
     }
 

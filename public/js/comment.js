@@ -29,21 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
         commentDiv.classList.add('card', 'mb-3', 'comment-item');
         commentDiv.id = `comment-${commentData.id}`;
 
-        // Si le commentaire n'est pas approuvé, l'afficher avec un style différent
-        let approvalBadge = '';
-        let cardClass = 'card-body';
-        
-        if (commentData.isApproved === false) {
-            approvalBadge = '<span class="badge bg-warning text-dark ms-2">En attente de modération</span>';
-            cardClass += ' bg-light opacity-75';
-        }
-
         commentDiv.innerHTML = `
-            <div class="${cardClass}">
+            <div class="card-body">
                 <h5 class="card-title">
-                    ${commentData.authorPseudo} 
+                    ${commentData.authorPseudo}
                     <small class="text-muted">- ${commentData.createdAt}</small>
-                    ${approvalBadge}
                 </h5>
                 <p class="card-text">${commentData.content}</p>
             </div>
