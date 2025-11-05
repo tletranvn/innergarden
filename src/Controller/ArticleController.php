@@ -110,7 +110,7 @@ class ArticleController extends AbstractController
                 $activityLogger->logArticleCreate($article, $this->getUser());
 
                 $this->addFlash('success', 'L\'article a été créé avec succès.');
-                return $this->redirectToRoute('articles_list');
+                return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
 
             } catch (\Exception $e) {
                 error_log("ERROR: Article creation failed: " . $e->getMessage());
@@ -195,7 +195,7 @@ class ArticleController extends AbstractController
                 $activityLogger->logArticleEdit($article, $this->getUser());
 
                 $this->addFlash('success', 'L\'article a été modifié avec succès.');
-                return $this->redirectToRoute('articles_list');
+                return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
 
             } catch (\Exception $e) {
                 error_log("ERROR: Article edit failed: " . $e->getMessage());
