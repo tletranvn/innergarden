@@ -12,6 +12,19 @@
                 {# ajouter ici un div pour les messages flash si base.html.twig ne les affiche pas #}
                 <div id="form-messages" class="mb-3"></div>
 
+                {# Display ALL form errors for debugging #}
+                {% if form.vars.submitted and not form.vars.valid %}
+                    <div class="alert alert-danger">
+                        <h4>Erreurs de formulaire :</h4>
+                        {{ form_errors(form) }}
+                        {% for child in form.children %}
+                            {% if not child.vars.valid %}
+                                <strong>{{ child.vars.label }}:</strong> {{ form_errors(child) }}<br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 {{ form_start(form) }}
                     <div class="mb-3">
                         {{ form_row(form.title, {
