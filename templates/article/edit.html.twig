@@ -43,6 +43,13 @@
                         }) }}
                     </div>
                     <div class="mb-3">
+                        {{ form_row(form.author, {
+                            'label': 'Auteur',
+                            'attr': {'class': 'form-select'},
+                            'placeholder': 'Choisissez un auteur'
+                        }) }}
+                    </div>
+                    <div class="mb-3">
                         {{ form_row(form.category, {
                             'label': 'Catégorie',
                             'attr': {'class': 'form-select'},

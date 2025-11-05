@@ -154,6 +154,20 @@ class ArticleController extends AbstractController
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
+        error_log("DEBUG: Form submitted: " . ($form->isSubmitted() ? 'true' : 'false'));
+
+        if ($form->isSubmitted()) {
+            error_log("DEBUG: Form valid: " . ($form->isValid() ? 'true' : 'false'));
+
+            if (!$form->isValid()) {
+                error_log("DEBUG: Form errors: " . (string) $form->getErrors(true, true));
+                // Log each field error
+                foreach ($form->getErrors(true, true) as $error) {
+                    error_log("DEBUG: Form error: " . $error->getMessage());
+                }
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             // Génération du slug (si vous autorisez la modification du titre)
             if (!$article->getSlug()) {
