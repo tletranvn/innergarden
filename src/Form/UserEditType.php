@@ -113,6 +113,7 @@ class UserEditType extends AbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
             'is_new' => true,
+            'csrf_protection' => false, // TEMPORARY: Disable CSRF for Heroku compatibility
         ]);
     }
 }

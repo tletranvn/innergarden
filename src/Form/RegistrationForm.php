@@ -80,9 +80,7 @@ class RegistrationForm extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_token_id' => 'registration_form',
+            'csrf_protection' => false, // TEMPORARY: Disable CSRF for Heroku compatibility
         ]);
     }
 }
