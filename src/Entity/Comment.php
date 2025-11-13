@@ -63,7 +63,8 @@ class Comment
 
     public function setComment(string $comment): static
     {
-        $this->comment = $comment;
+        // SÉCURITÉ XSS : Supprimer toutes les balises HTML potentiellement dangereuses
+        $this->comment = strip_tags($comment);
 
         return $this;
     }

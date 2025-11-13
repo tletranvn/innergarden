@@ -206,8 +206,6 @@ class AdminController extends AbstractController
     #[Route('/activity/logs', name: 'activity_logs')]
     public function activityLogs(DocumentManager $documentManager): Response
     {
-        // DEBUG: Ne pas catcher l'exception pour voir l'erreur exacte
-        // Récupérer les derniers 100 logs, triés par date décroissante
         $logs = $documentManager->getRepository(ActivityLog::class)
             ->createQueryBuilder()
             ->sort('timestamp', 'DESC')

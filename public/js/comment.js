@@ -23,19 +23,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Fonction pour échapper les caractères HTML dangereux (Protection XSS)
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
     // Fonction pour créer l'élément HTML d'un nouveau commentaire
     function createCommentElement(commentData) {
         const commentDiv = document.createElement('div');
         commentDiv.classList.add('card', 'mb-3', 'comment-item');
         commentDiv.id = `comment-${commentData.id}`;
 
+        // SÉCURITÉ : Échapper toutes les données utilisateur avant l'insertion
         commentDiv.innerHTML = `
             <div class="card-body">
                 <h5 class="card-title">
-                    ${commentData.authorPseudo}
-                    <small class="text-muted">- ${commentData.createdAt}</small>
+                    ${escapeHtml(commentData.authorPseudo)}
+                    <small class="text-muted">- ${escapeHtml(commentData.createdAt)}</small>
                 </h5>
-                <p class="card-text">${commentData.content}</p>
+                <p class="card-text">${escapeHtml(commentData.content)}</p>
             </div>
         `;
         return commentDiv;
@@ -111,4 +122,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
+}); 
