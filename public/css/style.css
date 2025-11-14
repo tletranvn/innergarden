@@ -52,6 +52,18 @@ a.btn:active {
     color: inherit !important;
 }
 
+/* Fix pour les boutons outline-light dans la navbar */
+.navbar .btn-outline-light {
+    color: #fff;
+    border-color: #fff;
+}
+
+.navbar .btn-outline-light:hover {
+    color: #000 !important;
+    background-color: #fff;
+    border-color: #fff;
+}
+
 /* Restore specific Bootstrap button colors */
 a.btn-warning,
 a.btn-warning:visited {
