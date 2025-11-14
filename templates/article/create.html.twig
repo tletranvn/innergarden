@@ -79,6 +79,15 @@
                         }) }}
                     </div>
                     <div class="mb-3">
+                        {{ form_row(form.publishedAt, {
+                            'label': 'Date de publication programmée (optionnel)',
+                            'attr': {
+                                'class': 'form-control'
+                            },
+                            'help': 'Laissez vide pour publier immédiatement si "Publier" est coché, ou définissez une date future pour programmer la publication'
+                        }) }}
+                    </div>
+                    <div class="mb-3">
                         {{ form_row(form.slug, {
                             'label': 'Slug (laisser vide pour générer automatiquement)',
                             'help': 'URL conviviale de l\'article (ex: mon-super-article)',

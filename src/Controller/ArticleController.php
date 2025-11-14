@@ -107,8 +107,15 @@ class ArticleController extends AbstractController
                 // Log l'activité dans MongoDB (sans bloquer si ça échoue)
                 $activityLogger->logArticleCreate($article, $this->getUser());
 
-                $this->addFlash('success', 'L\'article a été créé avec succès.');
-                return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+                // Rediriger vers la page appropriée selon le statut de publication
+                if ($article->isPublished()) {
+                    $this->addFlash('success', 'L\'article a été créé et publié avec succès.');
+                    return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+                } else {
+                    $this->addFlash('success', 'L\'article a été créé en tant que brouillon.' .
+                        ($article->getPublishedAt() ? ' Il sera publié automatiquement le ' . $article->getPublishedAt()->format('d/m/Y à H:i') : ''));
+                    return $this->redirectToRoute('admin_dashboard');
+                }
 
             } catch (\Exception $e) {
                 error_log("ERROR: Article creation failed: " . $e->getMessage());
@@ -206,8 +213,15 @@ class ArticleController extends AbstractController
                 // Log l'édition dans MongoDB
                 $activityLogger->logArticleEdit($article, $this->getUser());
 
-                $this->addFlash('success', 'L\'article a été modifié avec succès.');
-                return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+                // Rediriger vers la page appropriée selon le statut de publication
+                if ($article->isPublished()) {
+                    $this->addFlash('success', 'L\'article a été modifié avec succès.');
+                    return $this->redirectToRoute('articles_show', ['slug' => $article->getSlug()]);
+                } else {
+                    $this->addFlash('success', 'L\'article a été modifié.' .
+                        ($article->getPublishedAt() ? ' Il sera publié automatiquement le ' . $article->getPublishedAt()->format('d/m/Y à H:i') : ' Il reste en brouillon.'));
+                    return $this->redirectToRoute('admin_dashboard');
+                }
 
             } catch (\Exception $e) {
                 error_log("ERROR: Article edit failed: " . $e->getMessage());
