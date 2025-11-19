@@ -117,11 +117,17 @@ class ArticleController extends AbstractController
                     return $this->redirectToRoute('admin_dashboard');
                 }
 
+            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                error_log("ERROR: Duplicate slug detected: " . $e->getMessage());
+                $form->get('title')->addError(new \Symfony\Component\Form\FormError(
+                    'Un article avec ce titre existe déjà (ou un titre très similaire). Veuillez choisir un titre différent.'
+                ));
             } catch (\Exception $e) {
                 error_log("ERROR: Article creation failed: " . $e->getMessage());
                 error_log("ERROR: Stack trace: " . $e->getTraceAsString());
-                $this->addFlash('error', 'Erreur lors de la création de l\'article: ' . $e->getMessage());
-                // Re-render le formulaire avec les données
+                $form->addError(new \Symfony\Component\Form\FormError(
+                    'Une erreur est survenue lors de la création de l\'article. Veuillez réessayer.'
+                ));
             }
         }
 
@@ -223,11 +229,17 @@ class ArticleController extends AbstractController
                     return $this->redirectToRoute('admin_dashboard');
                 }
 
+            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                error_log("ERROR: Duplicate slug detected during edit: " . $e->getMessage());
+                $form->get('title')->addError(new \Symfony\Component\Form\FormError(
+                    'Un article avec ce titre existe déjà (ou un titre très similaire). Veuillez choisir un titre différent.'
+                ));
             } catch (\Exception $e) {
                 error_log("ERROR: Article edit failed: " . $e->getMessage());
                 error_log("ERROR: Stack trace: " . $e->getTraceAsString());
-                $this->addFlash('error', 'Erreur lors de la modification de l\'article: ' . $e->getMessage());
-                // Re-render le formulaire avec les données
+                $form->addError(new \Symfony\Component\Form\FormError(
+                    'Une erreur est survenue lors de la modification de l\'article. Veuillez réessayer.'
+                ));
             }
         }
 
