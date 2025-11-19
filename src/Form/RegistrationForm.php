@@ -44,7 +44,8 @@ class RegistrationForm extends AbstractType
                 ],
                 'attr' => [
                     'placeholder' => 'Entrez votre adresse email',
-                    'autocomplete' => 'email' // RGAA 11.13
+                    'autocomplete' => 'email', // RGAA 11.13
+                    'type' => 'email' // Force HTML5 email validation
                 ]
             ])
             ->add('agreeTerms', CheckboxType::class, [

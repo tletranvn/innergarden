@@ -70,16 +70,13 @@ class RegistrationController extends AbstractController
             // Form was submitted but has validation errors
             $logger->info('Registration form validation failed', [
                 'session_id' => $request->getSession()->getId(),
-                'csrf_token_submitted' => $request->request->get('registration_form')['_token'] ?? 'none',
-                'csrf_valid' => $form->get('_token') ? $form->get('_token')->isValid() : 'no_csrf_field'
             ]);
             
             // Log all form errors for debugging in Heroku logs
             foreach ($form->getErrors(true) as $error) {
                 $errorMessage = $error->getMessage();
                 $logger->error('Registration form error: ' . $errorMessage, [
-                    'field' => $error->getOrigin() ? $error->getOrigin()->getName() : 'form',
-                    'submitted_data' => array_intersect_key($request->request->all(), array_flip(['registration_form']))
+                    'field' => $error->getOrigin() ? $error->getOrigin()->getName() : 'form'
                 ]);
                 
                 // Handle CSRF token errors specifically

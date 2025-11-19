@@ -35,7 +35,7 @@ services:
     # platform: linux/arm64
     container_name: innergarden_symfony_mysql
     volumes:
-      - ./var/db_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro # Script d'initialisation to create database for new setup
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
