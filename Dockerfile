@@ -5,7 +5,7 @@ libzip-dev unzip git libpng-dev libonig-dev libxml2-dev libicu-dev libjpeg-dev l
 pkg-config libssl-dev \
 && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 && docker-php-ext-install pdo pdo_mysql intl opcache zip gd \
-# MONGODB AVEC PECL
+# MONGODB AVEC PECL - Installation de la dernière version stable
 && pecl install mongodb \
 && docker-php-ext-enable mongodb \
 && apt-get clean && rm -rf /var/lib/apt/lists/*
