@@ -301,22 +301,35 @@ class ArticleController extends AbstractController
         PaginatorInterface $paginator, // Injection du service de pagination
         CloudinaryUploader $cloudinaryUploader // Inject CloudinaryUploader for image URLs
     ): Response {
+        // Récupérer le slug de la catégorie depuis l'URL (paramètre GET)
+        $categorySlug = $request->query->get('category');
+
         // préparer la requête (au lieu de récupérer tous les résultats d'un coup)
-        $query = $articleRepository->createQueryBuilder('a')
+        $queryBuilder = $articleRepository->createQueryBuilder('a')
             ->where('a.isPublished = :published')
-            ->setParameter('published', true)
-            ->orderBy('a.publishedAt', 'DESC');
+            ->setParameter('published', true);
+
+        // Si un filtre de catégorie est spécifié, ajouter la condition
+        if ($categorySlug) {
+            $queryBuilder
+                ->leftJoin('a.category', 'c')
+                ->andWhere('c.slug = :categorySlug')
+                ->setParameter('categorySlug', $categorySlug);
+        }
+
+        $queryBuilder->orderBy('a.publishedAt', 'DESC');
 
         // utiliser le service de pagination
         $pagination = $paginator->paginate(
-            $query, // la requête
+            $queryBuilder, // la requête
             $request->query->getInt('page', 1), // numéro de page depuis l'URL, par défaut 1
             9 // nombre d'articles par page
         );
 
         return $this->render('article/list.html.twig', [
             'pagination' => $pagination, // envoyer la pagination à la vue
-            'cloudinaryUploader' => $cloudinaryUploader // Pass CloudinaryUploader to template
+            'cloudinaryUploader' => $cloudinaryUploader, // Pass CloudinaryUploader to template
+            'categorySlug' => $categorySlug // Passer le slug de la catégorie au template
         ]);
     }
 

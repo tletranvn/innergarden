@@ -23,10 +23,10 @@
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center">
                     
                     {% set categories = [
-                        { alt: 'Jardinage', title: 'Jardinage', text: 'Conseils, astuces et inspiration pour cultiver votre propre paradis vert.' },
-                        { alt: 'Voyage Nature', title: 'Voyage Nature', text: 'Partez à l\'aventure et reconnectez-vous avec la beauté sauvage du monde.' },
-                        { alt: 'Bien-être', title: 'Bien-être', text: 'Cultivez votre paix intérieure et votre équilibre avec nos guides.' },
-                        { alt: 'Développement Personnel', title: 'Développement Personnel', text: 'Des ressources pour grandir, apprendre et transformer votre vie.' }
+                        { alt: 'Jardinage', title: 'Jardinage', slug: 'jardinage', text: 'Conseils, astuces et inspiration pour cultiver votre propre paradis vert.' },
+                        { alt: 'Voyage Nature', title: 'Voyage Nature', slug: 'voyage-nature', text: 'Partez à l\'aventure et reconnectez-vous avec la beauté sauvage du monde.' },
+                        { alt: 'Bien-être', title: 'Bien-être', slug: 'bien-etre', text: 'Cultivez votre paix intérieure et votre équilibre avec nos guides.' },
+                        { alt: 'Développement Personnel', title: 'Développement Personnel', slug: 'developpement-personnel', text: 'Des ressources pour grandir, apprendre et transformer votre vie.' }
                     ] %}
 
                     {% for cat in categories %}
@@ -36,7 +36,7 @@
                                 <div class="card-body text-start">
                                     <h3 class="card-title card-title-custom">{{ cat.title }}</h3>
                                     <p class="card-text card-text-custom">{{ cat.text }}</p>
-                                    <a href="#" class="btn btn-custom">Explorer</a>
+                                    <a href="{{ path('articles_list', {category: cat.slug}) }}" class="btn btn-custom">Explorer</a>
                                 </div>
                             </div>
                         </div>
