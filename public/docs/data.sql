@@ -1,35 +1,27 @@
--- ========================================================================
--- REQUÊTES SQL ÉQUIVALENTES AUX QUERYBUILDER UTILISÉS DANS L'APPLICATION
--- ========================================================================
--- Fichier créé pour la pratique de SQL
---
--- SOMMAIRE :
--- A. MANIPULATION DE DONNÉES (INSERT, UPDATE, DELETE)
--- B. REQUÊTES DE LECTURE (SELECT)
--- ========================================================================
-
--- ========================================================================
--- A. MANIPULATION DE DONNÉES (INSERT, UPDATE, DELETE)
--- ========================================================================
-
--- 1. INSERTION DE DONNÉES (INSERT INTO)
--- ------------------------------------------------------------------------
 
 -- Insérer un nouvel utilisateur
 INSERT INTO user (email, roles, password, pseudo, created_at, is_verified)
-VALUES ('nouveau@email.com', '["ROLE_USER"]', '$2y$13$hashedpassword...', 'NouveauUser', NOW(), 1);
+VALUES 
+('tenten@email.com', '["ROLE_ADMIN"]', '$2y$13$vK3AeR.1rvi1tVTsnK.gceDw73EbHbHir.gyxJ9YvzlUzt4/.Ykwq', 'tenten', NOW()),
+('alice@email.com', '["ROLE_USER"]', '$2y$13$vK3AeR.1rvi1tVTsnK.gceDw73EbHbHir.gyxJ9YvzlUzt4/.Ykwq', 'alice', NOW()),
+('bob@email.com', '["ROLE_USER"]', '$2y$13$vK3AeR.1rvi1tVTsnK.gceDw73EbHbHir.gyxJ9YvzlUzt4/.Ykwq', 'bob', NOW()),
+('charlie@email.com', '["ROLE_USER"]', '$2y$13$vK3AeR.1rvi1tVTsnK.gceDw73EbHbHir.gyxJ9YvzlUzt4/.Ykwq', 'charlie', NOW()),
+('diana@email.com', '["ROLE_USER"]', '$2y$13$vK3AeR.1rvi1tVTsnK.gceDw73EbHbHir.gyxJ9YvzlUzt4/.Ykwq', 'diana', NOW()),
+('eve@email.com', '["ROLE_ADMIN"]', '$2y$13$vK3AeR.1rvi1tVTsnK.gceDw73EbHbHir.gyxJ9YvzlUzt4/.Ykwq', 'eve', NOW());
 
--- Insérer une nouvelle catégorie
-INSERT INTO category (name, slug, description)
-VALUES ('Nouvelle Catégorie', 'nouvelle-categorie', 'Description de la catégorie');
+-- Insérer les catégories (si elles n'existent pas déjà)
+INSERT INTO category (id, name, slug, description) VALUES 
+(1, 'Jardinage', 'jardinage', 'Conseils et astuces pour votre jardin'),
+(2, 'Voyage Nature', 'voyage-nature', 'Découvertes et explorations'),
+(3, 'Bien-être', 'bien-etre', 'Santé et équilibre de vie'),
+(4, 'Développement Personnel', 'developpement-personnel', 'Croissance et amélioration de soi')
+ON DUPLICATE KEY UPDATE name=name;
 
--- Insérer un article
+-- Insérer un article (lié à la catégorie 'Jardinage' id=1)
 INSERT INTO article (title, slug, content, created_at, published_at, is_published, author_id, category_id)
 VALUES ('Mon Super Article', 'mon-super-article', 'Contenu de l''article...', NOW(), NOW(), 1, 1, 1);
--- Note: author_id et category_id doivent exister dans les tables user et category
+-- Note: author_id=1 (tenten) et category_id=1 (Jardinage)
 
--- 2. MISE À JOUR DE DONNÉES (UPDATE)
--- ------------------------------------------------------------------------
 
 -- Modifier le titre d'un article
 UPDATE article
@@ -46,8 +38,6 @@ UPDATE user
 SET roles = '["ROLE_ADMIN"]'
 WHERE email = 'admin@innergarden.com';
 
--- 3. SUPPRESSION DE DONNÉES (DELETE)
--- ------------------------------------------------------------------------
 
 -- Supprimer un commentaire spécifique
 DELETE FROM comment WHERE id = 123;
