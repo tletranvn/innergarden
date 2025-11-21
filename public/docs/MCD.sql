@@ -1,7 +1,7 @@
-CREATE TABLE `users` (
+CREATE TABLE `user` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `email` varchar(180) UNIQUE NOT NULL,
-  `roles` json NOT NULL COMMENT 'Stores user roles as JSON array',
+  `roles` json NOT NULL,
   `password` varchar(255) NOT NULL,
   `pseudo` varchar(50) NOT NULL,
   `created_at` datetime NOT NULL,
@@ -11,14 +11,14 @@ CREATE TABLE `users` (
   `profile_picture_url` varchar(255)
 );
 
-CREATE TABLE `categories` (
+CREATE TABLE `category` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(150) NOT NULL,
   `slug` varchar(255) UNIQUE NOT NULL,
   `description` text
 );
 
-CREATE TABLE `articles` (
+CREATE TABLE `article` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `slug` varchar(255) UNIQUE NOT NULL,
@@ -34,22 +34,19 @@ CREATE TABLE `articles` (
   `category_id` int NOT NULL
 );
 
-CREATE TABLE `comments` (
+CREATE TABLE `comment` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `comment` text NOT NULL,
   `created_at` datetime NOT NULL,
   `is_approved` boolean NOT NULL DEFAULT false,
   `article_id` int,
-  `author_id` int NOT NULL,
-  `parent_comment_id` int COMMENT 'Self-referencing for replies'
+  `author_id` int NOT NULL
 );
 
-ALTER TABLE `articles` ADD FOREIGN KEY (`author_id`) REFERENCES `users` (`id`);
+ALTER TABLE `article` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `comments` ADD FOREIGN KEY (`author_id`) REFERENCES `users` (`id`);
+ALTER TABLE `comment` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`);
 
-ALTER TABLE `articles` ADD FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
+ALTER TABLE `article` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`);
 
-ALTER TABLE `comments` ADD FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`);
-
-ALTER TABLE `comments` ADD FOREIGN KEY (`parent_comment_id`) REFERENCES `comments` (`id`);
+ALTER TABLE `comment` ADD FOREIGN KEY (`article_id`) REFERENCES `article` (`id`);

@@ -2,6 +2,67 @@
 -- REQUÊTES SQL ÉQUIVALENTES AUX QUERYBUILDER UTILISÉS DANS L'APPLICATION
 -- ========================================================================
 -- Fichier créé pour la pratique de SQL
+--
+-- SOMMAIRE :
+-- A. MANIPULATION DE DONNÉES (INSERT, UPDATE, DELETE)
+-- B. REQUÊTES DE LECTURE (SELECT)
+-- ========================================================================
+
+-- ========================================================================
+-- A. MANIPULATION DE DONNÉES (INSERT, UPDATE, DELETE)
+-- ========================================================================
+
+-- 1. INSERTION DE DONNÉES (INSERT INTO)
+-- ------------------------------------------------------------------------
+
+-- Insérer un nouvel utilisateur
+INSERT INTO user (email, roles, password, pseudo, created_at, is_verified)
+VALUES ('nouveau@email.com', '["ROLE_USER"]', '$2y$13$hashedpassword...', 'NouveauUser', NOW(), 1);
+
+-- Insérer une nouvelle catégorie
+INSERT INTO category (name, slug, description)
+VALUES ('Nouvelle Catégorie', 'nouvelle-categorie', 'Description de la catégorie');
+
+-- Insérer un article
+INSERT INTO article (title, slug, content, created_at, published_at, is_published, author_id, category_id)
+VALUES ('Mon Super Article', 'mon-super-article', 'Contenu de l''article...', NOW(), NOW(), 1, 1, 1);
+-- Note: author_id et category_id doivent exister dans les tables user et category
+
+-- 2. MISE À JOUR DE DONNÉES (UPDATE)
+-- ------------------------------------------------------------------------
+
+-- Modifier le titre d'un article
+UPDATE article
+SET title = 'Titre Modifié', slug = 'titre-modifie', updated_at = NOW()
+WHERE id = 1;
+
+-- Publier tous les articles d'une catégorie
+UPDATE article
+SET is_published = 1, published_at = NOW()
+WHERE category_id = 2;
+
+-- Changer le rôle d'un utilisateur
+UPDATE user
+SET roles = '["ROLE_ADMIN"]'
+WHERE email = 'admin@innergarden.com';
+
+-- 3. SUPPRESSION DE DONNÉES (DELETE)
+-- ------------------------------------------------------------------------
+
+-- Supprimer un commentaire spécifique
+DELETE FROM comment WHERE id = 123;
+
+-- Supprimer tous les articles brouillons (non publiés)
+DELETE FROM article WHERE is_published = 0;
+
+-- Attention : Pour supprimer une catégorie, il faut d'abord gérer les articles liés
+-- (soit les supprimer, soit changer leur catégorie, soit utiliser ON DELETE CASCADE)
+DELETE FROM category WHERE id = 5;
+
+
+-- ========================================================================
+-- B. REQUÊTES DE LECTURE (SELECT)
+-- ========================================================================
 -- Chaque section contient :
 --   1. Le code PHP QueryBuilder original
 --   2. L'équivalent SQL commenté

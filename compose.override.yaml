@@ -1,12 +1,12 @@
 services:
-###> doctrine/doctrine-bundle ###
-# REMOVE THIS BROKEN BLOCK:
-#  database:
-#    ports:
-#      - "5432"
-###< doctrine/doctrine-bundle ###
+  ###> doctrine/doctrine-bundle ###
+  # REMOVE THIS BROKEN BLOCK:
+  #  database:
+  #    ports:
+  #      - "5432"
+  ###< doctrine/doctrine-bundle ###
 
-###> symfony/mailer ###
+  ###> symfony/mailer ###
   mailer:
     image: axllent/mailpit
     ports:
@@ -15,6 +15,7 @@ services:
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
 ###< symfony/mailer ###
 
 # ###> symfony/mercure-bundle ###
@@ -22,9 +23,3 @@ services:
 #    ports:
 #      - "80"
 ###< symfony/mercure-bundle ###
-
-###> doctrine/mongodb-odm-bundle ###
-  mongodb:
-    ports:
-      - "27017"
-###< doctrine/mongodb-odm-bundle ###

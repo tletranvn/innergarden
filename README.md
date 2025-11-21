@@ -84,8 +84,14 @@ docker compose exec www php bin/console doctrine:fixtures:load
 8. Acceder a l'application
 
 ```
-http://localhost:8081
+http://localhost:8085
 ```
+
+### Accès aux Bases de Données (Docker)
+
+- **MySQL**: `localhost:3309` (User: `root`, Password: (vide), Database: `innergarden`)
+- **MongoDB**: `localhost:27020` (User: `root`, Password: `rootpassword`, Database: `innergarden_mongodb`)
+- **Mailpit**: `http://localhost:8025`
 
 ### Sans Docker
 
