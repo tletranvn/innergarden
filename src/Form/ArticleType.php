@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Article;
 use App\Entity\Category;
-use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -87,11 +86,7 @@ class ArticleType extends AbstractType
                     )
                 ]
             ])
-            ->add('author', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'pseudo',
-                'label' => 'Auteur',
-            ])
+            // Le champ 'author' est supprimé - l'auteur est assigné automatiquement dans le contrôleur
             ->add('category', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',

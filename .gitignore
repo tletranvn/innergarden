@@ -45,3 +45,8 @@
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+
+###> Documentation ###
+/public/docs/data.sql
+/public/docs/mongo_practice.js
+###< Documentation ###

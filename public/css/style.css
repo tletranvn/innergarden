@@ -366,8 +366,8 @@ select:focus-visible {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* RESPONSIVE */
-@media (max-width: 1024px) {
+/* RESPONSIVE DESKTOP FIRST */
+/*@media (max-width: 1024px) {
     .hero-section h1 { font-size: 3.5rem; }
     .hero-subtitle { font-size: 1.4rem; }
     .section-title { font-size: 2.8rem; }
@@ -383,4 +383,37 @@ select:focus-visible {
     .hero-section h1 { font-size: 2.2rem; }
     .hero-subtitle { font-size: 1rem; }
     .section-title { font-size: 1.8rem; }
+}*/
+
+/* BASE (Mobile par défaut - xs: < 576px) */
+.hero-section h1 { font-size: 2.2rem; }
+.hero-subtitle { font-size: 1rem; }
+.section-title { font-size: 1.8rem; }
+
+/* RESPONSIVE MOBILE FIRST */
+/* SMALL (Mobile landscape - sm: ≥ 576px) */
+@media (min-width: 576px) {
+    .hero-section h1 { font-size: 2.5rem; }
+    .hero-subtitle { font-size: 1.1rem; }
+    .section-title { font-size: 2rem; }
+}
+
+/* MEDIUM (Tablette - md: ≥ 768px) */
+@media (min-width: 768px) {
+    .hero-section h1 { font-size: 2.8rem; }
+    .hero-subtitle { font-size: 1.2rem; }
+    .section-title { font-size: 2.2rem; }
+}
+
+/* LARGE (Desktop - lg: ≥ 992px) */
+@media (min-width: 992px) {
+    .hero-section h1 { font-size: 3.5rem; }
+    .hero-subtitle { font-size: 1.4rem; }
+    .section-title { font-size: 2.8rem; }
+
+/* EXTRA LARGE (Grand desktop - xl: ≥ 1200px) - Optionnel */
+@media (min-width: 1200px) {
+    .hero-section h1 { font-size: 4rem; }
+    .hero-subtitle { font-size: 1.5rem; }
+    .section-title { font-size: 3rem; }
 }

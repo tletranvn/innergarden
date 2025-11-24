@@ -3,6 +3,9 @@
 # Script pour publier automatiquement les articles programmés
 # Ce script doit être exécuté toutes les 5 minutes via un cronjob
 
+# Assurer que le PATH contient les binaires nécessaires (docker)
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+
 # Déterminer le répertoire du projet (le parent du dossier scripts)
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 

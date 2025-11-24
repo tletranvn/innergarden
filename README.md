@@ -175,29 +175,10 @@ heroku container:login
 
 2. Deployer
 
-```bash
-./scripts/deploy-heroku.sh
-```
+Deployer avec Container Registry :
 
-## Structure du projet
-
-```
-innergarden/
-├── src/
-│   ├── Controller/      # Controleurs Symfony
-│   ├── Entity/          # Entites Doctrine (MySQL)
-│   ├── Document/        # Documents Doctrine ODM (MongoDB)
-│   ├── Form/            # Formulaires
-│   ├── Repository/      # Repositories
-│   └── Service/         # Services metier
-├── templates/           # Templates Twig
-├── public/
-│   ├── docs/           # Documentation et schemas SQL
-│   └── uploads/        # Fichiers uploades (local uniquement)
-├── scripts/            # Scripts de maintenance et backup
-├── docker/             # Configuration Docker
-└── migrations/         # Migrations Doctrine
-```
+container:push
+container:release
 
 ## Tests
 

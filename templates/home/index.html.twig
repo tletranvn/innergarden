@@ -1,28 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - Inner Garden{% endblock %}
+{% block title %}Accueil - Inner Garden
+{% endblock %}
 
-{% block meta_description %}Inner Garden - Découvrez un monde de transformation et de nature. Cultivez votre jardin intérieur avec nos articles sur le jardinage, bien-être, développement personnel et voyages nature.{% endblock %}
+{% block meta_description %}Inner Garden - Découvrez un monde de transformation et de nature. Cultivez votre jardin intérieur avec nos articles sur le jardinage, bien-être, développement personnel et voyages nature.
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="preload" href="{{ asset('images/placeholder.png') }}" as="image">
+	{{ parent() }}
+{% endblock %}
 
 {% block body %}
-    <main>
-        <section class="hero-section text-center py-5 mb-5 rounded-3 shadow-lg" aria-labelledby="hero-title">
-            <div class="container">
-                <h1 class="hero-title display-3 fw-bold" id="hero-title">
-                    Découvrez un monde de transformation et de nature
-                </h1>
-                <p class="hero-subtitle lead">
-                    Inner Garden est votre oasis pour cultiver la vie, le jardinage et l'exploration de soi.
-                </p>
-            </div>
-        </section>
+<main>
+	<section class="hero-section text-center py-5 mb-5 rounded-3 shadow-lg" aria-labelledby="hero-title">
+		<div class="container">
+			<h1 class="hero-title display-3 fw-bold" id="hero-title">
+				Découvrez un monde de transformation et de nature
+			</h1>
+			<p class="hero-subtitle lead">
+				Inner Garden est votre oasis pour cultiver la vie, le jardinage et l'exploration de soi.
+			</p>
+		</div>
+	</section>
 
-        <section class="categories-section py-5 mb-5 text-center rounded-3 shadow-sm" aria-labelledby="categories-heading">
-            <div class="container">
-                <h2 class="section-title display-4 mb-5" id="categories-heading">Nos catégories phares</h2>
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center">
-                    
-                    {% set categories = [
+	<section class="categories-section py-5 mb-5 text-center rounded-3 shadow-sm" aria-labelledby="categories-heading">
+		<div class="container">
+			<h2 class="section-title display-4 mb-5" id="categories-heading">Nos catégories phares</h2>
+			<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 justify-content-center">
+
+				{% set categories = [
                         { alt: 'Jardinage', title: 'Jardinage', slug: 'jardinage', text: 'Conseils, astuces et inspiration pour cultiver votre propre paradis vert.' },
                         { alt: 'Voyage Nature', title: 'Voyage Nature', slug: 'voyage-nature', text: 'Partez à l\'aventure et reconnectez-vous avec la beauté sauvage du monde.' },
                         { alt: 'Bien-être', title: 'Bien-être', slug: 'bien-etre', text: 'Cultivez votre paix intérieure et votre équilibre avec nos guides.' },
@@ -51,4 +58,3 @@
 
     </main>
 {% endblock %}
-

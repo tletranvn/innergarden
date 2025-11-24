@@ -56,11 +56,9 @@
                         }) }}
                     </div>
                     <div class="mb-3">
-                        {{ form_row(form.author, {
-                            'label': 'Auteur',
-                            'attr': {'class': 'form-select'},
-                            'placeholder': 'Choisissez un auteur'
-                        }) }}
+                        <label class="form-label">Auteur</label>
+                        <input type="text" class="form-control" value="{{ article.author.pseudo }}" disabled>
+                        <small class="form-text text-muted">L'auteur ne peut pas être modifié</small>
                     </div>
                     <div class="mb-3">
                         {{ form_row(form.category, {

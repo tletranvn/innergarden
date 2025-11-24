@@ -59,11 +59,9 @@
                         }) }}
                     </div>
                     <div class="mb-3">
-                        {{ form_row(form.author, {
-                            'label': 'Auteur',
-                            'attr': {'class': 'form-select'},
-                            'placeholder': 'Choisissez un auteur'
-                        }) }}
+                        <label class="form-label">Auteur</label>
+                        <input type="text" class="form-control" value="{{ app.user.pseudo }}" disabled>
+                        <small class="form-text text-muted">Vous êtes automatiquement défini comme auteur de cet article</small>
                     </div>
                     <div class="mb-3">
                         {{ form_row(form.imageFile, {

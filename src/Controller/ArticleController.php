@@ -50,6 +50,9 @@ class ArticleController extends AbstractController
         error_log("DEBUG: Request has files: " . ($request->files->count() > 0 ? 'true' : 'false'));
         
         $article = new Article();
+        // Assigner automatiquement l'utilisateur connecté comme auteur
+        $article->setAuthor($this->getUser());
+
         $form = $this->createForm(ArticleType::class, $article);
 
         $form->handleRequest($request);
