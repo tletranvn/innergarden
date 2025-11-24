@@ -55,13 +55,7 @@
                             }
                         }) }}
                     </div>
-                    <div class="mb-3">
-                        {{ form_row(form.author, {
-                            'label': 'Auteur',
-                            'attr': {'class': 'form-select'},
-                            'placeholder': 'Choisissez un auteur'
-                        }) }}
-                    </div>
+                    {# Le champ auteur n'est plus affiché - l'auteur original est préservé automatiquement dans le contrôleur #}
                     <div class="mb-3">
                         {{ form_row(form.category, {
                             'label': 'Catégorie',

@@ -87,11 +87,7 @@ class ArticleType extends AbstractType
                     )
                 ]
             ])
-            ->add('author', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'pseudo',
-                'label' => 'Auteur',
-            ])
+            // Le champ 'author' n'est plus dans le formulaire - il sera défini automatiquement dans le contrôleur
             ->add('category', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',

@@ -58,13 +58,7 @@
                             'placeholder': 'Choisissez une catégorie'
                         }) }}
                     </div>
-                    <div class="mb-3">
-                        {{ form_row(form.author, {
-                            'label': 'Auteur',
-                            'attr': {'class': 'form-select'},
-                            'placeholder': 'Choisissez un auteur'
-                        }) }}
-                    </div>
+                    {# Le champ auteur n'est plus affiché - il est automatiquement défini dans le contrôleur #}
                     <div class="mb-3">
                         {{ form_row(form.imageFile, {
                             'label': 'Image de l\'article (format JPG, PNG, GIF)',

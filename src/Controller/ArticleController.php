@@ -50,6 +50,10 @@ class ArticleController extends AbstractController
         error_log("DEBUG: Request has files: " . ($request->files->count() > 0 ? 'true' : 'false'));
         
         $article = new Article();
+
+        // Définir automatiquement l'auteur comme l'utilisateur connecté
+        $article->setAuthor($this->getUser());
+
         $form = $this->createForm(ArticleType::class, $article);
 
         $form->handleRequest($request);
@@ -162,8 +166,14 @@ class ArticleController extends AbstractController
         // Sauvegarder l'état initial de l'image pour détecter les suppressions
         $originalImagePublicId = $article->getImagePublicId();
 
+        // S'assurer que l'auteur reste inchangé lors de l'édition
+        $originalAuthor = $article->getAuthor();
+
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
+
+        // Restaurer l'auteur original (empêche toute modification)
+        $article->setAuthor($originalAuthor);
 
         error_log("DEBUG: Form submitted: " . ($form->isSubmitted() ? 'true' : 'false'));
 
