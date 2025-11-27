@@ -33,4 +33,4 @@ jobs:
           HEROKU_API_KEY=$HEROKU_API_KEY heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
 
           # Run database migrations
-          HEROKU_API_KEY=$HEROKU_API_KEY heroku run --app ${{ secrets.HEROKU_APP_NAME }} php bin/console doctrine:migrations:migrate --no-interaction
+          HEROKU_API_KEY=$HEROKU_API_KEY heroku run --app ${{ secrets.HEROKU_APP_NAME }} "php bin/console doctrine:migrations:migrate --no-interaction"
