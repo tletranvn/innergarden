@@ -195,7 +195,7 @@ select:focus-visible {
 /* HERO */
 .hero-section {
     background: linear-gradient(var(--color-hero-bg-overlay), var(--color-hero-bg-overlay)), url('../images/placeholder.png') no-repeat center center/cover;
-    padding: 150px 20px;
+    padding: 150px 20px !important;
     background-size: cover;
 }
 
