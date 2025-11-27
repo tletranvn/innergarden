@@ -31,3 +31,6 @@ jobs:
 
           # Release the image
           heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+
+          # Run database migrations
+          heroku run php bin/console doctrine:migrations:migrate --no-interaction --app ${{ secrets.HEROKU_APP_NAME }}
