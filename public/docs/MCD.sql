@@ -55,3 +55,4 @@ ALTER TABLE article ADD CONSTRAINT FK_article_category FOREIGN KEY (category_id)
 
 ALTER TABLE comment ADD CONSTRAINT FK_comment_author FOREIGN KEY (author_id) REFERENCES user (id);
 ALTER TABLE comment ADD CONSTRAINT FK_comment_article FOREIGN KEY (article_id) REFERENCES article (id);
+

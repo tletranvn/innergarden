@@ -50,19 +50,6 @@ DELETE FROM article WHERE is_published = 0;
 DELETE FROM category WHERE id = 5;
 
 
--- ========================================================================
--- B. REQUÊTES DE LECTURE (SELECT)
--- ========================================================================
--- Chaque section contient :
---   1. Le code PHP QueryBuilder original
---   2. L'équivalent SQL commenté
---   3. La requête SQL exécutable
--- ========================================================================
-
--- ========================================================================
--- 1. ArticleController::list() - Liste des articles avec filtrage par catégorie
--- ========================================================================
-
 -- QueryBuilder PHP (ArticleController.php:308-320):
 -- $queryBuilder = $articleRepository->createQueryBuilder('a')
 --     ->where('a.isPublished = :published')
@@ -92,10 +79,6 @@ WHERE a.is_published = 1
 ORDER BY a.published_at DESC;
 
 
--- ========================================================================
--- 2. AdminController::dashboard() - Articles les plus vus
--- ========================================================================
-
 -- QueryBuilder PHP (AdminController.php:48-53):
 -- $mostViewedArticles = $articleRepository->createQueryBuilder('a')
 --     ->where('a.viewCount > 0')
@@ -112,10 +95,6 @@ ORDER BY a.view_count DESC
 LIMIT 5;
 
 
--- ========================================================================
--- 3. AdminController::dashboard() - Tous les articles pour l'admin
--- ========================================================================
-
 -- QueryBuilder PHP (AdminController.php:56-57):
 -- $query = $articleRepository->createQueryBuilder('a')
 --     ->orderBy('a.createdAt', 'DESC');
@@ -125,10 +104,6 @@ SELECT a.*
 FROM article a
 ORDER BY a.created_at DESC;
 
-
--- ========================================================================
--- 4. PublishScheduledArticlesCommand - Lister tous les articles avec leurs statuts
--- ========================================================================
 
 -- QueryBuilder PHP (PublishScheduledArticlesCommand.php:36-39):
 -- $allArticles = $this->articleRepository->createQueryBuilder('a')
@@ -141,9 +116,6 @@ SELECT a.id, a.title, a.published_at, a.is_published
 FROM article a;
 
 
--- ========================================================================
--- 5. PublishScheduledArticlesCommand - Articles programmés à publier
--- ========================================================================
 
 -- QueryBuilder PHP (PublishScheduledArticlesCommand.php:56-61):
 -- $articlesToPublish = $this->articleRepository->createQueryBuilder('a')
@@ -166,10 +138,6 @@ WHERE a.published_at <= '2025-11-20 12:00:00'
   AND (a.is_published = 0 OR a.is_published IS NULL);
 
 
--- ========================================================================
--- 6. ContactRepository::findUnprocessed() - Messages non traités
--- ========================================================================
-
 -- QueryBuilder PHP (ContactRepository.php:24-29):
 -- return $this->createQueryBuilder('c')
 --     ->andWhere('c.isProcessed = :processed')
@@ -185,9 +153,6 @@ WHERE c.is_processed = 0
 ORDER BY c.created_at DESC;
 
 
--- ========================================================================
--- 7. ContactRepository::countUnprocessed() - Compter les messages non traités
--- ========================================================================
 
 -- QueryBuilder PHP (ContactRepository.php:37-42):
 -- return $this->createQueryBuilder('c')
@@ -203,9 +168,6 @@ FROM contact c
 WHERE c.is_processed = 0;
 
 
--- ========================================================================
--- 8. REQUÊTES count() UTILISÉES DANS LES CONTRÔLEURS
--- ========================================================================
 
 -- AdminController.php utilise plusieurs count() qui deviennent:
 
@@ -230,9 +192,6 @@ SELECT COUNT(*) FROM article WHERE author_id = 1; -- exemple avec user id=1
 SELECT COUNT(*) FROM comment WHERE author_id = 1; -- exemple avec user id=1
 
 
--- ========================================================================
--- 9. REQUÊTES AVEC JOINTURES COMPLEXES
--- ========================================================================
 
 -- Pour récupérer les articles avec leurs catégories et auteurs:
 SELECT
@@ -254,10 +213,6 @@ LEFT JOIN user u ON a.author_id = u.id
 WHERE a.is_published = 1
 ORDER BY a.published_at DESC;
 
-
--- ========================================================================
--- 10. STATISTIQUES AVANCÉES
--- ========================================================================
 
 -- Nombre d'articles par catégorie (publiés seulement):
 SELECT
@@ -294,10 +249,6 @@ GROUP BY u.id, u.pseudo, u.email
 ORDER BY article_count DESC;
 
 
--- ========================================================================
--- 11. REQUÊTES DE RECHERCHE ET FILTRAGE
--- ========================================================================
-
 -- Recherche d'articles par mot-clé dans le titre ou le contenu:
 SELECT a.*
 FROM article a
@@ -320,9 +271,6 @@ WHERE a.is_published = 1
 ORDER BY a.published_at DESC;
 
 
--- ========================================================================
--- 12. REQUÊTES D'AGRÉGATION
--- ========================================================================
 
 -- Moyenne des vues par catégorie:
 SELECT
@@ -345,9 +293,6 @@ GROUP BY DATE_FORMAT(a.published_at, '%Y-%m')
 ORDER BY month DESC;
 
 
--- ========================================================================
--- 13. REQUÊTES AVEC SOUS-REQUÊTES
--- ========================================================================
 
 -- Articles avec le nombre de commentaires:
 SELECT
@@ -367,9 +312,6 @@ WHERE (
 ) >= 5;
 
 
--- ========================================================================
--- 14. REQUÊTES DE MISE À JOUR
--- ========================================================================
 
 -- Incrémenter le compteur de vues d'un article (ArticleController::show):
 UPDATE article
@@ -387,6 +329,4 @@ SET is_processed = 1, processed_at = NOW()
 WHERE id = 1; -- exemple avec contact id=1
 
 
--- ========================================================================
--- FIN DU FICHIER
--- ========================================================================
+
